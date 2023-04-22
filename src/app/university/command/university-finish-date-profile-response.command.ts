@@ -1,6 +1,8 @@
 import { UniversityFinishDateProfileResponseCommand } from '@app/university/command/university-finished-date-profile-response.command';
 
-export class UniversityFinishDateProfileResponse {
+export class UniversityFinishDateProfileResponse
+  implements UniversityFinishDateProfileResponseCommand
+{
   isFished: boolean;
   comingFinishDate: Date;
   apiCalled: Date;

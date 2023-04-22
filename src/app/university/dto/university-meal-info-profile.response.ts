@@ -1,6 +1,8 @@
 import { UniversityMealInfoProfileResponseCommand } from '@app/university/command/university-meal-info-profile-response.command';
 
-export class UniversityMealInfoProfileResponse {
+export class UniversityMealInfoProfileResponse
+  implements UniversityMealInfoProfileResponseCommand
+{
   id: number;
   date: Date;
   courseA: string[];

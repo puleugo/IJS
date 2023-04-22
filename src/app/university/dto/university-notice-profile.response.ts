@@ -1,11 +1,4 @@
-export type UniversityNoticeProfileResponseCommand = {
-  id: string;
-  title: string;
-  contentsUrl: string;
-  author: string;
-  writeDate: Date;
-  major: string;
-};
+import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
 
 export class UniversityNoticeProfileResponse
   implements UniversityNoticeProfileResponseCommand
