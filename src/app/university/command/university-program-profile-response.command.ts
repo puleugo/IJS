@@ -1,10 +1,7 @@
 export type UniversityProgramProfileResponseCommand = {
   id: number;
   title: string;
-  contentsUrl: string;
-  department: string;
-  endDate: Date;
-  remainDay: number;
+  url: string;
   author: string;
-  injeId: string;
+  endAt: Date;
 };

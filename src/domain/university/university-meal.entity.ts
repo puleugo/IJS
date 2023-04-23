@@ -1,12 +1,12 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-enum MealTimeEnum {
+export enum MealTimeEnum {
   BREAKFAST = 'BREAKFAST',
   LUNCH = 'LUNCH',
   DINNER = 'DINNER',
 }
 
-enum MealCourseEnum {
+export enum MealCourseEnum {
   A = 'A',
   B = 'B',
   C = 'C',

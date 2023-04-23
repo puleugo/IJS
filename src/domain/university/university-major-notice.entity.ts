@@ -1,5 +1,6 @@
 import { UniversityMajor } from './university-major.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { IsUrl } from 'class-validator';
 
 @Entity('university_major_notices')
 export class UniversityMajorNotice {
@@ -10,13 +11,11 @@ export class UniversityMajorNotice {
   title: string;
 
   @Column()
+  @IsUrl()
   url: string;
 
   @Column()
-  authorNickname: string;
-
-  @Column()
-  noticeId: string;
+  author: string;
 
   @Column('timestamp')
   wroteAt: Date;

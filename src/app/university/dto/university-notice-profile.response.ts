@@ -3,26 +3,24 @@ import { UniversityNoticeProfileResponseCommand } from '@app/university/command/
 export class UniversityNoticeProfileResponse
   implements UniversityNoticeProfileResponseCommand
 {
-  id: string;
+  id: number;
   title: string;
-  contentsUrl: string;
+  url: string;
   author: string;
-  writeDate: Date;
+  wroteAt: Date;
   major: string;
 
   constructor({
     id,
     title,
-    contentsUrl,
+    url,
     author,
-    writeDate,
-    major,
+    wroteAt,
   }: UniversityNoticeProfileResponseCommand) {
     this.id = id;
     this.title = title;
-    this.contentsUrl = contentsUrl;
+    this.url = url;
     this.author = author;
-    this.writeDate = writeDate;
-    this.major = major;
+    this.wroteAt = wroteAt;
   }
 }

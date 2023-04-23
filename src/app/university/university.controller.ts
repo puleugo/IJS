@@ -7,6 +7,8 @@ import { UniversityProgramProfileResponse } from '@app/university/dto/university
 import { UniversityMealInfoProfileResponse } from '@app/university/dto/university-meal-info-profile.response';
 import { UniversityBusResponse } from '@app/university/dto/university-bus.response';
 
+//TODO: 기능 테스트
+//TODO: API 문서화
 @Controller('universities')
 export class UniversityController {
   constructor(private readonly universityService: UniversityService) {}
@@ -23,7 +25,9 @@ export class UniversityController {
 
   @Get('programs')
   async getUniversityPrograms(): Promise<UniversityProgramProfileResponse[]> {
-    const programs = await this.universityService.getUniversityPrograms();
+    const programs = await this.universityService.getUniversityProgramsByDate(
+      new Date(),
+    );
     return programs.map(
       (program) => new UniversityProgramProfileResponse(program),
     );
@@ -45,16 +49,19 @@ export class UniversityController {
   //   return busInfos.map((busInfo) => new UniversityNearBusResponse(busInfo));
   // }
 
-  @Get()
+  @Get('finish-date')
   async getUniversityFinishDate(): Promise<UniversityFinishDateProfileResponse> {
-    const finishDate = await this.universityService.getUniversityFinishDate();
+    const finishDate = await this.universityService.getUniversityFinishDate(
+      new Date(),
+    );
     return new UniversityFinishDateProfileResponse(finishDate);
   }
 
   @Get('calendars')
   async getUniversityCalendarInfo(): Promise<UniversityCalendarResponse> {
-    const calendarInfo =
-      await this.universityService.getUniversityCalendarInfo();
+    const calendarInfo = await this.universityService.getUniversityCalendarInfo(
+      new Date(),
+    );
     return new UniversityCalendarResponse(calendarInfo);
   }
 

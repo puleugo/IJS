@@ -16,6 +16,9 @@ export class UniversityProgram {
   @Column('text')
   title: string;
 
+  @Column()
+  author: string;
+
   @Column('text')
   @IsUrl()
   url: string;

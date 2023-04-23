@@ -1,25 +1,23 @@
 import { UniversityMealInfoProfileResponseCommand } from '@app/university/command/university-meal-info-profile-response.command';
+import { MealTimeEnum } from '../../../domain/university/university-meal.entity';
 
 export class UniversityMealInfoProfileResponse
   implements UniversityMealInfoProfileResponseCommand
 {
-  id: number;
-  date: Date;
   courseA: string[];
   courseB: string[];
   courseC: string[];
+  mealTime: MealTimeEnum;
 
   constructor({
-    id,
-    date,
     courseA,
     courseB,
     courseC,
+    mealTime,
   }: UniversityMealInfoProfileResponseCommand) {
-    this.id = id;
-    this.date = date;
     this.courseA = courseA;
     this.courseB = courseB;
     this.courseC = courseC;
+    this.mealTime = mealTime;
   }
 }

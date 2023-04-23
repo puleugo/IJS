@@ -19,10 +19,10 @@ export class UniversityEvent {
   majorId: number | null;
 
   @Column('date')
-  startedAt: Date;
+  startAt: Date;
 
   @Column('date')
-  endedAt: Date;
+  endAt: Date;
 
   @Column('boolean')
   isFinishDate: boolean;

@@ -1,8 +1,7 @@
 export type UniversityNoticeProfileResponseCommand = {
-  id: string;
+  id: number;
   title: string;
-  contentsUrl: string;
+  url: string;
   author: string;
-  writeDate: Date;
-  major: string;
+  wroteAt: Date;
 };

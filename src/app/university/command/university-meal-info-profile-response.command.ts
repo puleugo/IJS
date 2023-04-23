@@ -1,7 +1,8 @@
+import { MealTimeEnum } from '../../../domain/university/university-meal.entity';
+
 export type UniversityMealInfoProfileResponseCommand = {
-  id: number;
-  date: Date;
   courseA: string[];
   courseB: string[];
   courseC: string[];
+  mealTime: MealTimeEnum;
 };

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UniversityMealInfoProfileResponseCommand } from '@app/university/command/university-meal-info-profile-response.command';
 import { UniversityProgramProfileResponseCommand } from '@app/university/command/university-program-profile-response.command';
 import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
@@ -6,25 +6,128 @@ import { UniversityNearBusResponseCommand } from '@app/university/command/univer
 import { UniversityFinishDateProfileResponseCommand } from '@app/university/command/university-finished-date-profile-response.command';
 import { UniversityCalendarResponseCommand } from '@app/university/command/university-calendar-response.command';
 import { UniversityBusResponseCommand } from '@app/university/command/university-bus-response.command';
+import {
+  LessThanOrEqual,
+  MoreThan,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
+import { UniversityMajor } from '../../domain/university/university-major.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UniversitySemester } from '../../domain/university/university-semester.entity';
+import { UniversityEvent } from '../../domain/university/university-event.entity';
+import {
+  MealCourseEnum,
+  MealTimeEnum,
+  UniversityMeal,
+} from '../../domain/university/university-meal.entity';
+import { UniversityProgram } from '../../domain/university/university-program.entity';
+import { UniversityMajorNotice } from '../../domain/university/university-major-notice.entity';
+import { UniversityBusSchedule } from '../../domain/university/university-bus-schedule.entity';
 
+//TODO: 기능 테스트
 @Injectable()
 export class UniversityService {
+  constructor(
+    @InjectRepository(UniversityMajor)
+    private readonly universityMajorRepository: Repository<UniversityMajor>,
+    @InjectRepository(UniversitySemester)
+    private readonly universitySemesterRepository: Repository<UniversitySemester>,
+    @InjectRepository(UniversityEvent)
+    private readonly universityEventRepository: Repository<UniversityEvent>,
+    @InjectRepository(UniversityMeal)
+    private readonly universityMealRepository: Repository<UniversityMeal>,
+    @InjectRepository(UniversityProgram)
+    private readonly universityProgramRepository: Repository<UniversityProgram>,
+    @InjectRepository(UniversityMajorNotice)
+    private readonly universityMajorNoticeRepository: Repository<UniversityMajorNotice>,
+    @InjectRepository(UniversityBusSchedule)
+    private readonly universityBusScheduleRepository: Repository<UniversityBusSchedule>,
+  ) {}
+
   async getUniversityMealInfoByDate(
     date: Date,
   ): Promise<UniversityMealInfoProfileResponseCommand[]> {
-    return;
+    const meals = await this.universityMealRepository.find({
+      where: {
+        publishedAt: date,
+      },
+    });
+
+    return [
+      {
+        courseA: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.A &&
+            meal.mealTime === MealTimeEnum.BREAKFAST,
+        ).menu,
+        courseB: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.B &&
+            meal.mealTime === MealTimeEnum.BREAKFAST,
+        ).menu,
+        courseC: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.C &&
+            meal.mealTime === MealTimeEnum.BREAKFAST,
+        ).menu,
+        mealTime: MealTimeEnum.BREAKFAST,
+      },
+      {
+        courseA: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.A &&
+            meal.mealTime === MealTimeEnum.LUNCH,
+        ).menu,
+        courseB: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.B &&
+            meal.mealTime === MealTimeEnum.LUNCH,
+        ).menu,
+        courseC: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.C &&
+            meal.mealTime === MealTimeEnum.LUNCH,
+        ).menu,
+        mealTime: MealTimeEnum.LUNCH,
+      },
+      {
+        courseA: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.A &&
+            meal.mealTime === MealTimeEnum.DINNER,
+        ).menu,
+        courseB: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.B &&
+            meal.mealTime === MealTimeEnum.DINNER,
+        ).menu,
+        courseC: meals.find(
+          (meal) =>
+            meal.course === MealCourseEnum.C &&
+            meal.mealTime === MealTimeEnum.DINNER,
+        ).menu,
+        mealTime: MealTimeEnum.DINNER,
+      },
+    ];
   }
 
-  async getUniversityPrograms(): Promise<
-    UniversityProgramProfileResponseCommand[]
-  > {
-    return;
+  async getUniversityProgramsByDate(
+    date: Date,
+  ): Promise<UniversityProgramProfileResponseCommand[]> {
+    return await this.universityProgramRepository.find({
+      where: {
+        endAt: LessThanOrEqual(date),
+      },
+    });
   }
 
   async getUniversityNotices(data: {
     slug: string;
   }): Promise<UniversityNoticeProfileResponseCommand[]> {
-    return;
+    return await this.universityMajorNoticeRepository.find({
+      where: { major: { slug: data.slug } },
+    });
   }
 
   async getUniversityNearBusInfo(): Promise<
@@ -33,15 +136,124 @@ export class UniversityService {
     return;
   }
 
-  async getUniversityFinishDate(): Promise<UniversityFinishDateProfileResponseCommand> {
-    return;
+  async getUniversityFinishDate(
+    date: Date,
+  ): Promise<UniversityFinishDateProfileResponseCommand> {
+    const semester = await this.getUniversitySemesterByDate(date);
+    if (!semester) return { isFished: true, apiCalled: date };
+    const finishDate = await this.universityEventRepository.findOne({
+      where: {
+        startAt: MoreThan(semester.startedAt),
+        endAt: LessThanOrEqual(semester.endedAt),
+        isFinishDate: true,
+      },
+    });
+    if (!finishDate)
+      throw new NotFoundException('학기 종료일을 찾을 수 없습니다.');
+    return {
+      isFished: false,
+      comingFinishDate: finishDate.startAt,
+      apiCalled: date,
+    };
   }
 
-  async getUniversityCalendarInfo(): Promise<UniversityCalendarResponseCommand> {
-    return;
+  async getUniversityCalendarInfo(
+    date: Date,
+  ): Promise<UniversityCalendarResponseCommand> {
+    const events = await this.universityEventRepository.find({
+      where: {
+        startAt: MoreThanOrEqual(new Date(date.getFullYear(), 0, 1)),
+        endAt: LessThanOrEqual(new Date(date.getFullYear(), 1, 31)),
+      },
+    });
+    return await this.groupEventByMonth(events);
   }
 
   async getUniversityBusInfo(): Promise<UniversityBusResponseCommand> {
-    return;
+    const toSchoolBus = await this.universityBusScheduleRepository.find({
+      where: { toSchool: true },
+    });
+    const fromSchoolBus = await this.universityBusScheduleRepository.find({
+      where: { fromSchool: true },
+    });
+
+    return {
+      toSchool: toSchoolBus,
+      fromSchool: fromSchoolBus,
+    };
+  }
+
+  private async getUniversitySemesterByDate(
+    date: Date,
+  ): Promise<UniversitySemester> {
+    return await this.universitySemesterRepository.findOne({
+      where: {
+        startedAt: LessThanOrEqual(date),
+        endedAt: MoreThan(date),
+      },
+    });
+  }
+
+  private async groupEventByMonth(
+    events: UniversityEvent[],
+  ): Promise<UniversityCalendarResponseCommand> {
+    const result: UniversityCalendarResponseCommand = {
+      Mar: [],
+      Apr: [],
+      May: [],
+      Jun: [],
+      Jul: [],
+      Aug: [],
+      Sep: [],
+      Oct: [],
+      Nov: [],
+      Dec: [],
+      Jan: [],
+      Feb: [],
+    };
+
+    events.forEach((event) => {
+      const month = event.startAt.getMonth();
+      switch (month) {
+        case 2:
+          result.Mar.push(event);
+          break;
+        case 3:
+          result.Apr.push(event);
+          break;
+        case 4:
+          result.May.push(event);
+          break;
+        case 5:
+          result.Jun.push(event);
+          break;
+        case 6:
+          result.Jul.push(event);
+          break;
+        case 7:
+          result.Aug.push(event);
+          break;
+        case 8:
+          result.Sep.push(event);
+          break;
+        case 9:
+          result.Oct.push(event);
+          break;
+        case 10:
+          result.Nov.push(event);
+          break;
+        case 11:
+          result.Dec.push(event);
+          break;
+        case 0:
+          result.Jan.push(event);
+          break;
+        case 1:
+          result.Feb.push(event);
+          break;
+      }
+    });
+
+    return result;
   }
 }

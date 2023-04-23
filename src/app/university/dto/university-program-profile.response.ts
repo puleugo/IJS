@@ -5,30 +5,21 @@ export class UniversityProgramProfileResponse
 {
   id: number;
   title: string;
-  contentsUrl: string;
-  department: string;
-  endDate: Date;
-  remainDay: number;
+  url: string;
   author: string;
-  injeId: string;
+  endAt: Date;
 
   constructor({
     id,
     title,
-    contentsUrl,
-    department,
-    endDate,
-    remainDay,
+    url,
     author,
-    injeId,
+    endAt,
   }: UniversityProgramProfileResponseCommand) {
     this.id = id;
     this.title = title;
-    this.contentsUrl = contentsUrl;
-    this.department = department;
-    this.endDate = endDate;
-    this.remainDay = remainDay;
+    this.url = url;
+    this.endAt = endAt;
     this.author = author;
-    this.injeId = injeId;
   }
 }
