@@ -15,6 +15,9 @@ export class UniversityMajor {
   @PrimaryColumn('varchar', { length: 50 })
   name: string;
 
+  @Column('varchar', { length: 10, unique: true })
+  slug: string;
+
   @Column('text', { unique: true })
   noticeUrl: string;
 
