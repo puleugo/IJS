@@ -1,5 +1,5 @@
 import { UniversityMealInfoProfileResponseCommand } from '@app/university/command/university-meal-info-profile-response.command';
-import { MealTimeEnum } from '../../../domain/university/university-meal.interface';
+import { MealTimeEnum } from '@domain/university/university-meal.interface';
 
 export class UniversityMealInfoProfileResponse
   implements UniversityMealInfoProfileResponseCommand

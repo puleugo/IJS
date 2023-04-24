@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsUrl } from 'class-validator';
-import { IUniversityProgram } from './university-program.interface';
+import { IUniversityProgram } from '@domain/university/university-program.interface';
 
 @Entity('university_programs')
 export class UniversityProgram implements IUniversityProgram {

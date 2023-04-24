@@ -12,18 +12,18 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { UniversityMajor } from '../../domain/university/university-major.entity';
+import { UniversityMajor } from '@domain/university/university-major.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UniversitySemester } from '../../domain/university/university-semester.entity';
-import { UniversityEvent } from '../../domain/university/university-event.entity';
-import { UniversityMeal } from '../../domain/university/university-meal.entity';
-import { UniversityProgram } from '../../domain/university/university-program.entity';
-import { UniversityMajorNotice } from '../../domain/university/university-major-notice.entity';
-import { UniversityBusSchedule } from '../../domain/university/university-bus-schedule.entity';
+import { UniversitySemester } from '@domain/university/university-semester.entity';
+import { UniversityEvent } from '@domain/university/university-event.entity';
+import { UniversityMeal } from '@domain/university/university-meal.entity';
+import { UniversityProgram } from '@domain/university/university-program.entity';
+import { UniversityMajorNotice } from '@domain/university/university-major-notice.entity';
+import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
 import {
   MealCourseEnum,
   MealTimeEnum,
-} from '../../domain/university/university-meal.interface';
+} from '@domain/university/university-meal.interface';
 
 @Injectable()
 export class UniversityService {

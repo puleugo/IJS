@@ -1,4 +1,4 @@
-import { UniversityMajor } from './university-major.entity';
+import { UniversityMajor } from '@domain/university/university-major.entity';
 
 export interface IUniversityEvent {
   id: number;

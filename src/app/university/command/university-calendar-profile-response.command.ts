@@ -1,4 +1,4 @@
-import { IUniversityEvent } from '../../../domain/university/university-event.interface';
+import { IUniversityEvent } from '@domain/university/university-event.interface';
 
 export type UniversityCalendarProfileResponseCommand = Pick<
   IUniversityEvent,

@@ -1,11 +1,11 @@
-import { UniversityMajorNotice } from './university-major-notice.entity';
-import { UniversityEvent } from './university-event.entity';
+import { IUniversityMajorNotice } from '@domain/university/university-major-notice.interface';
+import { IUniversityEvent } from '@domain/university/university-event.interface';
 
 export interface IUniversityMajor {
   id: number;
   name: string;
   slug: string;
   noticeUrl: string;
-  notices: UniversityMajorNotice[];
-  events: UniversityEvent[];
+  notices: IUniversityMajorNotice[];
+  events: IUniversityEvent[];
 }

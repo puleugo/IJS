@@ -5,8 +5,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UniversityMajor } from './university-major.entity';
-import { IUniversityEvent } from './university-event.interface';
+import { IUniversityEvent } from '@domain/university/university-event.interface';
+import { UniversityMajor } from '@domain/university/university-major.entity';
 
 @Entity('university_events')
 export class UniversityEvent implements IUniversityEvent {

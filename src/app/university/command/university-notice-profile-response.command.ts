@@ -1,4 +1,4 @@
-import { IUniversityMajorNotice } from '../../../domain/university/university-major-notice.interface';
+import { IUniversityMajorNotice } from '@domain/university/university-major-notice.interface';
 
 export type UniversityNoticeProfileResponseCommand = Pick<
   IUniversityMajorNotice,

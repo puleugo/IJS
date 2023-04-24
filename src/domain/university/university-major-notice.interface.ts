@@ -1,4 +1,4 @@
-import { UniversityMajor } from './university-major.entity';
+import { IUniversityMajor } from '@domain/university/university-major.interface';
 
 export interface IUniversityMajorNotice {
   id: number;
@@ -6,5 +6,5 @@ export interface IUniversityMajorNotice {
   url: string;
   author: string;
   wroteAt: Date;
-  major: UniversityMajor;
+  major: IUniversityMajor;
 }

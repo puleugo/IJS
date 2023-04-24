@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IUniversityBusSchedule } from './university-bus-schedule.interface';
+import { IUniversityBusSchedule } from '@domain/university/university-bus-schedule.interface';
 
 @Entity('university_bus_schedules')
 export class UniversityBusSchedule implements IUniversityBusSchedule {

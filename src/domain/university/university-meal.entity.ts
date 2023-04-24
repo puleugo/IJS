@@ -3,7 +3,7 @@ import {
   IUniversityMeal,
   MealCourseEnum,
   MealTimeEnum,
-} from './university-meal.interface';
+} from '@domain/university/university-meal.interface';
 
 @Entity('university_meals')
 export class UniversityMeal implements IUniversityMeal {

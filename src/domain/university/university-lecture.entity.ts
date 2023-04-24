@@ -7,8 +7,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UniversitySemester } from './university-semester.entity';
-import { IUniversityLecture } from './university-lecture.interface';
+import { IUniversityLecture } from '@domain/university/university-lecture.interface';
+import { UniversitySemester } from '@domain/university/university-semester.entity';
 
 @Entity('university_lectures')
 export class UniversityLecture implements IUniversityLecture {

@@ -1,4 +1,4 @@
-import { IUniversityBusSchedule } from '../../../domain/university/university-bus-schedule.interface';
+import { IUniversityBusSchedule } from '@domain/university/university-bus-schedule.interface';
 
 export type UniversityBusProfileCommand = Pick<
   IUniversityBusSchedule,

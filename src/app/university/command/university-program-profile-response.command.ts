@@ -1,4 +1,4 @@
-import { IUniversityProgram } from '../../../domain/university/university-program.interface';
+import { IUniversityProgram } from '@domain/university/university-program.interface';
 
 export type UniversityProgramProfileResponseCommand = Pick<
   IUniversityProgram,

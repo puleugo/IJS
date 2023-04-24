@@ -1,4 +1,4 @@
-import { UniversityLecture } from './university-lecture.entity';
+import { IUniversityLecture } from '@domain/university/university-lecture.interface';
 
 export interface IUniversitySemester {
   id: number;
@@ -6,5 +6,5 @@ export interface IUniversitySemester {
   year: number;
   startedAt: Date;
   endedAt: Date;
-  lectures: UniversityLecture[];
+  lectures: IUniversityLecture[];
 }

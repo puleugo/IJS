@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { UniversityService } from './university.service';
 import { UniversityCalendarResponse } from '@app/university/dto/university-calendar.response';
 import { UniversityFinishDateProfileResponse } from '@app/university/command/university-finish-date-profile-response.command';
 import { UniversityNoticeProfileResponse } from '@app/university/dto/university-notice-profile.response';
@@ -8,6 +7,7 @@ import { UniversityMealInfoProfileResponse } from '@app/university/dto/universit
 import { UniversityBusResponse } from '@app/university/dto/university-bus.response';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UniversityMajorProfileResponse } from '@app/university/dto/university-major-profile.response';
+import { UniversityService } from '@app/university/university.service';
 
 @ApiTags('University')
 @Controller('universities')
