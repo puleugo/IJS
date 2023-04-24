@@ -87,6 +87,9 @@ export class UniversityController {
     return new UniversityCalendarResponse(calendarInfo);
   }
 
+  //TODO: get next bus
+  async getUniversityNextBusInfo() {}
+
   @Get('bus-info')
   @ApiOperation({ summary: '통학 버스 정보를 가져옵니다.' })
   async getUniversityBusInfo(): Promise<UniversityBusResponse> {

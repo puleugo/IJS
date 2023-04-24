@@ -8,9 +8,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UniversitySemester } from './university-semester.entity';
+import { IUniversityLecture } from './university-lecture.interface';
 
 @Entity('university_lectures')
-export class UniversityLecture {
+export class UniversityLecture implements IUniversityLecture {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

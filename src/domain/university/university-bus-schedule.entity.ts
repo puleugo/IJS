@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IUniversityBusSchedule } from './university-bus-schedule.interface';
 
 @Entity('university_bus_schedules')
-export class UniversityBusSchedule {
+export class UniversityBusSchedule implements IUniversityBusSchedule {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
