@@ -1,7 +1,6 @@
-export type UniversityProgramProfileResponseCommand = {
-  id: number;
-  title: string;
-  url: string;
-  author: string;
-  endAt: Date;
-};
+import { IUniversityProgram } from '../../../domain/university/university-program.interface';
+
+export type UniversityProgramProfileResponseCommand = Pick<
+  IUniversityProgram,
+  'id' | 'title' | 'url' | 'author' | 'endAt'
+>;

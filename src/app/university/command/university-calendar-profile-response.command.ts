@@ -1,6 +1,6 @@
-export type UniversityCalendarProfileResponseCommand = {
-  id: number;
-  title: string;
-  startAt: Date;
-  endAt: Date;
-};
+import { IUniversityEvent } from '../../../domain/university/university-event.interface';
+
+export type UniversityCalendarProfileResponseCommand = Pick<
+  IUniversityEvent,
+  'id' | 'title' | 'startAt' | 'endAt'
+>;
