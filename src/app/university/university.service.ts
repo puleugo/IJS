@@ -182,6 +182,10 @@ export class UniversityService {
     };
   }
 
+  async getMajors() {
+    return await this.universityMajorRepository.find();
+  }
+
   private async getUniversitySemesterByDate(
     date: Date,
   ): Promise<UniversitySemester> {
