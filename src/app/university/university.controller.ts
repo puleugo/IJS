@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { UniversityCalendarResponse } from '@app/university/dto/university-calendar.response';
 import { UniversityFinishDateProfileResponse } from '@app/university/command/university-finish-date-profile-response.command';
 import { UniversityNoticeProfileResponse } from '@app/university/dto/university-notice-profile.response';
@@ -8,6 +8,7 @@ import { UniversityBusResponse } from '@app/university/dto/university-bus.respon
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UniversityMajorProfileResponse } from '@app/university/dto/university-major-profile.response';
 import { UniversityService } from '@app/university/university.service';
+import { UniversityBusProfileResponse } from '@app/university/dto/university-bus-profile.response';
 
 @ApiTags('University')
 @Controller('universities')
@@ -87,8 +88,19 @@ export class UniversityController {
     return new UniversityCalendarResponse(calendarInfo);
   }
 
-  //TODO: get next bus
-  async getUniversityNextBusInfo() {}
+  @Get('next-bus-info')
+  @ApiOperation({
+    summary: '금일 학교에서 아직 탈 수 있는 버스 정보를 가져옵니다.',
+  })
+  async getUniversityNextBusInfo(
+    @Query('stationName') stationName: string,
+  ): Promise<UniversityBusProfileResponse[]> {
+    const busInfo = await this.universityService.getUniversityNextBusInfo(
+      new Date(),
+      stationName,
+    );
+    return busInfo.map((bus) => new UniversityBusProfileResponse(bus));
+  }
 
   @Get('bus-info')
   @ApiOperation({ summary: '통학 버스 정보를 가져옵니다.' })

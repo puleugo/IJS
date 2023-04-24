@@ -5,7 +5,10 @@ import { UniversityNoticeProfileResponseCommand } from '@app/university/command/
 import { UniversityNearBusResponseCommand } from '@app/university/command/university-near-bus-response.command';
 import { UniversityFinishDateProfileResponseCommand } from '@app/university/command/university-finished-date-profile-response.command';
 import { UniversityCalendarResponseCommand } from '@app/university/command/university-calendar-response.command';
-import { UniversityBusResponseCommand } from '@app/university/command/university-bus-response.command';
+import {
+  UniversityBusProfileCommand,
+  UniversityBusResponseCommand,
+} from '@app/university/command/university-bus-response.command';
 import {
   LessThanOrEqual,
   MoreThan,
@@ -24,6 +27,7 @@ import {
   MealCourseEnum,
   MealTimeEnum,
 } from '@domain/university/university-meal.interface';
+import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 
 @Injectable()
 export class UniversityService {
@@ -184,6 +188,26 @@ export class UniversityService {
 
   async getMajors() {
     return await this.universityMajorRepository.find();
+  }
+
+  async getUniversityNextBusInfo(
+    currentTime: Date,
+    stationName?: string,
+  ): Promise<UniversityBusProfileCommand[]> {
+    const busInfo = await this.universityBusScheduleRepository.find({
+      where: {
+        title: stationName,
+        fromSchool: true,
+      },
+      order: {
+        departedOn: 'ASC',
+      },
+    });
+    busInfo.map(
+      (bus) => (bus.departedOn = getDateByTime(bus.departedOn.toString())),
+    );
+
+    return busInfo.filter((bus) => bus.departedOn > currentTime);
   }
 
   private async getUniversitySemesterByDate(
