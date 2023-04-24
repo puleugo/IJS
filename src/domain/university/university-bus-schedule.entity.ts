@@ -15,9 +15,9 @@ export class UniversityBusSchedule implements IUniversityBusSchedule {
   @Column('time')
   departedOn: Date;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   toSchool: boolean;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   fromSchool: boolean;
 }
