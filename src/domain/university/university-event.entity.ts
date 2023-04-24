@@ -24,12 +24,6 @@ export class UniversityEvent {
   @Column('date')
   endAt: Date;
 
-  @Column('boolean')
-  isFinishDate: boolean;
-
-  @Column('boolean')
-  isStartedDate: boolean;
-
   @ManyToOne(() => UniversityMajor, (major) => major.events)
   @JoinColumn({ name: 'major_id', referencedColumnName: 'id' })
   major: UniversityMajor;

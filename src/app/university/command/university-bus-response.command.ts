@@ -1,4 +1,5 @@
 export type UniversityBusProfileCommand = {
+  id: number;
   title: string;
   price: number;
   departedOn: Date;

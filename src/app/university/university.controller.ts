@@ -7,7 +7,6 @@ import { UniversityProgramProfileResponse } from '@app/university/dto/university
 import { UniversityMealInfoProfileResponse } from '@app/university/dto/university-meal-info-profile.response';
 import { UniversityBusResponse } from '@app/university/dto/university-bus.response';
 
-//TODO: 기능 테스트
 //TODO: API 문서화
 @Controller('universities')
 export class UniversityController {
