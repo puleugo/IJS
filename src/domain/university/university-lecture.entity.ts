@@ -22,8 +22,14 @@ export class UniversityLecture implements IUniversityLecture {
   @Column('smallint')
   weekdayIndex: number;
 
-  @Column('text')
+  @Column('varchar', { length: 30 })
   classRoom: string;
+
+  @Column('smallint')
+  startAt: number;
+
+  @Column('smallint')
+  endAt: number;
 
   @ManyToOne(() => UniversitySemester, (semester) => semester.lectures)
   semester: UniversitySemester;
@@ -33,6 +39,12 @@ export class UniversityLecture implements IUniversityLecture {
   async validate() {
     if (this.weekdayIndex < 0 || this.weekdayIndex > 4) {
       throw new Error('weekdayIndex must be between 0 and 4');
+    }
+    if (this.startAt < 0 || this.startAt > 9) {
+      throw new Error('startAt must be between 0 and 9');
+    }
+    if (this.endAt < 0 || this.endAt > 9) {
+      throw new Error('endAt must be between 0 and 9');
     }
   }
 }
