@@ -33,11 +33,6 @@ export class UserController {
   }
 
   @Post()
-  async verifySchoolEmail() {
-    // 학교 이메일을 인증한다.
-  }
-
-  @Post()
   async verifyMajor() {
     // 학과를 인증한다.
   }
