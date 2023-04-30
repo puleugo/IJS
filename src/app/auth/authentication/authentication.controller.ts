@@ -8,7 +8,6 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
-  //TODO TEST
   @Post('oauth')
   @ApiOperation({ summary: 'Oauth 로그인' })
   @ApiBody({ type: OauthLoginRequest })
