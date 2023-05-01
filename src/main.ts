@@ -6,10 +6,18 @@ import { MainModule } from './main.module';
 
 import generateSwaggerDocument from '@infrastructure/swagger/swagger.generator';
 import { API_PREFIX } from './contants';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 (async () => {
   // Initialize app with root module
-  const app = await NestFactory.create(MainModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    MainModule,
+    new FastifyAdapter(),
+  );
+
   // Create swagger document
   SwaggerModule.setup(`${API_PREFIX}/docs`, app, generateSwaggerDocument(app), {
     swaggerOptions: { persistAuthorization: true },
