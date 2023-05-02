@@ -1,4 +1,4 @@
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 export const USER_ERRORS = {
   USER_NOT_FOUND: 'USER_NOT_FOUND',
@@ -11,7 +11,7 @@ export class UserNotFoundException extends NotFoundException {
   }
 }
 
-export class UserUnauthenticated extends UnauthorizedException {
+export class UserUnauthenticated extends BadRequestException {
   constructor() {
     super('학생 인증이 필요합니다.', USER_ERRORS.USER_UNAUTHENTICATED);
   }
