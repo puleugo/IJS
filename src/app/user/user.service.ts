@@ -19,6 +19,7 @@ import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
+import { UserUnauthenticated } from '@domain/error/user.error';
 
 @Injectable()
 export class UserService {
@@ -270,6 +271,7 @@ export class UserService {
   }
 
   async getStudentQRCode(studentId: string): Promise<string> {
+    if (!studentId) throw new UserUnauthenticated();
     const date = new Date();
     const result = date
       .toISOString()

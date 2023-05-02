@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -27,6 +28,7 @@ import {
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse } from '@app/user/dto/user-schedule-profile.response';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
+import { Request } from '@infrastructure/types/request.types';
 
 // TODO 구현
 @ApiTags('User')
@@ -38,14 +40,16 @@ export class UserController {
 
   @ApiOperation({ summary: '모바일 학생증을 발급합니다.' })
   @Get('student-qr')
-  async getStudentQRCode(): Promise<string> {
-    return await this.userService.getStudentQRCode('20230000');
+  async getStudentQRCode(@Req() { user }: Request): Promise<string> {
+    return await this.userService.getStudentQRCode(user.schoolId);
   }
 
   @ApiOperation({ summary: '입장해있는 시간표 집합의 목록을 조회합니다.' })
   @Get('schedule-sets')
-  async getScheduleSets(): Promise<UserScheduleSetPreviewResponse[]> {
-    const scheduleSets = await this.userService.getScheduleSet('userId');
+  async getScheduleSets(
+    @Req() { user }: Request,
+  ): Promise<UserScheduleSetPreviewResponse[]> {
+    const scheduleSets = await this.userService.getScheduleSet(user.id);
     return scheduleSets.map(
       (scheduleSet) => new UserScheduleSetPreviewResponse(scheduleSet),
     );
@@ -66,17 +70,20 @@ export class UserController {
 
   @ApiOperation({ summary: '시간표 집합을 생성합니다.' })
   @Post('schedule-sets')
-  async openScheduleSet(): Promise<{ scheduleSetId: string; qrUrl: string }> {
-    return await this.userService.openScheduleSet('userId');
+  async openScheduleSet(
+    @Req() { user }: Request,
+  ): Promise<{ scheduleSetId: string; qrUrl: string }> {
+    return await this.userService.openScheduleSet(user.id);
   }
 
   @ApiOperation({ summary: '특정 시간표 집합에 입장합니다.' })
   @Post('schedule-sets/:scheduleSetId')
   async joinScheduleSet(
+    @Req() { user }: Request,
     @Param('scheduleSetId') scheduleSetId: string,
   ): Promise<{ scheduleSetId: string }> {
     const scheduleSet = await this.userService.joinScheduleSet(
-      'userId',
+      user.id,
       scheduleSetId,
     );
     return { scheduleSetId: scheduleSet.id };
@@ -88,11 +95,13 @@ export class UserController {
   @ApiOperation({ summary: '특정 시간표 집합에서 특정 유저를 강퇴합니다.' })
   @Delete('schedule-sets/:scheduleSetId/kick/:userId')
   async kickUserInScheduleSet(
+    @Req() { user }: Request,
     @Param('scheduleSetId', ParseUUIDPipe) scheduleSetId: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<{ message: string }> {
     await this.userService.kickUserInScheduleSet(
-      'ownerId',
-      'userId',
+      user.id,
+      userId,
       scheduleSetId,
     );
     return {
@@ -105,11 +114,12 @@ export class UserController {
   @UseInterceptors(FileFastifyInterceptor('file', { storage: memoryStorage() }))
   @ApiConsumes('multipart/form-data')
   async updateUniversitySchedule(
+    @Req() { user }: Request,
     @Body() data?: { lectureIds: number[] },
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<UserScheduleProfileResponse> {
     const lectures = await this.userService.updateUniversitySchedule(
-      'userId',
+      user.id,
       data.lectureIds,
       file.buffer,
     );
@@ -120,12 +130,10 @@ export class UserController {
   @ApiOperation({ summary: '특정 유저를 팔로우합니다.' })
   @Post('follow/:userId')
   async followUser(
+    @Req() { user }: Request,
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<{ message: string }> {
-    await this.userService.followUser(
-      '05baec8b-1fed-4255-a008-bf2d6f9d93ff',
-      userId,
-    );
+    await this.userService.followUser(user.id, userId);
     return {
       message: 'success',
     };
@@ -136,12 +144,10 @@ export class UserController {
   @ApiOperation({ summary: '팔로우 중인 유저를 언팔로우합니다.' })
   @Delete('unfollow/:userId')
   async unfollowUser(
+    @Req() { user }: Request,
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<{ message: string }> {
-    await this.userService.unfollowUser(
-      '05baec8b-1fed-4255-a008-bf2d6f9d93ff',
-      userId,
-    );
+    await this.userService.unfollowUser(user.id, userId);
     return {
       message: 'success',
     };
