@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
-import { UserAuthVendor } from './user-auth-vendor.entity';
+import { UserAuthProvider } from './user-auth-vendor.entity';
 
 @Entity('user_auth')
 export class UserAuth {
@@ -11,11 +11,13 @@ export class UserAuth {
   userId: string;
 
   @Column('smallint', { primary: true })
-  vendorId: number;
+  providerId: number;
 
   @ManyToOne(() => User, (user) => user.auth)
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
-  @ManyToOne(() => UserAuthVendor, (vendor) => vendor.userAuth)
-  vendor: UserAuthVendor;
+  @ManyToOne(() => UserAuthProvider, (vendor) => vendor.userAuth)
+  @JoinColumn({ name: 'vendor_provider_id', referencedColumnName: 'id' })
+  provider: UserAuthProvider;
 }

@@ -5,10 +5,12 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IUniversityLecture } from '@domain/university/university-lecture.interface';
 import { UniversitySemester } from '@domain/university/university-semester.entity';
+import { User } from '@domain/user/user.entity';
 
 @Entity('university_lectures')
 export class UniversityLecture implements IUniversityLecture {
@@ -33,6 +35,9 @@ export class UniversityLecture implements IUniversityLecture {
 
   @ManyToOne(() => UniversitySemester, (semester) => semester.lectures)
   semester: UniversitySemester;
+
+  @OneToMany(() => User, (user) => user.lectures, { cascade: true })
+  users: User[];
 
   @BeforeInsert()
   @BeforeUpdate()

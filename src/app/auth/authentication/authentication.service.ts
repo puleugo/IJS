@@ -87,5 +87,14 @@ export class AuthenticationService {
     return 'test';
   }
 
-  async verifySchoolEmail() {}
+  async verifySchoolId(data: {
+    schoolEmail: string;
+    schoolId: string;
+    schoolMajor: string;
+  }) {
+    const { schoolEmail, schoolId, schoolMajor } = data;
+    await this.verifySchoolEmail(schoolEmail);
+  }
+
+  async verifySchoolEmail(email: string) {}
 }

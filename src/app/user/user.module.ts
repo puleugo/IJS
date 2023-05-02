@@ -9,6 +9,9 @@ import { ScheduleSet } from '@domain/user/schedule-set.entity';
 import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UniversityLecture } from '@domain/university/university-lecture.entity';
 import { UserLecture } from '@domain/user/user-lecture.entity';
+import { UserFollow } from '@domain/user/user-follow.entity';
+import { UserPhotoClient } from '@app/user/utils/user-photo.client';
+import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 
 @Module({
   imports: [
@@ -17,12 +20,13 @@ import { UserLecture } from '@domain/user/user-lecture.entity';
       UserAuth,
       UserAuthProvider,
       UserLecture,
+      UserFollow,
       ScheduleSet,
       UserScheduleSet,
       UniversityLecture,
     ]),
   ],
-  providers: [UserService],
+  providers: [UserService, UserPhotoClient, UserOcrClient],
   controllers: [UserController],
   exports: [UserService],
 })

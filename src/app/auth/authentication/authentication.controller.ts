@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Query } from '@nestjs/common';
 import { AuthenticationService } from '@app/auth/authentication/authentication.service';
 import { OauthLoginRequest } from '@app/auth/authentication/dto/oauth-login.request';
 import { TokenResponse } from '@app/auth/authentication/dto/token.response';
@@ -18,9 +18,17 @@ export class AuthenticationController {
     return await this.authenticationService.oauthLogin(oauthLoginRequest);
   }
 
-  @Post('verify/school-email')
-  @ApiOperation({ summary: '학교 이메일 인증' })
-  async verifySchoolEmail() {
-    await this.authenticationService.verifySchoolEmail();
+  @Post('verify/school-id')
+  @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
+  async verifySchoolId(
+    @Query('schoolEmail') schoolEmail: string,
+    @Query('schoolId') schoolId: string,
+    @Query('schoolMajor') schoolMajor: string,
+  ) {
+    await this.authenticationService.verifySchoolId({
+      schoolEmail,
+      schoolId,
+      schoolMajor,
+    });
   }
 }
