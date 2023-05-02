@@ -272,12 +272,7 @@ export class UserService {
 
   async getStudentQRCode(studentId: string): Promise<string> {
     if (!studentId) throw new UserUnauthenticated();
-    const date = new Date();
-    const result = date
-      .toISOString()
-      .replace(/[-T:.Z]/g, '')
-      .slice(0, 14);
-    return QRCode.toDataURL(`AA${studentId}-${result}`);
+    return QRCode.toDataURL(`AA${studentId}`);
   }
 
   async unfollowUser(myId: string, userId: string) {
