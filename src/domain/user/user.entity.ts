@@ -1,25 +1,41 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserAuth } from './user-auth.entity';
-import { UserProfile } from './user-profile.entity';
 import { ScheduleSet } from '@domain/user/schedule-set.entity';
 import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UserLecture } from '@domain/user/user-lecture.entity';
+import { UniversityMajor } from '@domain/university/university-major.entity';
+import { IsEmail } from 'class-validator';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => UserProfile, (profile) => profile.user)
-  profile: UserProfile;
+  @Column('int', { nullable: true })
+  majorId: number | null;
+
+  @ManyToOne(() => UniversityMajor, (major) => major.notices, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'major_id', referencedColumnName: 'id' })
+  major: UniversityMajor;
+
+  @Column('varchar', { nullable: true, length: 20 })
+  schoolId: string | null;
+
+  @Column('varchar', { nullable: true, length: 255 })
+  @IsEmail()
+  schoolEmail: string | null;
 
   @OneToMany(() => UserAuth, (auth) => auth.user)
   auth: UserAuth[];

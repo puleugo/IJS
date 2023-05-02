@@ -5,21 +5,30 @@ import { TokenResponse } from '@app/auth/authentication/dto/token.response';
 import { UserService } from '@app/user/user.service';
 import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
 import { HttpService } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
+import { ACCESS_TOKEN_EXPIRE } from '../../../contants';
+import { JwtSubjectType } from '@infrastructure/types/jwt.types';
+import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private readonly userService: UserService,
     private readonly httpService: HttpService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async oauthLogin(
     oauthLoginRequest: OauthLoginRequestCommand,
   ): Promise<TokenResponse> {
-    const user = await this.userService.findUserByOauthId({
-      code: oauthLoginRequest.code,
-      provider: oauthLoginRequest.provider,
-    });
+    let user: User;
+    switch (oauthLoginRequest.provider) {
+      case OauthLoginProviderEnum.KAKAO:
+        user = await this.kakaoOauthLogin(oauthLoginRequest.code);
+        break;
+      default:
+        throw new UnauthorizedException();
+    }
     if (user) {
       const [accessToken, refreshToken] = await Promise.all([
         this.generateAccessToken(user.id),
@@ -27,25 +36,9 @@ export class AuthenticationService {
       ]);
       return { accessToken, refreshToken };
     }
-
-    const registeredUser = await this.oauthRegister(oauthLoginRequest);
-    const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(registeredUser.id),
-      this.generateRefreshToken(registeredUser.id),
-    ]);
-    return { accessToken, refreshToken };
   }
 
-  async oauthRegister(
-    oauthLoginRequest: OauthLoginRequestCommand,
-  ): Promise<User> {
-    switch (oauthLoginRequest.provider) {
-      case OauthLoginProviderEnum.KAKAO:
-        return await this.kakaoOauthRegister(oauthLoginRequest.code);
-    }
-  }
-
-  async kakaoOauthRegister(code: string): Promise<User> {
+  async kakaoOauthLogin(code: string): Promise<User> {
     try {
       const kakaoTokenInfo = await this.httpService.axiosRef.request({
         method: 'POST',
@@ -70,6 +63,19 @@ export class AuthenticationService {
           Authorization: `Bearer ${kakaoAccessToken}`,
         },
       });
+      const user = await this.userService.findUserById(kakaoUserInfo.data.id, {
+        where: {
+          auth: {
+            provider: {
+              name: OauthLoginProviderEnum.KAKAO,
+            },
+            username: kakaoUserInfo.data.id,
+          },
+        },
+      });
+      if (user) {
+        return user;
+      }
       return await this.userService.joinUserByOauth({
         providerUsername: kakaoUserInfo.data.id,
         providerName: OauthLoginProviderEnum.KAKAO,
@@ -79,12 +85,29 @@ export class AuthenticationService {
     }
   }
 
-  async generateAccessToken(id: string): Promise<string> {
-    return 'test';
+  async getMyProfile(userId: string): Promise<UserProfileResponse> {
+    const user = await this.userService.findUserById(userId);
+    return new UserProfileResponse(user);
   }
 
-  async generateRefreshToken(id: string): Promise<string> {
-    return 'test';
+  async generateAccessToken(userId: string): Promise<string> {
+    return await this.jwtService.signAsync(
+      { user_id: userId },
+      {
+        expiresIn: ACCESS_TOKEN_EXPIRE,
+        subject: JwtSubjectType.ACCESS,
+      },
+    );
+  }
+
+  async generateRefreshToken(userId: string): Promise<string> {
+    return await this.jwtService.signAsync(
+      { user_id: userId },
+      {
+        expiresIn: ACCESS_TOKEN_EXPIRE,
+        subject: JwtSubjectType.REFRESH,
+      },
+    );
   }
 
   async verifySchoolId(data: {
@@ -97,4 +120,8 @@ export class AuthenticationService {
   }
 
   async verifySchoolEmail(email: string) {}
+
+  async getProfile(userId: string): Promise<User> {
+    return await this.userService.findUserById(userId);
+  }
 }

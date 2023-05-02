@@ -18,6 +18,7 @@ import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum'
 import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
+import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 
 @Injectable()
 export class UserService {
@@ -147,8 +148,17 @@ export class UserService {
     });
   }
 
-  async findUserById(id: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { id } });
+  async findUserById(
+    id: string,
+    options?: FindOneOptions<User>,
+  ): Promise<User> {
+    console.log(id, typeof id, options, typeof options.relations);
+    const user = await this.userRepository.findOne({
+      where: { id },
+      ...options,
+    });
+    console.log(user);
+    return user;
   }
 
   async findScheduleSetById(id: string): Promise<ScheduleSet> {

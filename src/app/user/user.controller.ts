@@ -8,21 +8,30 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from '@app/user/user.service';
 import { UserScheduleSetPreviewResponse } from '@app/user/dto/user-schedule-set-preview.response';
 import { UserScheduleSetProfileResponse } from '@app/user/dto/user-schedule-set-profile.response';
-import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   FileFastifyInterceptor,
   memoryStorage,
 } from 'fastify-file-interceptor';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse } from '@app/user/dto/user-schedule-profile.response';
+import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 
 // TODO 구현
 @ApiTags('User')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
