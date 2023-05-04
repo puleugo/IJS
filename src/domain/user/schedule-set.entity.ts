@@ -8,9 +8,10 @@ import {
 } from 'typeorm';
 import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { User } from '@domain/user/user.entity';
+import { IScheduleSet } from '@domain/user/schedule-set.interface';
 
 @Entity('schedule_sets')
-export class ScheduleSet {
+export class ScheduleSet implements IScheduleSet {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

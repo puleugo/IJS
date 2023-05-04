@@ -43,7 +43,7 @@ export class UniversityController {
   @ApiOperation({
     summary: '학과 목록을 가져옵니다.',
   })
-  async getMajorProfiles() {
+  async getMajorProfiles(): Promise<UniversityMajorProfileResponse[]> {
     const majors = await this.universityService.getMajors();
     return majors.map((major) => new UniversityMajorProfileResponse(major));
   }

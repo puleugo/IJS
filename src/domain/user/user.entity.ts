@@ -15,9 +15,10 @@ import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UserLecture } from '@domain/user/user-lecture.entity';
 import { UniversityMajor } from '@domain/university/university-major.entity';
 import { IsEmail } from 'class-validator';
+import { IUser } from '@domain/user/user.interface';
 
 @Entity('users')
-export class User {
+export class User implements IUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

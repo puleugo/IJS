@@ -8,10 +8,11 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { IUserLecture } from '@domain/user/user-lecture.interface';
 
 @Entity('user_lectures')
 @Unique(['userId', 'lectureId'])
-export class UserLecture {
+export class UserLecture implements IUserLecture {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

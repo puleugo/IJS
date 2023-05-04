@@ -29,6 +29,8 @@ import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse } from '@app/user/dto/user-schedule-profile.response';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
+import { ScheduleSetProfileResponse } from '@app/user/dto/schedule-set-profile.response';
+import { LogResponseTypes } from '@infrastructure/types/log-respone.types';
 
 // TODO 구현
 @ApiTags('User')
@@ -39,8 +41,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: '모바일 학생증을 발급합니다.' })
-  @Get('student-qr')
-  async getStudentQRCode(@Req() { user }: Request): Promise<string> {
+  @Get('my-student-qr')
+  async getMyQRCode(@Req() { user }: Request): Promise<string> {
     return await this.userService.getStudentQRCode(user.schoolId);
   }
 
@@ -72,8 +74,9 @@ export class UserController {
   @Post('schedule-sets')
   async openScheduleSet(
     @Req() { user }: Request,
-  ): Promise<{ scheduleSetId: string; qrUrl: string }> {
-    return await this.userService.openScheduleSet(user.id);
+  ): Promise<ScheduleSetProfileResponse> {
+    const scheduleSet = await this.userService.openScheduleSet(user.id);
+    return new ScheduleSetProfileResponse(scheduleSet);
   }
 
   @ApiOperation({ summary: '특정 시간표 집합에 입장합니다.' })
@@ -81,12 +84,12 @@ export class UserController {
   async joinScheduleSet(
     @Req() { user }: Request,
     @Param('scheduleSetId') scheduleSetId: string,
-  ): Promise<{ scheduleSetId: string }> {
-    const scheduleSet = await this.userService.joinScheduleSet(
-      user.id,
-      scheduleSetId,
-    );
-    return { scheduleSetId: scheduleSet.id };
+  ): Promise<LogResponseTypes> {
+    await this.userService.joinScheduleSet(user.id, scheduleSetId);
+    return {
+      status: 'success',
+      message: '입장되었습니다.',
+    };
     // QR 스캔
     // 스케쥴 세트에 유저 추가
     // 스케쥴을 연 유저를 자동으로 맞팔로우 처리
@@ -98,14 +101,15 @@ export class UserController {
     @Req() { user }: Request,
     @Param('scheduleSetId', ParseUUIDPipe) scheduleSetId: string,
     @Param('userId', ParseUUIDPipe) userId: string,
-  ): Promise<{ message: string }> {
+  ): Promise<LogResponseTypes> {
     await this.userService.kickUserInScheduleSet(
       user.id,
       userId,
       scheduleSetId,
     );
     return {
-      message: 'success',
+      status: 'success',
+      message: '강퇴되었습니다.',
     };
   }
 
@@ -123,7 +127,7 @@ export class UserController {
       data.lectureIds,
       file.buffer,
     );
-    return new UserScheduleProfileResponse({ lectures });
+    return new UserScheduleProfileResponse(lectures);
     // 수동으로 시간표를 추가한다.
   }
 
@@ -132,10 +136,11 @@ export class UserController {
   async followUser(
     @Req() { user }: Request,
     @Param('userId', ParseUUIDPipe) userId: string,
-  ): Promise<{ message: string }> {
+  ): Promise<LogResponseTypes> {
     await this.userService.followUser(user.id, userId);
     return {
-      message: 'success',
+      status: 'success',
+      message: '팔로우되었습니다.',
     };
     // 유저를 팔로우한다.
     // 팔로우한 유저의 시간표를 볼 수 있다.
@@ -146,10 +151,11 @@ export class UserController {
   async unfollowUser(
     @Req() { user }: Request,
     @Param('userId', ParseUUIDPipe) userId: string,
-  ): Promise<{ message: string }> {
+  ): Promise<LogResponseTypes> {
     await this.userService.unfollowUser(user.id, userId);
     return {
-      message: 'success',
+      status: 'success',
+      message: '언팔로우되었습니다.',
     };
   }
 

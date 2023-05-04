@@ -1,9 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 import { UserAuthProvider } from './user-auth-vendor.entity';
+import { IUserAuth } from '@domain/user/user-auth.interface';
 
 @Entity('user_auth')
-export class UserAuth {
+export class UserAuth implements IUserAuth {
   @Column('varchar', { length: 50, primary: true })
   username: string;
 

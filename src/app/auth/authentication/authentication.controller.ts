@@ -10,7 +10,13 @@ import {
 import { AuthenticationService } from '@app/auth/authentication/authentication.service';
 import { OauthLoginRequest } from '@app/auth/authentication/dto/oauth-login.request';
 import { TokenResponse } from '@app/auth/authentication/dto/token.response';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 import { Request } from '@infrastructure/types/request.types';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
@@ -20,9 +26,10 @@ import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
-  @Post('oauth')
   @ApiOperation({ summary: 'Oauth 로그인' })
   @ApiBody({ type: OauthLoginRequest })
+  @ApiResponse({ type: TokenResponse })
+  @Post('oauth')
   async oauthLogin(
     @Body() oauthLoginRequest: OauthLoginRequest,
   ): Promise<TokenResponse> {

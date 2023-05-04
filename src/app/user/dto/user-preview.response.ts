@@ -1,9 +1,9 @@
-import { User } from '@domain/user/user.entity';
+import { UserPreviewResponseCommand } from '@app/user/command/user-preview-response.command';
 
-export class UserPreviewResponse {
+export class UserPreviewResponse implements UserPreviewResponseCommand {
   id: string;
 
-  constructor({ id }: Partial<User>) {
+  constructor({ id }: UserPreviewResponseCommand) {
     this.id = id;
   }
 }

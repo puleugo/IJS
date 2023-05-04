@@ -20,6 +20,8 @@ import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { UserUnauthenticated } from '@domain/error/user.error';
+import { ScheduleSetProfileResponse } from '@app/user/dto/schedule-set-profile.response';
+import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
 
 @Injectable()
 export class UserService {
@@ -100,7 +102,7 @@ export class UserService {
 
   async openScheduleSet(
     userId: string,
-  ): Promise<{ scheduleSetId: string; qrUrl: string }> {
+  ): Promise<ScheduleSetProfileResponseCommand> {
     const owner = await this.findUserById(userId);
     const userScheduleSet = new UserScheduleSet();
     userScheduleSet.user = owner;
@@ -254,7 +256,7 @@ export class UserService {
       );
   }
 
-  async getFollowersByUserId(myId: string) {
+  async getFollowersByUserId(myId: string): Promise<User[]> {
     const follows = await this.userFollowRepository.find({
       where: { toFollowId: myId },
       relations: ['toFollow'],
@@ -262,7 +264,7 @@ export class UserService {
     return follows.map((follow) => follow.toFollow);
   }
 
-  async getFollowingByUserId(myId: string) {
+  async getFollowingByUserId(myId: string): Promise<User[]> {
     const follows = await this.userFollowRepository.find({
       where: { userId: myId },
       relations: ['user'],
@@ -275,7 +277,7 @@ export class UserService {
     return QRCode.toDataURL(`AA${studentId}`);
   }
 
-  async unfollowUser(myId: string, userId: string) {
+  async unfollowUser(myId: string, userId: string): Promise<void> {
     await this.userFollowRepository.delete({
       userId: myId,
       toFollowId: userId,

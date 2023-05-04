@@ -1,8 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserAuth } from './user-auth.entity';
+import { IUserAuthProvider } from '@domain/user/user-auth-vendor.interface';
 
 @Entity('user_auth_providers')
-export class UserAuthProvider {
+export class UserAuthProvider implements IUserAuthProvider {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

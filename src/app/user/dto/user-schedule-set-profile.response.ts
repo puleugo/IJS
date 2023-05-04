@@ -1,8 +1,11 @@
 import { UniversityLectureProfileResponse } from '@app/university/dto/university-lecture-profile.response';
 import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum';
-import { UniversityLecture } from '@domain/university/university-lecture.entity';
+import { UserScheduleSetProfileResponseCommand } from '@app/user/command/user-schedule-set-profile-response.command';
+import { IUniversityLecture } from '@domain/university/university-lecture.interface';
 
-export class UserScheduleSetProfileResponse {
+export class UserScheduleSetProfileResponse
+  implements UserScheduleSetProfileResponseCommand
+{
   userId: string;
   role: UserScheduleRoleEnum;
   lectures: { [day: string]: UniversityLectureProfileResponse[] } = {
@@ -20,7 +23,7 @@ export class UserScheduleSetProfileResponse {
   }: {
     userId: string;
     role: UserScheduleRoleEnum;
-    lectures: UniversityLecture[];
+    lectures: IUniversityLecture[];
   }) {
     this.userId = userId;
     this.role = role;

@@ -1,8 +1,9 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '@domain/user/user.entity';
+import { IUserFollow } from '@domain/user/user-follow.interface';
 
 @Entity('user_follows')
-export class UserFollow {
+export class UserFollow implements IUserFollow {
   @PrimaryColumn('uuid')
   userId: string;
 
