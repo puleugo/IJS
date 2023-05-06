@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { OauthLoginRequestCommand } from '@app/auth/authentication/command/oauth-login-request.command';
 import { User } from '@domain/user/user.entity';
 import { TokenResponse } from '@app/auth/authentication/dto/token.response';
@@ -9,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ACCESS_TOKEN_EXPIRE } from '../../../contants';
 import { JwtSubjectType } from '@infrastructure/types/jwt.types';
 import { UserProfileResponse } from '@app/user/dto/user-profile.response';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthenticationService {
@@ -16,6 +21,7 @@ export class AuthenticationService {
     private readonly userService: UserService,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async oauthLogin(
@@ -116,10 +122,26 @@ export class AuthenticationService {
     schoolMajor: string;
   }) {
     const { schoolEmail, schoolId, schoolMajor } = data;
+
     await this.verifySchoolEmail(schoolEmail);
   }
 
-  async verifySchoolEmail(email: string) {}
+  async verifySchoolEmail(email: string) {
+    console.log('verifySchoolEmail', email);
+    this.mailerService
+      .sendMail({
+        to: email, // list of receivers
+        subject: '인제생 인증 메일입니다.', // Subject line
+        text: 'welcome', // plaintext body
+        html: '<b>welcome</b>', // HTML body content
+      })
+      .then(() => {
+        console.log('이메일 송신에 성공했습니다.');
+      })
+      .catch(() => {
+        throw new BadRequestException('이메일 송신에 실패했습니다.');
+      });
+  }
 
   async getProfile(userId: string): Promise<User> {
     return await this.userService.findUserById(userId);
