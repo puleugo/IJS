@@ -5,10 +5,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UniversityMajor } from './university-major.entity';
+import { IUniversityEvent } from '@domain/university/university-event.interface';
+import { UniversityMajor } from '@domain/university/university-major.entity';
 
 @Entity('university_events')
-export class UniversityEvent {
+export class UniversityEvent implements IUniversityEvent {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -23,12 +24,6 @@ export class UniversityEvent {
 
   @Column('date')
   endAt: Date;
-
-  @Column('boolean')
-  isFinishDate: boolean;
-
-  @Column('boolean')
-  isStartedDate: boolean;
 
   @ManyToOne(() => UniversityMajor, (major) => major.events)
   @JoinColumn({ name: 'major_id', referencedColumnName: 'id' })

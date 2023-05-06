@@ -1,19 +1,12 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum MealTimeEnum {
-  BREAKFAST = 'BREAKFAST',
-  LUNCH = 'LUNCH',
-  DINNER = 'DINNER',
-}
-
-export enum MealCourseEnum {
-  A = 'A',
-  B = 'B',
-  C = 'C',
-}
+import {
+  IUniversityMeal,
+  MealCourseEnum,
+  MealTimeEnum,
+} from '@domain/university/university-meal.interface';
 
 @Entity('university_meals')
-export class UniversityMeal {
+export class UniversityMeal implements IUniversityMeal {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

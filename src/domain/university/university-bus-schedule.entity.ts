@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IUniversityBusSchedule } from '@domain/university/university-bus-schedule.interface';
 
 @Entity('university_bus_schedules')
-export class UniversityBusSchedule {
+export class UniversityBusSchedule implements IUniversityBusSchedule {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -14,9 +15,9 @@ export class UniversityBusSchedule {
   @Column('time')
   departedOn: Date;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   toSchool: boolean;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   fromSchool: boolean;
 }

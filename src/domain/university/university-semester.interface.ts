@@ -1,0 +1,10 @@
+import { IUniversityLecture } from '@domain/university/university-lecture.interface';
+
+export interface IUniversitySemester {
+  id: number;
+  name: string;
+  year: number;
+  startedAt: Date;
+  endedAt: Date;
+  lectures: IUniversityLecture[];
+}

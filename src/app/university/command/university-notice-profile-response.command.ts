@@ -1,7 +1,6 @@
-export type UniversityNoticeProfileResponseCommand = {
-  id: number;
-  title: string;
-  url: string;
-  author: string;
-  wroteAt: Date;
-};
+import { IUniversityMajorNotice } from '@domain/university/university-major-notice.interface';
+
+export type UniversityNoticeProfileResponseCommand = Pick<
+  IUniversityMajorNotice,
+  'id' | 'title' | 'url' | 'author' | 'wroteAt'
+>;

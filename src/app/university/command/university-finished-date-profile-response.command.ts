@@ -1,5 +1,5 @@
 export type UniversityFinishDateProfileResponseCommand = {
-  isFished: boolean;
+  isFinished: boolean;
   comingFinishDate?: Date;
   apiCalled: Date;
 };

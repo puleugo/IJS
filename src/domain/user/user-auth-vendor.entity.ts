@@ -1,19 +1,15 @@
-import {
-  Entity,
-  OneToMany,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserAuth } from './user-auth.entity';
+import { IUserAuthProvider } from '@domain/user/user-auth-vendor.interface';
 
-@Entity('user_auth_vendors')
-export class UserAuthVendor {
+@Entity('user_auth_providers')
+export class UserAuthProvider implements IUserAuthProvider {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @PrimaryColumn('varchar', { length: 50 })
+  @Column('varchar', { length: 50 })
   name: string;
 
-  @OneToMany(() => UserAuth, (userAuth) => userAuth.vendor)
+  @OneToMany(() => UserAuth, (userAuth) => userAuth.provider)
   userAuth: UserAuth[];
 }

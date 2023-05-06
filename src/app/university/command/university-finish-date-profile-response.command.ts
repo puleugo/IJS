@@ -3,16 +3,16 @@ import { UniversityFinishDateProfileResponseCommand } from '@app/university/comm
 export class UniversityFinishDateProfileResponse
   implements UniversityFinishDateProfileResponseCommand
 {
-  isFished: boolean;
+  isFinished: boolean;
   comingFinishDate: Date;
   apiCalled: Date;
 
   constructor({
-    isFished,
+    isFinished,
     comingFinishDate,
     apiCalled,
   }: UniversityFinishDateProfileResponseCommand) {
-    this.isFished = isFished;
+    this.isFinished = isFinished;
     this.comingFinishDate = comingFinishDate;
     this.apiCalled = apiCalled;
   }

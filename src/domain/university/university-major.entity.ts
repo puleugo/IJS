@@ -1,9 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UniversityMajorNotice } from './university-major-notice.entity';
 import { UniversityEvent } from './university-event.entity';
+import { IUniversityMajor } from './university-major.interface';
 
 @Entity('university_majors')
-export class UniversityMajor {
+export class UniversityMajor implements IUniversityMajor {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

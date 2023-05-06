@@ -3,35 +3,52 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsEmail } from 'class-validator';
-import { UserSchedule } from './user-schedule.entity';
 import { UserAuth } from './user-auth.entity';
-import { UserProfile } from './user-profile.entity';
+import { ScheduleSet } from '@domain/user/schedule-set.entity';
+import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
+import { UserLecture } from '@domain/user/user-lecture.entity';
+import { UniversityMajor } from '@domain/university/university-major.entity';
+import { IsEmail } from 'class-validator';
+import { IUser } from '@domain/user/user.interface';
 
 @Entity('users')
-export class User {
+export class User implements IUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => UserProfile, (profile) => profile.user)
-  profile: UserProfile;
+  @Column('int', { nullable: true })
+  majorId: number | null;
+
+  @ManyToOne(() => UniversityMajor, (major) => major.notices, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'major_id', referencedColumnName: 'id' })
+  major: UniversityMajor;
+
+  @Column('varchar', { nullable: true, length: 20 })
+  schoolId: string | null;
 
   @Column('varchar', { nullable: true, length: 255 })
   @IsEmail()
   schoolEmail: string | null;
 
-  @OneToMany(() => UserSchedule, (schedule) => schedule.user, {
-    onUpdate: 'CASCADE',
-  })
-  schedules: UserSchedule[];
-
   @OneToMany(() => UserAuth, (auth) => auth.user)
   auth: UserAuth[];
+
+  @OneToMany(() => UserScheduleSet, (userScheduleSet) => userScheduleSet.user)
+  userScheduleSets: UserScheduleSet[];
+
+  @OneToMany(() => ScheduleSet, (scheduleSet) => scheduleSet.owner)
+  createdScheduleSets: ScheduleSet[];
+
+  @OneToMany(() => UserLecture, (lecture) => lecture.user)
+  lectures: UserLecture[];
 
   @CreateDateColumn()
   createdAt: Date;

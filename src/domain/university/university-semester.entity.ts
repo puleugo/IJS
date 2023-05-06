@@ -1,8 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UniversityLecture } from './university-lecture.entity';
+import { IUniversitySemester } from '@domain/university/university-semester.interface';
+import { UniversityLecture } from '@domain/university/university-lecture.entity';
 
 @Entity('university_semesters')
-export class UniversitySemester {
+export class UniversitySemester implements IUniversitySemester {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

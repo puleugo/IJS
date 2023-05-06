@@ -7,9 +7,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsUrl } from 'class-validator';
+import { IUniversityProgram } from '@domain/university/university-program.interface';
 
 @Entity('university_programs')
-export class UniversityProgram {
+export class UniversityProgram implements IUniversityProgram {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

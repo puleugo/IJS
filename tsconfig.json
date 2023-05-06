@@ -19,8 +19,15 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "paths": {
-      "@app/*": ["src/app/*"],
-      "@infrastructure/*": ["src/infrastructure/*"]
+      "@app/*": [
+        "src/app/*"
+      ],
+      "@infrastructure/*": [
+        "src/infrastructure/*"
+      ],
+      "@domain/*": [
+        "src/domain/*"
+      ]
     }
   }
 }
