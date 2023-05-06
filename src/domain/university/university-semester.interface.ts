@@ -4,6 +4,7 @@ export interface IUniversitySemester {
   id: number;
   name: string;
   year: number;
+  semesterNumber: number;
   startedAt: Date;
   endedAt: Date;
   lectures: IUniversityLecture[];

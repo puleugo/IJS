@@ -17,13 +17,11 @@ export class UniversityController {
 
   @Get('meals')
   @ApiOperation({ summary: '오늘의 식단 정보를 가져옵니다.' })
-  async getTodayUniversityMealInfo(): Promise<
-    UniversityMealInfoProfileResponse[]
-  > {
-    const meals = await this.universityService.getUniversityMealInfoByDate(
+  async getTodayUniversityMealInfo(): Promise<UniversityMealInfoProfileResponse> {
+    const meal = await this.universityService.getUniversityMealInfoByDate(
       new Date(),
     );
-    return meals.map((meal) => new UniversityMealInfoProfileResponse(meal));
+    return new UniversityMealInfoProfileResponse(meal);
   }
 
   @Get('programs')
