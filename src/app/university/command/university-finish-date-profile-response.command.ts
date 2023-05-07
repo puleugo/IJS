@@ -6,14 +6,17 @@ export class UniversityFinishDateProfileResponse
   isFinished: boolean;
   comingFinishDate: Date;
   apiCalled: Date;
+  semester: number;
 
   constructor({
     isFinished,
     comingFinishDate,
     apiCalled,
+    semester,
   }: UniversityFinishDateProfileResponseCommand) {
     this.isFinished = isFinished;
     this.comingFinishDate = comingFinishDate;
     this.apiCalled = apiCalled;
+    this.semester = semester;
   }
 }

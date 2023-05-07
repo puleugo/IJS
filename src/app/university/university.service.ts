@@ -23,10 +23,7 @@ import { UniversityMeal } from '@domain/university/university-meal.entity';
 import { UniversityProgram } from '@domain/university/university-program.entity';
 import { UniversityMajorNotice } from '@domain/university/university-major-notice.entity';
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
-import {
-  MealCourseEnum,
-  MealTimeEnum,
-} from '@domain/university/university-meal.interface';
+import { MealCourseEnum } from '@domain/university/university-meal.interface';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 
 @Injectable()
@@ -48,73 +45,24 @@ export class UniversityService {
     private readonly universityBusScheduleRepository: Repository<UniversityBusSchedule>,
   ) {}
 
+  //TODO: 레디스로 캐시처리
   async getUniversityMealInfoByDate(
     date: Date,
-  ): Promise<UniversityMealInfoProfileResponseCommand[]> {
+  ): Promise<UniversityMealInfoProfileResponseCommand> {
     const meals = await this.universityMealRepository.find({
       where: {
         publishedAt: date,
       },
     });
+
     if (meals.length === 0)
       throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
 
-    return [
-      {
-        courseA: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.A &&
-            meal.mealTime === MealTimeEnum.BREAKFAST,
-        ).menu,
-        courseB: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.B &&
-            meal.mealTime === MealTimeEnum.BREAKFAST,
-        ).menu,
-        courseC: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.C &&
-            meal.mealTime === MealTimeEnum.BREAKFAST,
-        ).menu,
-        mealTime: MealTimeEnum.BREAKFAST,
-      },
-      {
-        courseA: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.A &&
-            meal.mealTime === MealTimeEnum.LUNCH,
-        ).menu,
-        courseB: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.B &&
-            meal.mealTime === MealTimeEnum.LUNCH,
-        ).menu,
-        courseC: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.C &&
-            meal.mealTime === MealTimeEnum.LUNCH,
-        ).menu,
-        mealTime: MealTimeEnum.LUNCH,
-      },
-      {
-        courseA: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.A &&
-            meal.mealTime === MealTimeEnum.DINNER,
-        ).menu,
-        courseB: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.B &&
-            meal.mealTime === MealTimeEnum.DINNER,
-        ).menu,
-        courseC: meals.find(
-          (meal) =>
-            meal.course === MealCourseEnum.C &&
-            meal.mealTime === MealTimeEnum.DINNER,
-        ).menu,
-        mealTime: MealTimeEnum.DINNER,
-      },
-    ];
+    return {
+      courseA: meals.find((meal) => meal.course === MealCourseEnum.A).menu,
+      courseB: meals.find((meal) => meal.course === MealCourseEnum.B).menu,
+      courseC: meals.find((meal) => meal.course === MealCourseEnum.C).menu,
+    };
   }
 
   async getUniversityProgramsByDate(
@@ -149,12 +97,21 @@ export class UniversityService {
     date: Date,
   ): Promise<UniversityFinishDateProfileResponseCommand> {
     const semester = await this.getUniversitySemesterByDate(date);
-    if (!semester) return { isFinished: true, apiCalled: date };
+    if (!semester) {
+      const comingSemester = await this.getUniversityComingSemesterByDate(date);
+      return {
+        isFinished: true,
+        semester: comingSemester.semesterNumber,
+        comingFinishDate: comingSemester.startedAt,
+        apiCalled: date,
+      };
+    }
     const endAt = new Date(semester.endedAt);
     const endNextDate = new Date(endAt.setDate(endAt.getDate() + 1));
 
     return {
       isFinished: false,
+      semester: semester.semesterNumber,
       comingFinishDate: endNextDate,
       apiCalled: date,
     };
@@ -219,6 +176,20 @@ export class UniversityService {
         endedAt: MoreThan(date),
       },
     });
+  }
+
+  private async getUniversityComingSemesterByDate(
+    date: Date,
+  ): Promise<UniversitySemester> {
+    const semesters = await this.universitySemesterRepository.find({
+      where: {
+        startedAt: MoreThanOrEqual(date),
+      },
+      order: {
+        startedAt: 'ASC',
+      },
+    });
+    return semesters[0];
   }
 
   private async groupEventByMonth(

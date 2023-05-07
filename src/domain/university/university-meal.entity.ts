@@ -2,7 +2,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import {
   IUniversityMeal,
   MealCourseEnum,
-  MealTimeEnum,
 } from '@domain/university/university-meal.interface';
 
 @Entity('university_meals')
@@ -18,7 +17,4 @@ export class UniversityMeal implements IUniversityMeal {
 
   @Column('date')
   publishedAt: Date;
-
-  @Column('enum', { enum: MealTimeEnum })
-  mealTime: MealTimeEnum;
 }
