@@ -3,4 +3,6 @@ export type UniversityFinishDateProfileResponseCommand = {
   comingFinishDate: Date;
   apiCalled: Date;
   semester: number;
+  middleExamAt?: Date;
+  finalExamAt?: Date;
 };

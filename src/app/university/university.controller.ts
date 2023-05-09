@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { UniversityCalendarResponse } from '@app/university/dto/university-calendar.response';
-import { UniversityFinishDateProfileResponse } from '@app/university/command/university-finish-date-profile-response.command';
 import { UniversityNoticeProfileResponse } from '@app/university/dto/university-notice-profile.response';
 import { UniversityProgramProfileResponse } from '@app/university/dto/university-program-profile.response';
 import { UniversityMealInfoProfileResponse } from '@app/university/dto/university-meal-info-profile.response';
@@ -9,6 +8,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UniversityMajorProfileResponse } from '@app/university/dto/university-major-profile.response';
 import { UniversityService } from '@app/university/university.service';
 import { UniversityBusProfileResponse } from '@app/university/dto/university-bus-profile.response';
+import { UniversityFinishDateProfileResponse } from '@app/university/dto/university-finish-date-profile.response';
 
 @ApiTags('University')
 @Controller('universities')
@@ -98,7 +98,7 @@ export class UniversityController {
   })
   @ApiResponse({ type: [UniversityBusProfileResponse] })
   async getUniversityNextBusInfo(
-    @Query('stationName') stationName: string,
+    @Query('stationName') stationName?: string,
   ): Promise<UniversityBusProfileResponse[]> {
     const busInfo = await this.universityService.getUniversityNextBusInfo(
       new Date(),

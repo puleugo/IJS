@@ -114,6 +114,8 @@ export class UniversityService {
       semester: semester.semesterNumber,
       comingFinishDate: endNextDate,
       apiCalled: date,
+      middleExamAt: semester.middleExamAt,
+      finalExamAt: semester.finalExamAt,
     };
   }
 

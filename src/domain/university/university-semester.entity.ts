@@ -22,6 +22,12 @@ export class UniversitySemester implements IUniversitySemester {
   @Column('smallint')
   semesterNumber: number;
 
+  @Column('date')
+  middleExamAt: Date;
+
+  @Column('date')
+  finalExamAt: Date;
+
   @OneToMany(() => UniversityLecture, (lecture) => lecture.semester)
   lectures: UniversityLecture[];
 }
