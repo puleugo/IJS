@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CrawlerClient } from '@infrastructure/utils/crawlerClient';
+import { CrawlerClient } from '@infrastructure/utils/crawler.client';
 
 @Injectable()
 export class UniversityProgramCrawlerClient implements CrawlerClient {
