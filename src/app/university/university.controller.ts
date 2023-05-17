@@ -4,11 +4,12 @@ import { UniversityNoticeProfileResponse } from '@app/university/dto/university-
 import { UniversityProgramProfileResponse } from '@app/university/dto/university-program-profile.response';
 import { UniversityMealInfoProfileResponse } from '@app/university/dto/university-meal-info-profile.response';
 import { UniversityBusResponse } from '@app/university/dto/university-bus.response';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UniversityMajorProfileResponse } from '@app/university/dto/university-major-profile.response';
 import { UniversityService } from '@app/university/university.service';
 import { UniversityBusProfileResponse } from '@app/university/dto/university-bus-profile.response';
 import { UniversityFinishDateProfileResponse } from '@app/university/dto/university-finish-date-profile.response';
+import { UniversityMealSearchQuery } from '@app/university/command/university-meal-info-profile-response.command';
 
 @ApiTags('University')
 @Controller('universities')
@@ -18,11 +19,26 @@ export class UniversityController {
   @Get('meals')
   @ApiOperation({ summary: '오늘의 식단 정보를 가져옵니다.' })
   @ApiResponse({ type: UniversityMealInfoProfileResponse })
-  async getTodayUniversityMealInfo(): Promise<UniversityMealInfoProfileResponse> {
-    const meal = await this.universityService.getUniversityMealInfoByDate(
+  @ApiQuery({
+    name: 'time_range',
+    enum: ['today', 'weekly'],
+  })
+  async getTodayUniversityMealInfo(
+    @Query('time_range') timeRange?: UniversityMealSearchQuery['timeRange'],
+  ): Promise<UniversityMealInfoProfileResponse> {
+    const meals = await this.universityService.getUniversityMealInfoByDate(
+      {
+        timeRange,
+      },
       new Date(),
     );
-    return new UniversityMealInfoProfileResponse(meal);
+
+    switch (timeRange) {
+      case 'today':
+        return new UniversityMealInfoProfileResponse(meals);
+      case 'weekly':
+        return new UniversityMealInfoProfileResponse(meals);
+    }
   }
 
   @Get('programs')
@@ -34,6 +50,7 @@ export class UniversityController {
     const programs = await this.universityService.getUniversityProgramsByDate(
       new Date(),
     );
+
     return programs.map(
       (program) => new UniversityProgramProfileResponse(program),
     );

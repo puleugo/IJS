@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UniversityMealInfoProfileResponseCommand } from '@app/university/command/university-meal-info-profile-response.command';
+import { UniversityMealSearchQuery } from '@app/university/command/university-meal-info-profile-response.command';
 import { UniversityProgramProfileResponseCommand } from '@app/university/command/university-program-profile-response.command';
 import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
 import { UniversityNearBusResponseCommand } from '@app/university/command/university-near-bus-response.command';
@@ -10,6 +10,7 @@ import {
   UniversityBusResponseCommand,
 } from '@app/university/command/university-bus-response.command';
 import {
+  Between,
   LessThanOrEqual,
   MoreThan,
   MoreThanOrEqual,
@@ -23,7 +24,7 @@ import { UniversityMeal } from '@domain/university/university-meal.entity';
 import { UniversityProgram } from '@domain/university/university-program.entity';
 import { UniversityMajorNotice } from '@domain/university/university-major-notice.entity';
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
-import { MealCourseEnum } from '@domain/university/university-meal.interface';
+import { IUniversityMealInfo } from '@domain/university/university-meal.interface';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 
 @Injectable()
@@ -47,22 +48,17 @@ export class UniversityService {
 
   //TODO: 레디스로 캐시처리
   async getUniversityMealInfoByDate(
+    UniversityMealSearchQuery: UniversityMealSearchQuery,
     date: Date,
-  ): Promise<UniversityMealInfoProfileResponseCommand> {
-    const meals = await this.universityMealRepository.find({
-      where: {
-        publishedAt: date,
-      },
-    });
-
-    if (meals.length === 0)
-      throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
-
-    return {
-      courseA: meals.find((meal) => meal.course === MealCourseEnum.A).menu,
-      courseB: meals.find((meal) => meal.course === MealCourseEnum.B).menu,
-      courseC: meals.find((meal) => meal.course === MealCourseEnum.C).menu,
-    };
+  ): Promise<IUniversityMealInfo[]> {
+    console.log(date);
+    switch (UniversityMealSearchQuery.timeRange) {
+      case 'today':
+        console.log('today', date);
+        return await this.getUniversityMealInfoByToday(date);
+      case 'weekly':
+        return await this.getUniversityMealInfoByWeekly(date);
+    }
   }
 
   async getUniversityProgramsByDate(
@@ -253,6 +249,58 @@ export class UniversityService {
       }
     });
 
+    return result;
+  }
+
+  private async getUniversityMealInfoByToday(
+    date: Date,
+  ): Promise<IUniversityMealInfo[]> {
+    const meals = await this.universityMealRepository.find({
+      where: {
+        publishedAt: date,
+      },
+    });
+
+    if (meals.length === 0)
+      throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
+    console.log(meals);
+    const courseA = meals.find((meal) => meal.course === 'A');
+    const courseB = meals.find((meal) => meal.course === 'B');
+    const courseC = meals.find((meal) => meal.course === 'C');
+    return [{ courseA, courseB, courseC }];
+  }
+
+  private async getUniversityMealInfoByWeekly(
+    date: Date,
+  ): Promise<IUniversityMealInfo[]> {
+    const lastMonday = new Date(
+      date.setDate(date.getDate() - date.getDay() + 1),
+    );
+
+    const meals = await this.universityMealRepository.find({
+      where: {
+        publishedAt: Between(
+          lastMonday,
+          new Date(date.getFullYear(), date.getMonth(), date.getDate() + 4),
+        ),
+      },
+      order: {
+        publishedAt: 'ASC',
+      },
+    });
+
+    const courseA = meals.filter((meal) => meal.course === 'A');
+    const courseB = meals.filter((meal) => meal.course === 'B');
+    const courseC = meals.filter((meal) => meal.course === 'C');
+
+    const result: IUniversityMealInfo[] = [];
+    for (let i = 0; i < 5; i++) {
+      result.push({
+        courseA: courseA[i],
+        courseB: courseB[i],
+        courseC: courseC[i],
+      });
+    }
     return result;
   }
 }
