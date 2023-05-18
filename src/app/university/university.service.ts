@@ -26,6 +26,7 @@ import { UniversityMajorNotice } from '@domain/university/university-major-notic
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
 import { IUniversityMealInfo } from '@domain/university/university-meal.interface';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
+import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 
 @Injectable()
 export class UniversityService {
@@ -273,9 +274,7 @@ export class UniversityService {
   private async getUniversityMealInfoByWeekly(
     date: Date,
   ): Promise<IUniversityMealInfo[]> {
-    const lastMonday = new Date(
-      date.setDate(date.getDate() - date.getDay() + 1),
-    );
+    const lastMonday = getLastMondayByDate(date);
 
     const meals = await this.universityMealRepository.find({
       where: {
