@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { DeliveryService } from '@app/delivery/delivery.service';
 import { ApiTags } from '@nestjs/swagger';
-import { dirxml } from 'console';
 import { DeliveryPreviewResponse } from '@app/delivery/dto/delivery-profile.response';
 
 @ApiTags('Delivery')
