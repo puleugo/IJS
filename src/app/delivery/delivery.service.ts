@@ -68,8 +68,7 @@ export class DeliveryService {
   async deleteDelivery(deliveryId: number): Promise<void> {
     const delivery = await this.deliveryRepository.findOne({
       where: { id: deliveryId },
-    }); // 영속성,
-    // 데이터
+    }); 
 
     await this.deliveryRepository.softDelete(deliveryId);
   }
