@@ -33,7 +33,10 @@ export class DeliveryService {
   }
 
   async getDeliveryById(deliveryId: number): Promise<Delivery> {
-    return await this.deliveryRepository.findOne({ where: { id: deliveryId } });
+    if (!deliveryId) throw new NotFoundException();
+    else{
+      return await this.deliveryRepository.findOne({ where: { id: deliveryId } });
+    }
   }
 
   async makeDelivery(delivery: {

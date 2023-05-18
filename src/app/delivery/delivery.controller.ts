@@ -31,9 +31,6 @@ export class DeliveryController {
     @Param('deliveryId', ParseIntPipe) deliveryId: number,
   ) {
     const delivery = await this.deliveryService.getDeliveryById(deliveryId);
-    if (!delivery) {
-      console.log('정보가 없습니다');
-    }
     return delivery;
   }
 
