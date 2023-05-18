@@ -1,5 +1,5 @@
 import { Delivery } from '@domain/delivery/delivery.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 //import { DeliveryPreviewResponse } from '@common/dto/delivery/delivery.dto';
 
@@ -15,6 +15,7 @@ import { User } from '@domain/user/user.entity';
 import {
   UserNotFoundException,
   DuplicatiedUserException,
+  UserAlreadyJoin,
 } from '@domain/error/user.error';
 
 @Injectable()
@@ -61,6 +62,8 @@ export class DeliveryService {
       },
     });
     if (!finduser) throw new UserNotFoundException();
+    if (delivery.users.some(user=>user.id===finduser.id)){
+      throw new UserAlreadyJoin()};
     const updatedDelivery = await this.deliveryRepository.save({
       ...delivery,
       users: [...delivery.users, finduser],
