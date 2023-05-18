@@ -21,7 +21,7 @@ export class DeliveryController {
   async getDeliveries(): Promise<DeliveryPreviewResponse[]> {
     const deliveries = await this.deliveryService.getDeliveries();
     return deliveries.map(
-      (deliveryService) => new DeliveryPreviewResponse(deliveryService),
+      (delivery) => new DeliveryPreviewResponse(delivery),
     );
   }
 
