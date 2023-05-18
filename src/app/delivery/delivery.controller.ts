@@ -42,7 +42,6 @@ export class DeliveryController {
       orderId: string;
       storeUrl: string;
       orderUrl: string;
-      show: boolean;
     },
   ) {
     await this.deliveryService.makeDelivery(deliveryData);
@@ -53,7 +52,8 @@ export class DeliveryController {
     @Param('orderId', ParseIntPipe) orderId: number,
     @Param('userId', ParseUUIDPipe) userId: string,
   ) {
-    await this.deliveryService.joinDelivery(orderId, userId);
+    const join = await this.deliveryService.joinDelivery(orderId, userId);
+    return join;
   }
 
   @Delete(':deliveryId')
