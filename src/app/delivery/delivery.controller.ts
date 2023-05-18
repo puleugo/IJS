@@ -13,7 +13,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { dirxml } from 'console';
 import { DeliveryPreviewResponse } from '@app/delivery/dto/delivery-profile.response';
 
-//TODO: 구현
 @ApiTags('Delivery')
 @Controller('deliveries')
 export class DeliveryController {
