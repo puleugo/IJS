@@ -19,13 +19,13 @@ export class UniversityMajor implements IUniversityMajor {
   @Column('varchar', { length: 50 })
   name: string;
 
-  @Column('varchar', { length: 10, unique: true })
+  @Column('varchar', { length: 50, unique: true, nullable: true })
   slug: string;
 
   @Column('int')
   departmentId: number;
 
-  @Column('text', { unique: true })
+  @Column('text', { unique: true, nullable: true })
   noticeUrl: string;
 
   @ManyToOne(() => UniversityDepartment, (department) => department.majors)

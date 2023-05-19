@@ -13,6 +13,9 @@ export class UniversityDepartment implements IUniversityDepartment {
   @Column({ nullable: true })
   url: string | null;
 
+  @Column({ nullable: true })
+  slug: string | null;
+
   @OneToMany(() => UniversityMajor, (major) => major.department)
   majors: UniversityMajor[];
 }
