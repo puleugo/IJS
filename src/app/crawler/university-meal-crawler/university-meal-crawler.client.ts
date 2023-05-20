@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { CrawlerClient } from '@infrastructure/utils/crawler.client';
 import { Repository } from 'typeorm';
 import { UniversityMeal } from '@domain/university/university-meal.entity';
@@ -9,7 +9,9 @@ import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-da
 import { Crawler } from '@domain/crawler/crawler.entity';
 
 @Injectable()
-export class UniversityMealCrawlerClient implements CrawlerClient {
+export class UniversityMealCrawlerClient
+  implements CrawlerClient, OnApplicationBootstrap
+{
   constructor(
     @InjectRepository(UniversityMeal)
     private readonly universityMealRepository: Repository<UniversityMeal>,
@@ -17,14 +19,34 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
     private readonly crawlerRepository: Repository<Crawler>,
   ) {}
 
+  onApplicationBootstrap(): any {
+    this.crawl();
+  }
+
   async crawl(): Promise<any> {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
     const browser = await puppeteer.launch({
-      headless: 'new',
+      headless: false,
       waitForInitialPage: true,
     });
+
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      if (
+        req.resourceType() === 'image' ||
+        req.resourceType() === 'font' ||
+        req.resourceType() === 'stylesheet' ||
+        req.resourceType() === 'script' ||
+        req.resourceType() === 'stylesheet' ||
+        req.resourceType() === 'media'
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     await page.goto(url, { waitUntil: 'networkidle2' });
 
     const weekDay = getLastMondayByDate(new Date());
@@ -73,6 +95,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
 
       await this.universityMealRepository.save(meals);
     }
+    await browser.close();
     return;
   }
 

@@ -27,6 +27,20 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
       waitForInitialPage: true,
     });
     const page = await browser.newPage();
+    page.on('request', (req) => {
+      if (
+        req.resourceType() === 'image' ||
+        req.resourceType() === 'font' ||
+        req.resourceType() === 'stylesheet' ||
+        req.resourceType() === 'script' ||
+        req.resourceType() === 'stylesheet' ||
+        req.resourceType() === 'media'
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     await page.goto(url, { waitUntil: 'networkidle2' });
 
     let currentYear = new Date().getFullYear();

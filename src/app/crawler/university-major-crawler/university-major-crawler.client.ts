@@ -24,6 +24,20 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
       headless: 'new',
     });
     const page = await browser.newPage();
+    page.on('request', (req) => {
+      if (
+        req.resourceType() === 'image' ||
+        req.resourceType() === 'font' ||
+        req.resourceType() === 'stylesheet' ||
+        req.resourceType() === 'script' ||
+        req.resourceType() === 'stylesheet' ||
+        req.resourceType() === 'media'
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     await page.goto(url, { waitUntil: 'networkidle2' });
 
     const departments: {
