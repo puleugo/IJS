@@ -22,6 +22,9 @@ export class Delivery {
   @Column()
   orderUrl: string;
 
+  @Column()
+  deliveryUrl: string;
+
   @OneToMany(() => User, (user) => user.delivery)
   users: User[];
 

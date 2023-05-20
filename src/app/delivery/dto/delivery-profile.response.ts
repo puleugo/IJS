@@ -13,7 +13,14 @@ export class DeliveryPreviewResponse {
     storeUrl,
     deliveryUrl,
     createdAt,
-  }: any) {
+  }: {
+    id: number;
+    orderName: string;
+    orderUrl: string;
+    storeUrl: string;
+    deliveryUrl: string;
+    createdAt: Date;
+  }) {
     this.id = id;
     this.orderName = orderName;
     this.orderUrl = orderUrl;
