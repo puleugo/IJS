@@ -3,5 +3,6 @@ import { UniversityLectureCrawlerClient } from '@app/crawler/university-lecture-
 
 @Module({
   providers: [UniversityLectureCrawlerClient],
+  exports: [UniversityLectureCrawlerClient],
 })
 export class UniversityLectureCrawlerModule {}

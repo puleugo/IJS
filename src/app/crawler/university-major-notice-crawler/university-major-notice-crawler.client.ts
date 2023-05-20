@@ -12,4 +12,6 @@ export class UniversityMajorNoticeCrawlerClient implements CrawlerClient {
   async getStatus(): Promise<any> {
     return;
   }
+
+  async initialize(): Promise<void> {}
 }

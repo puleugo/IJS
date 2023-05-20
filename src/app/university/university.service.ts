@@ -264,7 +264,6 @@ export class UniversityService {
 
     if (meals.length === 0)
       throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
-    console.log(meals);
     const courseA = meals.find((meal) => meal.course === 'A');
     const courseB = meals.find((meal) => meal.course === 'B');
     const courseC = meals.find((meal) => meal.course === 'C');

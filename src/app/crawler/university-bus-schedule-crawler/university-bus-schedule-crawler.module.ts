@@ -3,5 +3,6 @@ import { UniversityBusScheduleCrawlerClient } from '@app/crawler/university-bus-
 
 @Module({
   providers: [UniversityBusScheduleCrawlerClient],
+  exports: [UniversityBusScheduleCrawlerClient],
 })
 export class UniversityBusScheduleCrawlerModule {}

@@ -3,5 +3,6 @@ import { UniversityMajorNoticeCrawlerClient } from '@app/crawler/university-majo
 
 @Module({
   providers: [UniversityMajorNoticeCrawlerClient],
+  exports: [UniversityMajorNoticeCrawlerClient],
 })
 export class UniversityMajorNoticeCrawlerModule {}

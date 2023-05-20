@@ -1,7 +1,13 @@
-export type CrawlerClient = {
-  crawl(): Promise<void>;
-  getStatus(): Promise<CrawlerClientStatus>;
-};
+export abstract class CrawlerClient {
+  abstract crawl(): Promise<void>;
+
+  abstract getStatus(): Promise<CrawlerClientStatus>;
+
+  abstract initialize(
+    name: string,
+    executeIntervalHours: number,
+  ): Promise<void>;
+}
 
 export type CrawlerClientStatus = {
   status: CrawlerClientStatusEnum;

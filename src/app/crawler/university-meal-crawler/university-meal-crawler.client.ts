@@ -6,19 +6,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as puppeteer from 'puppeteer';
 import { MealCourseEnum } from '@domain/university/university-meal.interface';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
+import { Crawler } from '@domain/crawler/crawler.entity';
 
 @Injectable()
 export class UniversityMealCrawlerClient implements CrawlerClient {
   constructor(
     @InjectRepository(UniversityMeal)
     private readonly universityMealRepository: Repository<UniversityMeal>,
+    @InjectRepository(Crawler)
+    private readonly crawlerRepository: Repository<Crawler>,
   ) {}
 
   async crawl(): Promise<any> {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: 'new',
       waitForInitialPage: true,
     });
     const page = await browser.newPage();
@@ -75,5 +78,20 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
 
   async getStatus(): Promise<any> {
     return;
+  }
+
+  async initialize(
+    name: 'university-meal-crawler',
+    executeIntervalHours: number,
+  ): Promise<void> {
+    const crawler = await this.crawlerRepository.findOne({ where: { name } });
+    if (!crawler) {
+      await this.crawlerRepository.save({
+        name,
+        executeIntervalHours,
+      });
+      return;
+    }
+    await this.crawlerRepository.update(crawler, { executeIntervalHours });
   }
 }

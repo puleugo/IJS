@@ -6,9 +6,15 @@ import { UniversityLectureCrawlerModule } from '@app/crawler/university-lecture-
 import { UniversityMajorCrawlerModule } from '@app/crawler/university-major-crawler/university-major-crawler.module';
 import { UniversityMajorNoticeCrawlerModule } from '@app/crawler/university-major-notice-crawler/university-major-notice-crawler.module';
 import { UniversityProgramCrawlerModule } from '@app/crawler/university-program-crawler/university-program-crawler.module';
+import { CrawlerService } from '@app/crawler/crawler.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Crawler } from '@domain/crawler/crawler.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Crawler]),
+    ScheduleModule.forRoot(),
     UniversityBusScheduleCrawlerModule,
     UniversityEventCrawlerModule,
     UniversityLectureCrawlerModule,
@@ -17,5 +23,6 @@ import { UniversityProgramCrawlerModule } from '@app/crawler/university-program-
     UniversityMealCrawlerModule,
     UniversityProgramCrawlerModule,
   ],
+  providers: [CrawlerService],
 })
 export class CrawlerModule {}

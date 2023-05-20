@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { UniversityMajor } from '@domain/university/university-major.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UniversityDepartment } from '@domain/university/university-department.entity';
+import { Crawler } from '@domain/crawler/crawler.entity';
 
 @Injectable()
 export class UniversityMajorCrawlerClient implements CrawlerClient {
@@ -13,6 +14,8 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
     private readonly universityMajorRepository: Repository<UniversityMajor>,
     @InjectRepository(UniversityDepartment)
     private readonly universityDepartmentRepository: Repository<UniversityDepartment>,
+    @InjectRepository(Crawler)
+    private readonly crawlerRepository: Repository<Crawler>,
   ) {}
 
   async crawl(): Promise<any> {
@@ -82,5 +85,20 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
 
   async getStatus(): Promise<any> {
     return;
+  }
+
+  async initialize(
+    name: 'university-major-crawler',
+    executeIntervalHours: number,
+  ): Promise<void> {
+    const crawler = await this.crawlerRepository.findOne({ where: { name } });
+    if (!crawler) {
+      await this.crawlerRepository.save({
+        name,
+        executeIntervalHours,
+      });
+      return;
+    }
+    await this.crawlerRepository.update(crawler, { executeIntervalHours });
   }
 }

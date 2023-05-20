@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as puppeteer from 'puppeteer';
 import { removeEscapeCharacters } from '@infrastructure/utils/remove-escape-characters';
 import { UniversitySemester } from '@domain/university/university-semester.entity';
+import { Crawler } from '@domain/crawler/crawler.entity';
 
 @Injectable()
 export class UniversityEventCrawlerClient implements CrawlerClient {
@@ -14,6 +15,8 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
     private readonly universityEventRepository: Repository<UniversityEvent>,
     @InjectRepository(UniversitySemester)
     private readonly universitySemesterRepository: Repository<UniversitySemester>,
+    @InjectRepository(Crawler)
+    private readonly crawlerRepository: Repository<Crawler>,
   ) {}
 
   async crawl(): Promise<void> {
@@ -70,6 +73,21 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
 
   async getStatus(): Promise<any> {
     return;
+  }
+
+  async initialize(
+    name: 'university-event-crawler',
+    executeIntervalHours: number,
+  ): Promise<void> {
+    const crawler = await this.crawlerRepository.findOne({ where: { name } });
+    if (!crawler) {
+      await this.crawlerRepository.save({
+        name,
+        executeIntervalHours,
+      });
+      return;
+    }
+    await this.crawlerRepository.update(crawler, { executeIntervalHours });
   }
 
   private async getDatesByEventKey(
