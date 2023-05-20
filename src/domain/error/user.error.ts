@@ -31,6 +31,6 @@ export class DuplicatiedUserException extends ConflictException {
 
 export class UserAlreadyJoin extends ConflictException {
   constructor() {
-  super('이미 참여한 회원입니다.', USER_ERRORS.USER_ALREADY_JOIN);
+    super('이미 참여한 회원입니다.', USER_ERRORS.USER_ALREADY_JOIN);
   }
 }

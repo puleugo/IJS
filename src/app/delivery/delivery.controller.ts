@@ -6,11 +6,14 @@ import {
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
-  Post
+  Post,
 } from '@nestjs/common';
 import { DeliveryService } from '@app/delivery/delivery.service';
 import { ApiTags } from '@nestjs/swagger';
-import { DeliveryPreviewResponse, DeliveryData} from '@app/delivery/dto/delivery-profile.response';
+import {
+  DeliveryPreviewResponse,
+  DeliveryData,
+} from '@app/delivery/dto/delivery-profile.response';
 
 @ApiTags('Delivery')
 @Controller('deliveries')
@@ -20,11 +23,8 @@ export class DeliveryController {
   @Get()
   async getDeliveries(): Promise<DeliveryPreviewResponse[]> {
     const deliveries = await this.deliveryService.getDeliveries();
-    return deliveries.map(
-      (delivery) => new DeliveryPreviewResponse(delivery),
-    );
+    return deliveries.map((delivery) => new DeliveryPreviewResponse(delivery));
   }
-
 
   @Get(':deliveryId')
   async getDeliveryProfile(

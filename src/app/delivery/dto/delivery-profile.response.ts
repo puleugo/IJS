@@ -1,5 +1,3 @@
-import { type } from "os";
-
 export class DeliveryPreviewResponse {
   id: number;
   orderName: string;
@@ -30,4 +28,4 @@ export type DeliveryData = {
   orderId: string;
   storeUrl: string;
   orderUrl: string;
-}
+};

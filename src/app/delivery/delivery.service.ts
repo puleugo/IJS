@@ -1,20 +1,12 @@
 import { Delivery } from '@domain/delivery/delivery.entity';
-import { Injectable, NotFoundException, } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryData } from '@app/delivery/dto/delivery-profile.response';
 
-import {
-  LessThan,
-  LessThanOrEqual,
-  MoreThan,
-  MoreThanOrEqual,
-  OneToMany,
-  Repository,
-} from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import {
   UserNotFoundException,
-  DuplicatiedUserException,
   UserAlreadyJoin,
 } from '@domain/error/user.error';
 
@@ -35,8 +27,10 @@ export class DeliveryService {
 
   async getDeliveryById(deliveryId: number): Promise<Delivery> {
     if (!deliveryId) throw new NotFoundException();
-    else{
-      return await this.deliveryRepository.findOne({ where: { id: deliveryId } });
+    else {
+      return await this.deliveryRepository.findOne({
+        where: { id: deliveryId },
+      });
     }
   }
 
@@ -57,8 +51,9 @@ export class DeliveryService {
       },
     });
     if (!finduser) throw new UserNotFoundException();
-    if (delivery.users.some(user=>user.id===finduser.id)){
-      throw new UserAlreadyJoin()};
+    if (delivery.users.some((user) => user.id === finduser.id)) {
+      throw new UserAlreadyJoin();
+    }
     const updatedDelivery = await this.deliveryRepository.save({
       ...delivery,
       users: [...delivery.users, finduser],
@@ -67,10 +62,6 @@ export class DeliveryService {
   }
 
   async deleteDelivery(deliveryId: number): Promise<void> {
-    const delivery = await this.deliveryRepository.findOne({
-      where: { id: deliveryId },
-    }); 
-
     await this.deliveryRepository.softDelete(deliveryId);
   }
 }
