@@ -1,8 +1,15 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 import { UniversityMajor } from '@domain/university/university-major.entity';
 import { IUniversityDepartment } from '@domain/university/university-department.interface';
 
 @Entity({ name: 'university_departments' })
+@Unique(['name', 'url'])
 export class UniversityDepartment implements IUniversityDepartment {
   @PrimaryGeneratedColumn('increment')
   id: number;

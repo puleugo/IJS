@@ -1,10 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import {
   IUniversityMeal,
   MealCourseEnum,
 } from '@domain/university/university-meal.interface';
 
 @Entity('university_meals')
+@Unique(['course', 'publishedAt'])
 export class UniversityMeal implements IUniversityMeal {
   @PrimaryGeneratedColumn('increment')
   id: number;

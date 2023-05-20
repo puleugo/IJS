@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { UniversityMajorNotice } from './university-major-notice.entity';
 import { UniversityEvent } from './university-event.entity';
@@ -12,6 +13,7 @@ import { IUniversityMajor } from './university-major.interface';
 import { UniversityDepartment } from '@domain/university/university-department.entity';
 
 @Entity('university_majors')
+@Unique(['name', 'departmentId'])
 export class UniversityMajor implements IUniversityMajor {
   @PrimaryGeneratedColumn('increment')
   id: number;
