@@ -1,3 +1,5 @@
+import { type } from "os";
+
 export class DeliveryPreviewResponse {
   id: number;
   orderName: string;
@@ -21,4 +23,11 @@ export class DeliveryPreviewResponse {
     this.createdAt = createdAt;
     this.deliveryUrl = deliveryUrl;
   }
+}
+
+export type DeliveryData = {
+  orderName: string;
+  orderId: string;
+  storeUrl: string;
+  orderUrl: string;
 }

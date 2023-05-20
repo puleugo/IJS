@@ -1,7 +1,7 @@
 import { Delivery } from '@domain/delivery/delivery.entity';
 import { Injectable, NotFoundException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-//import { DeliveryPreviewResponse } from '@common/dto/delivery/delivery.dto';
+import { DeliveryData } from '@app/delivery/dto/delivery-profile.response';
 
 import {
   LessThan,
@@ -40,12 +40,7 @@ export class DeliveryService {
     }
   }
 
-  async makeDelivery(delivery: {
-    orderName: string;
-    orderId: string;
-    storeUrl: string;
-    orderUrl: string;
-  }): Promise<Delivery> {
+  async makeDelivery(delivery: DeliveryData): Promise<Delivery> {
     return await this.deliveryRepository.save(delivery);
   }
 

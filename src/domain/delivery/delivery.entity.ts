@@ -35,3 +35,4 @@ export class Delivery {
   @DeleteDateColumn()
   deletedAt: Date | null;
 }
+

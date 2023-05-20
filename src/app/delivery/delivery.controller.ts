@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { DeliveryService } from '@app/delivery/delivery.service';
 import { ApiTags } from '@nestjs/swagger';
-import { DeliveryPreviewResponse } from '@app/delivery/dto/delivery-profile.response';
+import { DeliveryPreviewResponse, DeliveryData} from '@app/delivery/dto/delivery-profile.response';
 
 @ApiTags('Delivery')
 @Controller('deliveries')
@@ -37,12 +37,7 @@ export class DeliveryController {
   @Post()
   async createDelivery(
     @Body()
-    deliveryData: {
-      orderName: string;
-      orderId: string;
-      storeUrl: string;
-      orderUrl: string;
-    },
+    deliveryData: DeliveryData,
   ) {
     await this.deliveryService.makeDelivery(deliveryData);
   }
