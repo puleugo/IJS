@@ -1,4 +1,4 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CrawlerClient } from '@infrastructure/utils/crawler.client';
 import { Repository } from 'typeorm';
 import { UniversityMeal } from '@domain/university/university-meal.entity';
@@ -9,19 +9,13 @@ import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-da
 import { Crawler } from '@domain/crawler/crawler.entity';
 
 @Injectable()
-export class UniversityMealCrawlerClient
-  implements CrawlerClient, OnApplicationBootstrap
-{
+export class UniversityMealCrawlerClient implements CrawlerClient {
   constructor(
     @InjectRepository(UniversityMeal)
     private readonly universityMealRepository: Repository<UniversityMeal>,
     @InjectRepository(Crawler)
     private readonly crawlerRepository: Repository<Crawler>,
   ) {}
-
-  onApplicationBootstrap(): any {
-    this.crawl();
-  }
 
   async crawl(): Promise<any> {
     const url =
