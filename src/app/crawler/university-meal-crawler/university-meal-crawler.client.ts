@@ -21,7 +21,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: 'new',
       waitForInitialPage: true,
     });
 
@@ -45,8 +45,8 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
 
     const weekDay = getLastMondayByDate(new Date());
 
-    for (let i = 3; i < 7; i++) {
-      const meals: UniversityMeal[] = [];
+    const meals: UniversityMeal[] = [];
+    for (let i = 3; i < 8; i++) {
       const elem1 = await page.$(
         `#table1 > tbody > tr:nth-child(1) > td:nth-child(${i})`,
       );
@@ -56,7 +56,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
         await this.universityMealRepository.create({
           menu: courseA.split(','),
           course: MealCourseEnum.A,
-          publishedAt: weekDay,
+          publishedAt: new Date(weekDay.valueOf()),
         }),
       );
 
@@ -69,7 +69,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
         await this.universityMealRepository.create({
           menu: courseB.split(','),
           course: MealCourseEnum.B,
-          publishedAt: weekDay,
+          publishedAt: new Date(weekDay.valueOf()),
         }),
       );
 
@@ -81,14 +81,12 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
         await this.universityMealRepository.create({
           menu: courseC.split(','),
           course: MealCourseEnum.C,
-          publishedAt: weekDay,
+          publishedAt: new Date(weekDay.valueOf()),
         }),
       );
-
       weekDay.setDate(weekDay.getDate() + 1);
-
-      await this.universityMealRepository.save(meals);
     }
+    await this.universityMealRepository.save(meals);
     await browser.close();
     return;
   }

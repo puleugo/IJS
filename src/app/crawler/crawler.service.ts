@@ -45,7 +45,7 @@ export class CrawlerService implements OnApplicationBootstrap {
     );
   }
 
-  private async executeCrawler(crawlerName: string): Promise<void> {
+  private executeCrawler(crawlerName: string): Promise<void> {
     switch (crawlerName) {
       case 'university-bus-schedule-crawler':
         return this.universityBusScheduleCrawlerClient.crawl();
