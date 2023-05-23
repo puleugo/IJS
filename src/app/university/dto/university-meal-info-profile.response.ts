@@ -38,6 +38,7 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '화요일 식단 정보',
+    nullable: true,
   })
   '1'?: UniversityMealInfo;
   @ApiProperty({
@@ -54,6 +55,7 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '수요일 식단 정보',
+    nullable: true,
   })
   '2'?: UniversityMealInfo;
   @ApiProperty({
@@ -70,6 +72,7 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '목요일 식단 정보',
+    nullable: true,
   })
   '3'?: UniversityMealInfo;
   @ApiProperty({
@@ -86,6 +89,7 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '금요일 식단 정보',
+    nullable: true,
   })
   '4'?: UniversityMealInfo;
 
@@ -98,9 +102,9 @@ export class UniversityMealInfoProfileResponse
   constructor(meals: IUniversityMealInfo[]) {
     for (let i = 0; i < meals.length; i++) {
       this[i] = {
-        courseA: meals[i].courseA.menu,
-        courseB: meals[i].courseB.menu,
-        courseC: meals[i].courseC.menu,
+        courseA: meals[i].courseA?.menu,
+        courseB: meals[i].courseB?.menu,
+        courseC: meals[i].courseC?.menu,
       };
     }
     if (meals.length === 1) this.time_range = 'today';

@@ -24,7 +24,10 @@ import { UniversityMeal } from '@domain/university/university-meal.entity';
 import { UniversityProgram } from '@domain/university/university-program.entity';
 import { UniversityMajorNotice } from '@domain/university/university-major-notice.entity';
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
-import { IUniversityMealInfo } from '@domain/university/university-meal.interface';
+import {
+  IUniversityMealInfo,
+  MealCourseEnum,
+} from '@domain/university/university-meal.interface';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 
@@ -52,10 +55,8 @@ export class UniversityService {
     UniversityMealSearchQuery: UniversityMealSearchQuery,
     date: Date,
   ): Promise<IUniversityMealInfo[]> {
-    console.log(date);
     switch (UniversityMealSearchQuery.timeRange) {
       case 'today':
-        console.log('today', date);
         return await this.getUniversityMealInfoByToday(date);
       case 'weekly':
         return await this.getUniversityMealInfoByWeekly(date);
@@ -264,9 +265,9 @@ export class UniversityService {
 
     if (meals.length === 0)
       throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
-    const courseA = meals.find((meal) => meal.course === 'A');
-    const courseB = meals.find((meal) => meal.course === 'B');
-    const courseC = meals.find((meal) => meal.course === 'C');
+    const courseA = meals.find((meal) => meal.course === MealCourseEnum.A);
+    const courseB = meals.find((meal) => meal.course === MealCourseEnum.B);
+    const courseC = meals.find((meal) => meal.course === MealCourseEnum.C);
     return [{ courseA, courseB, courseC }];
   }
 
@@ -274,13 +275,15 @@ export class UniversityService {
     date: Date,
   ): Promise<IUniversityMealInfo[]> {
     const lastMonday = getLastMondayByDate(date);
+    const thisFriday = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() + 5,
+    );
 
     const meals = await this.universityMealRepository.find({
       where: {
-        publishedAt: Between(
-          lastMonday,
-          new Date(date.getFullYear(), date.getMonth(), date.getDate() + 4),
-        ),
+        publishedAt: Between(lastMonday, thisFriday),
       },
       order: {
         publishedAt: 'ASC',
