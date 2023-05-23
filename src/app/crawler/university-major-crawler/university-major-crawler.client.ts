@@ -103,16 +103,16 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
 
   async initialize(
     name: 'university-major-crawler',
-    executeIntervalHours: number,
+    cronTime: string,
   ): Promise<void> {
     const crawler = await this.crawlerRepository.findOne({ where: { name } });
     if (!crawler) {
       await this.crawlerRepository.save({
         name,
-        executeIntervalHours,
+        cronTime,
       });
       return;
     }
-    await this.crawlerRepository.update(crawler, { executeIntervalHours });
+    await this.crawlerRepository.update(crawler, { cronTime });
   }
 }

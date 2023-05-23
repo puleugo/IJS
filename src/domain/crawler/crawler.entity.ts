@@ -15,8 +15,8 @@ export class Crawler {
   @Column({ unique: true })
   name: string;
 
-  @Column({ type: 'int' })
-  executeIntervalHours: number;
+  @Column({ type: 'text', default: '* 0 * * * *' }) // 0~6, 0: Sunday, 6: Saturday
+  cronTime: string;
 
   @OneToMany(() => CrawlerLog, (log) => log.crawler)
   logs: CrawlerLog[];

@@ -35,12 +35,9 @@ export class CrawlerService implements OnApplicationBootstrap {
     const crawlers = await this.crawlerRepository.find();
     await Promise.all(
       crawlers.map((crawler) => {
-        const job = new CronJob(
-          `* * ${crawler.executeIntervalHours} * * *`,
-          () => {
-            this.executeCrawler(crawler.name);
-          },
-        );
+        const job = new CronJob(crawler.cronTime, () => {
+          this.executeCrawler(crawler.name);
+        });
 
         this.schedulerRegistry.addCronJob(crawler.name, job);
         job.start();

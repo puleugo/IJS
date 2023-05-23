@@ -3,10 +3,7 @@ export abstract class CrawlerClient {
 
   abstract getStatus(): Promise<CrawlerClientStatus>;
 
-  abstract initialize(
-    name: string,
-    executeIntervalHours: number,
-  ): Promise<void>;
+  abstract initialize(name: string, cronTime: string): Promise<void>;
 }
 
 export type CrawlerClientStatus = {
