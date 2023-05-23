@@ -20,8 +20,8 @@ import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { UserUnauthenticated } from '@domain/error/user.error';
-import { ScheduleSetProfileResponse } from '@app/user/dto/schedule-set-profile.response';
 import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
+import { IUser } from '@domain/user/user.interface';
 
 @Injectable()
 export class UserService {
@@ -56,28 +56,21 @@ export class UserService {
         name: data.providerName,
       },
     });
+    if (!userAuthProvider)
+      throw new NotFoundException('존재하지 않는 OAUTH 로그인 방식입니다.');
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const user = await this.userRepository.save({});
 
-    try {
-      const user = await this.userRepository.save({});
+    const userAuth = await this.userAuthRepository.create({
+      provider: userAuthProvider,
+      providerId: userAuthProvider.id,
+      username: data.providerUsername,
+      user: user,
+      userId: user.id,
+    });
 
-      const userAuth = new UserAuth();
-      userAuth.provider = userAuthProvider;
-      userAuth.providerId = userAuthProvider.id;
-      userAuth.username = data.providerUsername;
-      userAuth.user = user;
-      userAuth.userId = user.id;
-
-      await this.userAuthRepository.save(userAuth);
-      await queryRunner.commitTransaction();
-      return user;
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-      throw new NotFoundException('회원가입 실패');
-    }
+    await this.userAuthRepository.save(userAuth);
+    return user;
   }
 
   async findUserByOauthId(data: {
@@ -155,12 +148,10 @@ export class UserService {
     id: string,
     options?: FindOneOptions<User>,
   ): Promise<User> {
-    console.log(id, typeof id, options, typeof options.relations);
     const user = await this.userRepository.findOne({
       where: { id },
       ...options,
     });
-    console.log(user);
     return user;
   }
 
@@ -254,6 +245,19 @@ export class UserService {
         user.id,
         lectureIds,
       );
+  }
+
+  async updateUserProfile(
+    userId: string,
+    data: Partial<IUser>,
+  ): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('user not found');
+    const { affected } = await this.userRepository.update({ id: userId }, data);
+    await console.log(affected);
+    return affected > 0;
   }
 
   async getFollowersByUserId(myId: string): Promise<User[]> {

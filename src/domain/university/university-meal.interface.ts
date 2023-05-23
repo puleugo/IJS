@@ -10,3 +10,9 @@ export interface IUniversityMeal {
   course: MealCourseEnum | null;
   publishedAt: Date;
 }
+
+export interface IUniversityMealInfo {
+  courseA: IUniversityMeal;
+  courseB: IUniversityMeal;
+  courseC: IUniversityMeal;
+}

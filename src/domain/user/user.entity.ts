@@ -31,10 +31,10 @@ export class User implements IUser {
   @JoinColumn({ name: 'major_id', referencedColumnName: 'id' })
   major: UniversityMajor;
 
-  @Column('varchar', { nullable: true, length: 20 })
+  @Column('varchar', { unique: true, nullable: true, length: 20 })
   schoolId: string | null;
 
-  @Column('varchar', { nullable: true, length: 255 })
+  @Column('varchar', { unique: true, nullable: true, length: 255 })
   @IsEmail()
   schoolEmail: string | null;
 

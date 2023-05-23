@@ -7,5 +7,7 @@ export interface IUniversitySemester {
   semesterNumber: number;
   startedAt: Date;
   endedAt: Date;
+  middleExamAt: Date;
+  finalExamAt: Date;
   lectures: IUniversityLecture[];
 }

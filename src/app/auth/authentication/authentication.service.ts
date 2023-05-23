@@ -10,10 +10,12 @@ import { UserService } from '@app/user/user.service';
 import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
-import { ACCESS_TOKEN_EXPIRE } from '../../../contants';
+import { ACCESS_TOKEN_EXPIRE, API_PREFIX } from '../../../contants';
 import { JwtSubjectType } from '@infrastructure/types/jwt.types';
 import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 import { MailerService } from '@nestjs-modules/mailer';
+import { v4 as uuidv4 } from 'uuid';
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 
 @Injectable()
 export class AuthenticationService {
@@ -22,6 +24,8 @@ export class AuthenticationService {
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    @InjectRedis()
+    private readonly redis: Redis,
   ) {}
 
   async oauthLogin(
@@ -79,9 +83,8 @@ export class AuthenticationService {
           },
         },
       });
-      if (user) {
-        return user;
-      }
+      if (user) return user;
+
       return await this.userService.joinUserByOauth({
         providerUsername: kakaoUserInfo.data.id,
         providerName: OauthLoginProviderEnum.KAKAO,
@@ -117,28 +120,67 @@ export class AuthenticationService {
   }
 
   async verifySchoolId(data: {
+    user: User;
     schoolEmail: string;
     schoolId: string;
-    schoolMajor: string;
+    majorId: number;
   }) {
-    const { schoolEmail, schoolId, schoolMajor } = data;
-
-    await this.verifySchoolEmail(schoolEmail);
+    const { user, schoolEmail, schoolId, majorId } = data;
+    await this.verifySchoolEmail(user.id, {
+      schoolEmail,
+      schoolId,
+      majorId,
+    });
   }
 
-  async verifySchoolEmail(email: string) {
-    console.log('verifySchoolEmail', email);
-    this.mailerService
+  async verifySchoolEmailByAuthenticationCode(code: string): Promise<boolean> {
+    const userData: {
+      userId: string;
+      schoolEmail: string;
+      schoolId: string;
+      majorId: number;
+    } = JSON.parse(await this.redis.get(`code_${code}`));
+    console.log('verifySchoolEmailByAuthenticationCode', code, '호출');
+    const { userId, schoolEmail, schoolId, majorId } = userData;
+    if (!userData) {
+      throw new BadRequestException('인증 코드가 잘못되었습니다.');
+    }
+    await this.redis.del(`code_${code}`);
+
+    return await this.userService.updateUserProfile(userId, {
+      schoolEmail,
+      schoolId,
+      majorId,
+    });
+  }
+
+  async verifySchoolEmail(
+    userId: string,
+    userSchoolData: {
+      schoolEmail: string;
+      schoolId: string;
+      majorId: number;
+    },
+  ) {
+    const { schoolEmail, schoolId, majorId } = userSchoolData;
+
+    const randomKey = uuidv4();
+    await this.mailerService
       .sendMail({
-        to: email, // list of receivers
+        to: schoolEmail, // list of receivers
         subject: '인제생 인증 메일입니다.', // Subject line
-        text: 'welcome', // plaintext body
-        html: '<b>welcome</b>', // HTML body content
+        html: `인증을 위해 아래 링크를 클릭해주세요. ${process.env.APP_URL}/${API_PREFIX}/auth/mail-auth?code=${randomKey}`, // HTML body content
       })
       .then(() => {
-        console.log('이메일 송신에 성공했습니다.');
+        this.redis.set(
+          `code_${randomKey}`,
+          `{"userId": "${userId}", "schoolEmail": "${schoolEmail}", "schoolId": "${schoolId}", "majorId": "${majorId}" }`,
+        );
+
+        this.redis.expire(`${randomKey}`, 60 * 60 * 24);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         throw new BadRequestException('이메일 송신에 실패했습니다.');
       });
   }

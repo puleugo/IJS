@@ -4,6 +4,7 @@ import { HealthCheckModule } from '@app/health/health-check.module';
 import { UserModule } from '@app/user/user.module';
 import { AuthModule } from '@app/auth/auth.module';
 import { DeliveryModule } from '@app/delivery/delivery.module';
+import { CrawlerModule } from '@app/crawler/crawler.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DeliveryModule } from '@app/delivery/delivery.module';
     UserModule,
     AuthModule,
     DeliveryModule,
+    CrawlerModule,
   ],
 })
 export class AppModule {}

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -49,14 +50,31 @@ export class AuthenticationController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
   async verifySchoolId(
-    @Query('schoolEmail') schoolEmail: string,
+    @Query('schoolEmail')
+    schoolEmail: string,
     @Query('schoolId') schoolId: string,
-    @Query('schoolMajor') schoolMajor: string,
+    @Query('majorId', ParseIntPipe) majorId: number,
+    @Req() { user }: Request,
   ) {
     await this.authenticationService.verifySchoolId({
+      user,
       schoolEmail,
       schoolId,
-      schoolMajor,
+      majorId,
     });
+  }
+
+  @Get('mail-auth')
+  @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
+  async verifySchoolEmailByAuthenticationCode(
+    @Query('code') code: string,
+  ): Promise<string> {
+    const updated =
+      await this.authenticationService.verifySchoolEmailByAuthenticationCode(
+        code,
+      );
+    if (updated) {
+      return '인증이 완료되었습니다.';
+    }
   }
 }
