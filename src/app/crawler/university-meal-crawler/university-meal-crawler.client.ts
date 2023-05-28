@@ -107,6 +107,6 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
       });
       return;
     }
-    await this.crawlerRepository.update(crawler, { cronTime });
+    await this.crawlerRepository.update({ id: crawler.id }, { cronTime });
   }
 }

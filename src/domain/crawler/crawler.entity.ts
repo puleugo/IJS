@@ -1,4 +1,7 @@
 import {
+  BaseEntity,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -8,7 +11,7 @@ import {
 import { CrawlerLog } from '@domain/crawler/crawler-log.entity';
 
 @Entity('crawlers')
-export class Crawler {
+export class Crawler extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,6 +24,38 @@ export class Crawler {
   @OneToMany(() => CrawlerLog, (log) => log.crawler)
   logs: CrawlerLog[];
 
+  @Column({ default: 'STOPPED' })
+  state: 'RUNNING' | 'STOPPED' | 'FAILED';
+
   @CreateDateColumn()
   createdAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  private validateCronTime() {
+    const splitCronTime = this.cronTime.split(' ').slice(0, 6);
+    if (splitCronTime.length !== 6) {
+      this.cronTime = '0 * * * 1';
+    }
+    splitCronTime.map((time) => {
+      if (time === '*' && typeof Number(time) === 'number') {
+        this.cronTime = splitCronTime.join(' ');
+        return;
+      }
+      this.cronTime = '0 * * * 1';
+      return;
+    });
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  private validateState() {
+    if (
+      this.state != 'RUNNING' &&
+      this.state != 'STOPPED' &&
+      this.state != 'FAILED'
+    ) {
+      this.state = 'STOPPED';
+    }
+  }
 }

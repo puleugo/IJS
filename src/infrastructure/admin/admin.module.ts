@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { Crawler } from '@domain/crawler/crawler.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CrawlerService } from '@app/crawler/crawler.service';
+import { CrawlerModule } from '@app/crawler/crawler.module';
 
 const DEFAULT_ADMIN = {
   email: 'admin@example.com',
@@ -14,6 +18,7 @@ const authenticate = async (email: string, password: string) => {
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Crawler]),
     import('@adminjs/nestjs').then(async ({ AdminModule }) => {
       const AdminJSTypeOrm = await import('@adminjs/typeorm');
       const AdminJS = (await import('adminjs')).default;
@@ -24,17 +29,92 @@ const authenticate = async (email: string, password: string) => {
       });
 
       return AdminModule.createAdminAsync({
-        useFactory: async () => {
+        imports: [CrawlerModule],
+        inject: [CrawlerService],
+        useFactory: async (crawlerService: CrawlerService) => {
           return {
             adminJsOptions: {
               rootPath: '/admin',
-              resources: [],
+              resources: [
+                {
+                  resource: Crawler,
+                  options: {
+                    sort: {
+                      direction: 'asc',
+                      sortBy: 'state',
+                    },
+                    actions: {
+                      runCrawler: {
+                        actionType: 'record',
+                        icon: 'Play',
+                        component: false,
+                        handler: (request, response, context) => {
+                          const { record, resource, currentAdmin, h } = context;
+                          const { params } = record;
+                          record.params = crawlerService.addCrawlerCron(params);
+                          return {
+                            record: record.toJSON(currentAdmin),
+                            redirectUrl: h.resourceUrl({
+                              resourceId:
+                                resource._decorated?.id() || resource.id(),
+                            }),
+                            notice: {
+                              message: 'successfullyRunCrawler',
+                              type: 'success',
+                            },
+                          };
+                        },
+                      },
+
+                      stopCrawler: {
+                        actionType: 'record',
+                        icon: 'Stop',
+                        component: false,
+                        handler: (request, response, context) => {
+                          const { record, resource, currentAdmin, h } = context;
+                          const { params } = record;
+                          if (params.state === 'RUNNING') {
+                            const crawler = crawlerService.stopCronJob(params);
+
+                            return {
+                              record: record.toJSON(currentAdmin),
+                              redirectUrl: h.resourceUrl({
+                                resourceId:
+                                  resource._decorated?.id() || resource.id(),
+                              }),
+                              notice: {
+                                message: 'successfullyRunCrawler',
+                                type: 'success',
+                              },
+                            };
+                          }
+                          return {
+                            record: record.toJSON(currentAdmin),
+                            redirectUrl: h.resourceUrl({
+                              resourceId:
+                                resource._decorated?.id() || resource.id(),
+                            }),
+                            notice: {
+                              message: 'AlreadyStoppedCrawler',
+                              type: 'success',
+                            },
+                          };
+                        },
+                      },
+                    },
+                  },
+                },
+              ],
+              branding: {
+                companyName: 'IJS Admin',
+                logo: false,
+              },
             },
-            auth: {
-              authenticate,
-              cookieName: 'adminjs',
-              cookiePassword: 'secret',
-            },
+            // auth: {
+            //   authenticate,
+            //   cookieName: 'adminjs',
+            //   cookiePassword: 'secret',
+            // },
             sessionOptions: {
               resave: true,
               saveUninitialized: true,
@@ -42,7 +122,6 @@ const authenticate = async (email: string, password: string) => {
             },
           };
         },
-        inject: [],
       });
     }),
   ],

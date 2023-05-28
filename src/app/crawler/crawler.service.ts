@@ -31,12 +31,45 @@ export class CrawlerService implements OnApplicationBootstrap {
     await this.runCrawlers();
   }
 
+  async addCrawlerCron(crawler: Crawler): Promise<Crawler> {
+    const isExist = this.schedulerRegistry.doesExist('cron', crawler.name);
+    if (isExist) {
+      return crawler;
+    }
+    const job = new CronJob(crawler.cronTime, () => {
+      this.executeCrawlerByName(crawler.name);
+    });
+
+    await this.schedulerRegistry.addCronJob(crawler.name, job);
+    await this.crawlerRepository.update(crawler.id, {
+      state: 'RUNNING',
+    });
+    await job.start();
+    return crawler;
+  }
+
+  async stopCronJob(crawler: Crawler): Promise<Crawler> {
+    const isExist = this.schedulerRegistry.doesExist('cron', crawler.name);
+    if (isExist) {
+      await this.schedulerRegistry.deleteCronJob(crawler.name);
+      return crawler;
+    }
+    await this.crawlerRepository.update(crawler.id, {
+      state: 'STOPPED',
+    });
+    return crawler;
+  }
+
   async runCrawlers() {
-    const crawlers = await this.crawlerRepository.find();
+    const crawlers = await this.crawlerRepository.find({
+      where: {
+        state: 'RUNNING',
+      },
+    });
     await Promise.all(
       crawlers.map((crawler) => {
         const job = new CronJob(crawler.cronTime, () => {
-          this.executeCrawler(crawler.name);
+          this.executeCrawlerByName(crawler.name);
         });
 
         this.schedulerRegistry.addCronJob(crawler.name, job);
@@ -45,7 +78,7 @@ export class CrawlerService implements OnApplicationBootstrap {
     );
   }
 
-  private executeCrawler(crawlerName: string): Promise<void> {
+  private executeCrawlerByName(crawlerName: string): Promise<void> {
     switch (crawlerName) {
       case 'university-bus-schedule-crawler':
         return this.universityBusScheduleCrawlerClient.crawl();

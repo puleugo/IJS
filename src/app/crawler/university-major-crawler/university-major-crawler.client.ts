@@ -24,6 +24,7 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
       headless: 'new',
     });
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
     page.on('request', (req) => {
       if (
         req.resourceType() === 'image' ||
@@ -113,6 +114,6 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
       });
       return;
     }
-    await this.crawlerRepository.update(crawler, { cronTime });
+    await this.crawlerRepository.update({ id: crawler.id }, { cronTime });
   }
 }
