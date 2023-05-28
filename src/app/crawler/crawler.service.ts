@@ -60,6 +60,10 @@ export class CrawlerService implements OnApplicationBootstrap {
     return crawler;
   }
 
+  async deleteCrawler(crawler: Crawler): Promise<void> {
+    await this.crawlerRepository.delete({ name: crawler.name });
+  }
+
   async runCrawlers() {
     const crawlers = await this.crawlerRepository.find({
       where: {

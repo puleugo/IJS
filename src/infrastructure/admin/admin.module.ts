@@ -3,15 +3,17 @@ import { Crawler } from '@domain/crawler/crawler.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CrawlerService } from '@app/crawler/crawler.service';
 import { CrawlerModule } from '@app/crawler/crawler.module';
-
-const DEFAULT_ADMIN = {
-  email: 'admin@example.com',
-  password: 'password',
-};
+import * as process from 'process';
 
 const authenticate = async (email: string, password: string) => {
-  if (email === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
-    return Promise.resolve(DEFAULT_ADMIN);
+  if (
+    email === process.env.ADMIN_EMAIL &&
+    password === process.env.ADMIN_PASSWORD
+  ) {
+    return {
+      email,
+      password,
+    };
   }
   return null;
 };
@@ -44,6 +46,31 @@ const authenticate = async (email: string, password: string) => {
                       sortBy: 'state',
                     },
                     actions: {
+                      delete: {
+                        actionType: 'record',
+                        icon: 'Stop',
+                        component: false,
+                        guard: 'doYouReallyWantToDoThis',
+                        handler: (request, response, context) => {
+                          const { record, resource, currentAdmin, h } = context;
+                          const { params } = record;
+                          if (params.state === 'RUNNING') {
+                            crawlerService.stopCronJob(params);
+                          }
+                          crawlerService.deleteCrawler(params);
+                          return {
+                            record: record.toJSON(currentAdmin),
+                            redirectUrl: h.resourceUrl({
+                              resourceId:
+                                resource._decorated?.id() || resource.id(),
+                            }),
+                            notice: {
+                              message: 'successfullyDeleted',
+                              type: 'success',
+                            },
+                          };
+                        },
+                      },
                       runCrawler: {
                         actionType: 'record',
                         icon: 'Play',
@@ -74,7 +101,7 @@ const authenticate = async (email: string, password: string) => {
                           const { record, resource, currentAdmin, h } = context;
                           const { params } = record;
                           if (params.state === 'RUNNING') {
-                            const crawler = crawlerService.stopCronJob(params);
+                            crawlerService.stopCronJob(params);
 
                             return {
                               record: record.toJSON(currentAdmin),
@@ -110,11 +137,11 @@ const authenticate = async (email: string, password: string) => {
                 logo: false,
               },
             },
-            // auth: {
-            //   authenticate,
-            //   cookieName: 'adminjs',
-            //   cookiePassword: 'secret',
-            // },
+            auth: {
+              authenticate,
+              cookieName: 'adminjs',
+              cookiePassword: 'secret',
+            },
             sessionOptions: {
               resave: true,
               saveUninitialized: true,
