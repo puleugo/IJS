@@ -27,7 +27,8 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
       waitForInitialPage: true,
     });
     const page = await browser.newPage();
-    page.on('request', (req) => {
+    await page.setRequestInterception(true);
+    await page.on('request', (req) => {
       if (
         req.resourceType() === 'image' ||
         req.resourceType() === 'font' ||
@@ -101,7 +102,7 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
       });
       return;
     }
-    await this.crawlerRepository.update(crawler, { cronTime });
+    await this.crawlerRepository.update({ id: crawler.id }, { cronTime });
   }
 
   private async getDatesByEventKey(

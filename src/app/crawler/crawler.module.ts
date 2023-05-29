@@ -24,5 +24,6 @@ import { Crawler } from '@domain/crawler/crawler.entity';
     UniversityProgramCrawlerModule,
   ],
   providers: [CrawlerService],
+  exports: [CrawlerService],
 })
 export class CrawlerModule {}
