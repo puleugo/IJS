@@ -21,8 +21,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
     const browser = await puppeteer.launch({
-      // headless: 'new',
-      headless: false,
+      headless: 'new',
       waitForInitialPage: true,
     });
     try {
