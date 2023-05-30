@@ -12,8 +12,3 @@ export class TokenResponse {
     this.refreshToken = refreshToken;
   }
 }
-
-// export class GoogleTokenResponse{
-//   @ApiProperty
-// }
-// 여기를 손봐야함, 토큰을 받아오는 형태를 집어 넣어야함
