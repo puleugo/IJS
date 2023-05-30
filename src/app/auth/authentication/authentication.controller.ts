@@ -23,7 +23,7 @@ import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 
 @ApiTags('Auth')
 @Controller('auth')
-export default class AuthenticationController {
+export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @ApiOperation({ summary: 'Oauth 로그인' })
