@@ -5,7 +5,6 @@ import { UserModule } from '@app/user/user.module';
 import { AuthModule } from '@app/auth/auth.module';
 import { DeliveryModule } from '@app/delivery/delivery.module';
 
-
 @Module({
   imports: [
     UniversityModule,

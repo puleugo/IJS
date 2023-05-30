@@ -20,10 +20,13 @@ import {
 import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 import { Request } from '@infrastructure/types/request.types';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
+// import { GoogleOAuthGuard } from '@app/auth/authentication/src/auth.google.gaurd';
+// import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+// import { AppService } from '@app/auth/authentication/src/auth.google.service';
 
 @ApiTags('Auth')
 @Controller('auth')
-export default class AuthenticationController {
+export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @ApiOperation({ summary: 'Oauth 로그인' })
@@ -36,10 +39,10 @@ export default class AuthenticationController {
     return await this.authenticationService.oauthLogin(oauthLoginRequest);
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '회원 정보 조회' })
   @ApiBearerAuth()
   @Get('profile')
-  @UseGuards(JwtAuthGuard)
   async getProfile(@Req() { user }: Request): Promise<UserProfileResponse> {
     return new UserProfileResponse(user);
   }
@@ -52,11 +55,21 @@ export default class AuthenticationController {
     @Query('schoolEmail') schoolEmail: string,
     @Query('schoolId') schoolId: string,
     @Query('schoolMajor') schoolMajor: string,
-  ): Promise<void> {
+  ) {
     await this.authenticationService.verifySchoolId({
       schoolEmail,
       schoolId,
       schoolMajor,
     });
   }
+
+  // @Get()
+  // @UseGuards(GoogleOAuthGuard)
+  // async googleAuth(@Request() req) {}
+
+  // @Get('google-redirect')
+  // @UseGuards(GoogleOAuthGuard)
+  // googleAuthRedirect(@Request() req) {
+  //   return this.appService.googleLogin(req);
+  // }
 }

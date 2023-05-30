@@ -32,6 +32,9 @@ export class AuthenticationService {
       case OauthLoginProviderEnum.KAKAO:
         user = await this.kakaoOauthLogin(oauthLoginRequest.code);
         break;
+      case OauthLoginProviderEnum.GOOGLE:
+        user = await this.googleOauthLogin(oauthLoginRequest.code);
+        break;
       default:
         throw new UnauthorizedException();
     }
@@ -41,6 +44,58 @@ export class AuthenticationService {
         this.generateRefreshToken(user.id),
       ]);
       return { accessToken, refreshToken };
+    }
+  }
+
+  async googleOauthLogin(code: string): Promise<User> {
+    try {
+      const googleTokenInfo = await this.httpService.axiosRef.request({
+        method: 'POST',
+        url: `https://oauth2.googleapis.com/token`,
+        data: {
+          client_id: `${process.env.GOOGLE_API_KEY}`,
+          client_secret: `${process.env.GOOGLE_API_SECRET}`,
+          redirect_uri: `${process.env.GOOGLE_REDIRECT_URI}`,
+          grant_type: `authorization_code`,
+          code,
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+
+      const googleAccessToken = googleTokenInfo.data.access_token;
+
+      const googleUserInfo = await this.httpService.axiosRef.request({
+        method: 'GET',
+        url: 'https://people.googleapis.com/v1/people/me',
+        headers: {
+          Authorization: `Bearer ${googleAccessToken}`,
+        },
+        params: {
+          personFields: 'names,metadata',
+        },
+      });
+
+      const user = await this.userService.findUserById(googleUserInfo.data.id, {
+        where: {
+          auth: {
+            provider: {
+              name: OauthLoginProviderEnum.GOOGLE,
+            },
+            username: googleUserInfo.data.id,
+          },
+        },
+      });
+      if (user) {
+        return user;
+      }
+      return await this.userService.joinUserByOauth({
+        providerUsername: googleUserInfo.data.id,
+        providerName: OauthLoginProviderEnum.GOOGLE,
+      });
+    } catch (e) {
+      throw new UnauthorizedException('인증 정보가 잘못되었습니다.');
     }
   }
 

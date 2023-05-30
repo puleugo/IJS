@@ -11,7 +11,7 @@ export class OauthLoginRequest implements OauthLoginRequestCommand {
   @IsEnum(OauthLoginProviderEnum)
   @ApiProperty({
     enum: OauthLoginProviderEnum,
-    default: OauthLoginProviderEnum.KAKAO,
+    default: OauthLoginProviderEnum.GOOGLE,
   })
   provider: OauthLoginProviderEnum;
 }

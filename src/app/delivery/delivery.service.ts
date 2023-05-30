@@ -1,5 +1,5 @@
 import { Delivery } from '@domain/delivery/delivery.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Request } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryData } from '@app/delivery/dto/delivery-profile.response';
 
