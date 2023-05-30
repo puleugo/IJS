@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { IUniversityBusSchedule } from '@domain/university/university-bus-schedule.interface';
 
 @Entity('university_bus_schedules')
+@Unique(['title', 'departedOn', 'price', 'toSchool', 'fromSchool'])
 export class UniversityBusSchedule implements IUniversityBusSchedule {
   @PrimaryGeneratedColumn('increment')
   id: number;
