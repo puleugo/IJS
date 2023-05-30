@@ -20,6 +20,9 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "paths": {
+      "@src/*": [
+        "IJS/src/*"
+      ],
       "@app/*": [
         "src/app/*"
       ],
@@ -29,6 +32,7 @@
       "@domain/*": [
         "src/domain/*"
       ]
-    }
+    },
+    "allowJs": true
   }
 }
