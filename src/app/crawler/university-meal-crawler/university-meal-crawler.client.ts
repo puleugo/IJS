@@ -31,39 +31,53 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
 
       const meals: UniversityMeal[] = [];
       for (let i = 3; i < 8; i++) {
-        const elem1 = await page.$(
+        const courseA = await page.$eval(
           `#table1 > tbody > tr:nth-child(1) > td:nth-child(${i})`,
+          (elem) =>
+            elem.innerHTML
+              .replace(/&nbsp;/g, '')
+              .replace(/&amp;/g, '&')
+              .replace(/\((.*?)\)<br>/g, '')
+              .split('<br>'),
         );
-
-        const courseA = await page.evaluate((elem) => elem.textContent, elem1);
         meals.push(
           await this.universityMealRepository.create({
-            menu: courseA.split(','),
+            menu: courseA,
             course: MealCourseEnum.A,
             publishedAt: new Date(weekDay.valueOf()),
           }),
         );
 
-        const elem2 = await page.$(
+        const courseB = await page.$eval(
           `#table1 > tbody > tr:nth-child(2) > td:nth-child(${i})`,
+          (elem) =>
+            elem.innerHTML
+              .replace(/&nbsp;/g, '')
+              .replace(/&amp;/g, '&')
+              .replace(/\((.*?)\)<br>/g, '')
+              .split('<br>'),
         );
-        const courseB = await page.evaluate((elem) => elem.textContent, elem2);
 
         meals.push(
           await this.universityMealRepository.create({
-            menu: courseB.split(','),
+            menu: courseB,
             course: MealCourseEnum.B,
             publishedAt: new Date(weekDay.valueOf()),
           }),
         );
 
-        const elem3 = await page.$(
+        const courseC = await page.$eval(
           `#table1 > tbody > tr:nth-child(3) > td:nth-child(${i})`,
+          (elem) =>
+            elem.innerHTML
+              .replace(/&nbsp;/g, '')
+              .replace(/&amp;/g, '&')
+              .replace(/\((.*?)\)<br>/g, '')
+              .split('<br>'),
         );
-        const courseC = await page.evaluate((elem) => elem.textContent, elem3);
         meals.push(
           await this.universityMealRepository.create({
-            menu: courseC.split(','),
+            menu: courseC,
             course: MealCourseEnum.C,
             publishedAt: new Date(weekDay.valueOf()),
           }),
