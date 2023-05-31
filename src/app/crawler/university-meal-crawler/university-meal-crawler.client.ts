@@ -7,6 +7,7 @@ import * as puppeteer from 'puppeteer';
 import { MealCourseEnum } from '@domain/university/university-meal.interface';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 import { Crawler } from '@domain/crawler/crawler.entity';
+import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
 
 @Injectable()
 export class UniversityMealCrawlerClient implements CrawlerClient {
@@ -20,29 +21,12 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
   async crawl(): Promise<any> {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
-    const browser = await puppeteer.launch({
+    const browser: puppeteer.Browser = await puppeteer.launch({
       headless: 'new',
       waitForInitialPage: true,
     });
+    const page = await getPuppeteerPage(browser, url);
     try {
-      const page = await browser.newPage();
-      await page.setRequestInterception(true);
-      page.on('request', (req) => {
-        if (
-          req.resourceType() === 'image' ||
-          req.resourceType() === 'font' ||
-          req.resourceType() === 'stylesheet' ||
-          req.resourceType() === 'script' ||
-          req.resourceType() === 'stylesheet' ||
-          req.resourceType() === 'media'
-        ) {
-          req.abort();
-        } else {
-          req.continue();
-        }
-      });
-      await page.goto(url, { waitUntil: 'networkidle2' });
-
       const weekDay = getLastMondayByDate(new Date());
 
       const meals: UniversityMeal[] = [];
