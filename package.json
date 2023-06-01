@@ -18,7 +18,7 @@
     "migration:generate": "yarn typeorm-ts-node-commonjs migration:generate -d ./src/data-source.ts -p true",
     "migration:run": "yarn typeorm-ts-node-commonjs migration:run -d ./src/data-source.ts",
     "migration:revert": "yarn typeorm-ts-node-commonjs migration:revert -d ./src/data-source.ts",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -119,13 +119,20 @@
     "typescript": "^4.7.4"
   },
   "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
     "moduleFileExtensions": [
       "js",
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "roots": [
+      "<rootDir>",
+      "src"
+    ],
+    "testRegex": ".*\\.e2e-spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
@@ -133,6 +140,12 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^@app/(.*)$": "<rootDir>/src/app/$1",
+      "@domain/(.*)$": "<rootDir>/src/domain/$1",
+      "@infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1"
+    }
   }
 }
