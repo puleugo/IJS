@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UniversityMealSearchQuery } from '@app/university/command/university-meal-info-profile-response.command';
 import { UniversityProgramProfileResponseCommand } from '@app/university/command/university-program-profile-response.command';
 import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
@@ -60,6 +64,8 @@ export class UniversityService {
         return await this.getUniversityMealInfoByToday(date);
       case 'weekly':
         return await this.getUniversityMealInfoByWeekly(date);
+      default:
+        throw new BadRequestException('탐색 쿼리가 존재하지 않습니다.');
     }
   }
 
@@ -264,7 +270,7 @@ export class UniversityService {
     });
 
     if (meals.length === 0)
-      throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
+      throw new NotFoundException('해당주에 식단 정보가 없습니다.');
     const courseA = meals.find((meal) => meal.course === MealCourseEnum.A);
     const courseB = meals.find((meal) => meal.course === MealCourseEnum.B);
     const courseC = meals.find((meal) => meal.course === MealCourseEnum.C);
@@ -278,7 +284,7 @@ export class UniversityService {
     const thisFriday = new Date(
       date.getFullYear(),
       date.getMonth(),
-      date.getDate() + 5,
+      lastMonday.getDate() + 4,
     );
 
     const meals = await this.universityMealRepository.find({
@@ -290,6 +296,8 @@ export class UniversityService {
       },
     });
 
+    if (meals.length === 0)
+      throw new NotFoundException('해당 날짜의 식단 정보가 없습니다.');
     const courseA = meals.filter((meal) => meal.course === 'A');
     const courseB = meals.filter((meal) => meal.course === 'B');
     const courseC = meals.filter((meal) => meal.course === 'C');
