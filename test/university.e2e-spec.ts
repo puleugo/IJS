@@ -441,8 +441,85 @@ describe('학교 정보 API e2e', () => {
 
   describe('종강 시계 API 동작 테스트', () => {
     const url = '/universities/finish-date';
-    it('API를 호출했을 때 200을 반환해야 함', async () => {});
-    it('학기 중에 종강일이 조회되야 함', async () => {});
-    it('방학 중에 개강일이 조회되야 함', async () => {});
+    const semesters = [
+      {
+        name: 'semester #1',
+        startedAt: new Date('2023-03-02'),
+        endedAt: new Date('2023-06-19'),
+        year: 2023,
+        semesterNumber: 1,
+        middleExamAt: new Date('2023-05-01'),
+        finalExamAt: new Date('2023-06-01'),
+      },
+      {
+        name: 'semester #2',
+        startedAt: new Date('2023-09-01'),
+        endedAt: new Date('2023-12-19'),
+        year: 2023,
+        semesterNumber: 2,
+        middleExamAt: new Date('2023-11-01'),
+        finalExamAt: new Date('2023-12-01'),
+      },
+    ];
+
+    it('데이터베이스에 값이 없다면 404를 반환해야 함', async () => {
+      const response = await request(app.getHttpServer()).get(`${url}`);
+      expect(response.status).toBe(404);
+    });
+
+    it('값이 존재한다면 API를 호출했을 때 200을 반환해야 함', async () => {
+      const connection = await app
+        .get(Connection)
+        .getRepository('university_semesters');
+      await connection.save(semesters);
+
+      const response = await request(app.getHttpServer()).get(`${url}`);
+      expect(response.status).toBe(200);
+    });
+
+    it('학기 중에 종강일이 조회되야 함', async () => {
+      // given
+      const connection = await app
+        .get(Connection)
+        .getRepository('university_semesters');
+      await connection.save(semesters);
+
+      // when
+      const response = await request(app.getHttpServer()).get(
+        `${url}?date=2023-04-01`,
+      );
+
+      // then
+      expect(response.body).toEqual({
+        // check apiCalled is date
+        apiCalled: '2023-04-01T00:00:00.000Z',
+        comingFinishDate: '2023-06-20T00:00:00.000Z',
+        finalExamAt: '2023-06-01',
+        isFinished: false,
+        middleExamAt: '2023-05-01',
+        semester: 1,
+      });
+    });
+
+    it('방학 중에 개강일이 조회되야 함', async () => {
+      // given
+      const connection = await app
+        .get(Connection)
+        .getRepository('university_semesters');
+      await connection.save(semesters);
+
+      // when
+      const response = await request(app.getHttpServer()).get(
+        `${url}?date=2023-07-01`,
+      );
+
+      // then
+      expect(response.body).toEqual({
+        apiCalled: '2023-07-01T00:00:00.000Z',
+        comingFinishDate: '2023-09-01',
+        isFinished: true,
+        semester: 2,
+      });
+    });
   });
 });
