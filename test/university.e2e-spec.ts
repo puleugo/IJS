@@ -10,165 +10,6 @@ import * as request from 'supertest';
 import { Connection } from 'typeorm';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 
-const mealOneDayArray = [
-  {
-    menu: ['firstMeal #1', 'lastMeal #1'],
-    course: 'A',
-    publishedAt: new Date(),
-  },
-  {
-    menu: ['firstMeal #2', 'lastMeal #2'],
-    course: 'B',
-    publishedAt: new Date(),
-  },
-  {
-    menu: ['firstMeal #3', 'lastMeal #3'],
-    course: 'C',
-    publishedAt: new Date(),
-  },
-];
-
-const date = new Date();
-const thisMonday = getLastMondayByDate(new Date());
-const lastSunday = new Date(
-  date.getFullYear(),
-  date.getMonth() - 1,
-  thisMonday.getDate() - 1,
-);
-const thisTuesday = new Date(
-  date.getFullYear(),
-  date.getMonth() - 1,
-  thisMonday.getDate() + 1,
-);
-const thisWednesday = new Date(
-  date.getFullYear(),
-  date.getMonth() - 1,
-  thisMonday.getDate() + 2,
-);
-const thisThursday = new Date(
-  date.getFullYear(),
-  date.getMonth() - 1,
-  thisMonday.getDate() + 3,
-);
-const thisFriday = new Date(
-  date.getFullYear(),
-  date.getMonth() - 1,
-  thisMonday.getDate() + 4,
-);
-const thisSaturday = new Date(
-  date.getFullYear(),
-  date.getMonth() - 1,
-  thisMonday.getDate() + 5,
-);
-
-const mealWeekArray = [
-  {
-    menu: ['badFirstMeal #1', 'badLastMeal #1'],
-    course: 'A',
-    publishedAt: lastSunday,
-  },
-  {
-    menu: ['badFirstMeal #2', 'badLastMeal #2'],
-    course: 'B',
-    publishedAt: lastSunday,
-  },
-  {
-    menu: ['badFirstMeal #3', 'badLastMeal #3'],
-    course: 'C',
-    publishedAt: lastSunday,
-  },
-  {
-    menu: ['firstMeal #1', 'lastMeal #1'],
-    course: 'A',
-    publishedAt: thisMonday,
-  },
-  {
-    menu: ['firstMeal #2', 'lastMeal #2'],
-    course: 'B',
-    publishedAt: thisMonday,
-  },
-  {
-    menu: ['firstMeal #3', 'lastMeal #3'],
-    course: 'C',
-    publishedAt: thisMonday,
-  },
-  {
-    menu: ['firstMeal #4', 'lastMeal #4'],
-    course: 'A',
-    publishedAt: thisTuesday,
-  },
-  {
-    menu: ['firstMeal #5', 'lastMeal #5'],
-    course: 'B',
-    publishedAt: thisTuesday,
-  },
-  {
-    menu: ['firstMeal #6', 'lastMeal #6'],
-    course: 'C',
-    publishedAt: thisTuesday,
-  },
-  {
-    menu: ['firstMeal #7', 'lastMeal #7'],
-    course: 'A',
-    publishedAt: thisWednesday,
-  },
-  {
-    menu: ['firstMeal #8', 'lastMeal #8'],
-    course: 'B',
-    publishedAt: thisWednesday,
-  },
-  {
-    menu: ['firstMeal #9', 'lastMeal #9'],
-    course: 'C',
-    publishedAt: thisWednesday,
-  },
-  {
-    menu: ['firstMeal #10', 'lastMeal #10'],
-    course: 'A',
-    publishedAt: thisThursday,
-  },
-  {
-    menu: ['firstMeal #11', 'lastMeal #11'],
-    course: 'B',
-    publishedAt: thisThursday,
-  },
-  {
-    menu: ['firstMeal #12', 'lastMeal #12'],
-    course: 'C',
-    publishedAt: thisThursday,
-  },
-  {
-    menu: ['firstMeal #13', 'lastMeal #13'],
-    course: 'A',
-    publishedAt: thisFriday,
-  },
-  {
-    menu: ['firstMeal #14', 'lastMeal #14'],
-    course: 'B',
-    publishedAt: thisFriday,
-  },
-  {
-    menu: ['firstMeal #15', 'lastMeal #15'],
-    course: 'C',
-    publishedAt: thisFriday,
-  },
-  {
-    menu: ['BadFirstMeal #16', 'badLastMeal #16'],
-    course: 'A',
-    publishedAt: thisSaturday,
-  },
-  {
-    menu: ['BadFirstMeal #16', 'badLastMeal #17'],
-    course: 'B',
-    publishedAt: thisSaturday,
-  },
-  {
-    menu: ['BadFirstMeal #18', 'badLastMeal #18'],
-    course: 'C',
-    publishedAt: thisSaturday,
-  },
-];
-
 describe('학교 정보 API e2e', () => {
   let app: INestApplication;
 
@@ -209,6 +50,166 @@ describe('학교 정보 API e2e', () => {
 
   describe('학식 API 동작 테스트', () => {
     const url = '/universities/meals';
+
+    const date = new Date();
+
+    const mealOneDayArray = [
+      {
+        menu: ['firstMeal #1', 'lastMeal #1'],
+        course: 'A',
+        publishedAt: date,
+      },
+      {
+        menu: ['firstMeal #2', 'lastMeal #2'],
+        course: 'B',
+        publishedAt: date,
+      },
+      {
+        menu: ['firstMeal #3', 'lastMeal #3'],
+        course: 'C',
+        publishedAt: date,
+      },
+    ];
+
+    const thisMonday = getLastMondayByDate(new Date());
+    const lastSunday = new Date(
+      date.getFullYear(),
+      date.getMonth() - 1,
+      thisMonday.getDate() - 1,
+    );
+    const thisTuesday = new Date(
+      date.getFullYear(),
+      date.getMonth() - 1,
+      thisMonday.getDate() + 1,
+    );
+    const thisWednesday = new Date(
+      date.getFullYear(),
+      date.getMonth() - 1,
+      thisMonday.getDate() + 2,
+    );
+    const thisThursday = new Date(
+      date.getFullYear(),
+      date.getMonth() - 1,
+      thisMonday.getDate() + 3,
+    );
+    const thisFriday = new Date(
+      date.getFullYear(),
+      date.getMonth() - 1,
+      thisMonday.getDate() + 4,
+    );
+    const thisSaturday = new Date(
+      date.getFullYear(),
+      date.getMonth() - 1,
+      thisMonday.getDate() + 5,
+    );
+
+    const mealWeekArray = [
+      {
+        menu: ['badFirstMeal #1', 'badLastMeal #1'],
+        course: 'A',
+        publishedAt: lastSunday,
+      },
+      {
+        menu: ['badFirstMeal #2', 'badLastMeal #2'],
+        course: 'B',
+        publishedAt: lastSunday,
+      },
+      {
+        menu: ['badFirstMeal #3', 'badLastMeal #3'],
+        course: 'C',
+        publishedAt: lastSunday,
+      },
+      {
+        menu: ['firstMeal #1', 'lastMeal #1'],
+        course: 'A',
+        publishedAt: thisMonday,
+      },
+      {
+        menu: ['firstMeal #2', 'lastMeal #2'],
+        course: 'B',
+        publishedAt: thisMonday,
+      },
+      {
+        menu: ['firstMeal #3', 'lastMeal #3'],
+        course: 'C',
+        publishedAt: thisMonday,
+      },
+      {
+        menu: ['firstMeal #4', 'lastMeal #4'],
+        course: 'A',
+        publishedAt: thisTuesday,
+      },
+      {
+        menu: ['firstMeal #5', 'lastMeal #5'],
+        course: 'B',
+        publishedAt: thisTuesday,
+      },
+      {
+        menu: ['firstMeal #6', 'lastMeal #6'],
+        course: 'C',
+        publishedAt: thisTuesday,
+      },
+      {
+        menu: ['firstMeal #7', 'lastMeal #7'],
+        course: 'A',
+        publishedAt: thisWednesday,
+      },
+      {
+        menu: ['firstMeal #8', 'lastMeal #8'],
+        course: 'B',
+        publishedAt: thisWednesday,
+      },
+      {
+        menu: ['firstMeal #9', 'lastMeal #9'],
+        course: 'C',
+        publishedAt: thisWednesday,
+      },
+      {
+        menu: ['firstMeal #10', 'lastMeal #10'],
+        course: 'A',
+        publishedAt: thisThursday,
+      },
+      {
+        menu: ['firstMeal #11', 'lastMeal #11'],
+        course: 'B',
+        publishedAt: thisThursday,
+      },
+      {
+        menu: ['firstMeal #12', 'lastMeal #12'],
+        course: 'C',
+        publishedAt: thisThursday,
+      },
+      {
+        menu: ['firstMeal #13', 'lastMeal #13'],
+        course: 'A',
+        publishedAt: thisFriday,
+      },
+      {
+        menu: ['firstMeal #14', 'lastMeal #14'],
+        course: 'B',
+        publishedAt: thisFriday,
+      },
+      {
+        menu: ['firstMeal #15', 'lastMeal #15'],
+        course: 'C',
+        publishedAt: thisFriday,
+      },
+      {
+        menu: ['BadFirstMeal #16', 'badLastMeal #16'],
+        course: 'A',
+        publishedAt: thisSaturday,
+      },
+      {
+        menu: ['BadFirstMeal #16', 'badLastMeal #17'],
+        course: 'B',
+        publishedAt: thisSaturday,
+      },
+      {
+        menu: ['BadFirstMeal #18', 'badLastMeal #18'],
+        course: 'C',
+        publishedAt: thisSaturday,
+      },
+    ];
 
     it('쿼리가 제공되지 않았을 때 400을 반환해야 함', async () => {
       const response = await request(app.getHttpServer()).get(`${url}`);
