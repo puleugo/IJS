@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { InfrastructureModule } from '@infrastructure/infrastructure.module';
 import { AppModule } from '@app/app.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceConfig } from './data-source';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import * as process from 'process';
+import { dataSourceConfig } from './data-source';
 
 @Module({
   imports: [
@@ -16,6 +16,7 @@ import * as process from 'process';
         options: {
           host: process.env.REDIS_HOST || 'localhost',
           port: Number(process.env.REDIS_PORT) || 6379,
+          password: process.env.REDIS_PASSWORD,
         },
       },
     ]),

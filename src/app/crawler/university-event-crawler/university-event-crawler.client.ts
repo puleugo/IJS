@@ -7,6 +7,7 @@ import * as puppeteer from 'puppeteer';
 import { removeEscapeCharacters } from '@infrastructure/utils/remove-escape-characters';
 import { UniversitySemester } from '@domain/university/university-semester.entity';
 import { Crawler } from '@domain/crawler/crawler.entity';
+import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
 
 @Injectable()
 export class UniversityEventCrawlerClient implements CrawlerClient {
@@ -26,62 +27,50 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
       headless: 'new',
       waitForInitialPage: true,
     });
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-    await page.on('request', (req) => {
-      if (
-        req.resourceType() === 'image' ||
-        req.resourceType() === 'font' ||
-        req.resourceType() === 'stylesheet' ||
-        req.resourceType() === 'script' ||
-        req.resourceType() === 'stylesheet' ||
-        req.resourceType() === 'media'
-      ) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    const page = await getPuppeteerPage(browser, url);
 
-    let currentYear = new Date().getFullYear();
+    try {
+      let currentYear = new Date().getFullYear();
 
-    for (let pageIdx = 1; pageIdx <= 12; pageIdx++) {
-      const monthData = await page.$(
-        `#contents > div.b-calendar > div:nth-child(${pageIdx}) > div.detail`,
-      );
-      const courseA = await page.evaluate(
-        (elem) => elem.textContent,
-        monthData,
-      );
-      if (pageIdx === 11) currentYear += 1;
-
-      const removedText = removeEscapeCharacters(courseA, '\t')
-        .split('\n')
-        .filter((line) => line.trim() !== '');
-
-      for (let i = 0; i < removedText.length; i += 2) {
-        const key = removedText[i];
-        const value = removedText[i + 1];
-        const [startAt, endAt] = await this.getDatesByEventKey(
-          key,
-          currentYear,
+      for (let pageIdx = 1; pageIdx <= 12; pageIdx++) {
+        const monthData = await page.$(
+          `#contents > div.b-calendar > div:nth-child(${pageIdx}) > div.detail`,
         );
-        await this.universityEventRepository.save({
-          title: value,
-          startAt,
-          endAt,
-        });
+        const courseA = await page.evaluate(
+          (elem) => elem.textContent,
+          monthData,
+        );
+        if (pageIdx === 11) currentYear += 1;
+
+        const removedText = removeEscapeCharacters(courseA, '\t')
+          .split('\n')
+          .filter((line) => line.trim() !== '');
+
+        for (let i = 0; i < removedText.length; i += 2) {
+          const key = removedText[i];
+          const value = removedText[i + 1];
+          const [startAt, endAt] = await this.getDatesByEventKey(
+            key,
+            currentYear,
+          );
+          await this.universityEventRepository.save({
+            title: value,
+            startAt,
+            endAt,
+          });
+        }
       }
+
+      const searchYear = new Date().getFullYear();
+      const semesters = await Promise.all([
+        this.getSemesterByUniversityEvents(searchYear, 1),
+        this.getSemesterByUniversityEvents(searchYear, 2),
+      ]);
+      await this.universitySemesterRepository.save(semesters);
+    } catch (e) {
+      console.log(e);
     }
     await browser.close();
-
-    const searchYear = new Date().getFullYear();
-    const semesters = await Promise.all([
-      this.getSemesterByUniversityEvents(searchYear, 1),
-      this.getSemesterByUniversityEvents(searchYear, 2),
-    ]);
-    await this.universitySemesterRepository.save(semesters);
 
     return;
   }

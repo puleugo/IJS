@@ -7,6 +7,7 @@ import * as puppeteer from 'puppeteer';
 import { MealCourseEnum } from '@domain/university/university-meal.interface';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 import { Crawler } from '@domain/crawler/crawler.entity';
+import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
 
 @Injectable()
 export class UniversityMealCrawlerClient implements CrawlerClient {
@@ -20,67 +21,63 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
   async crawl(): Promise<any> {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
-    const browser = await puppeteer.launch({
-      // headless: 'new',
-      headless: false,
+    const browser: puppeteer.Browser = await puppeteer.launch({
+      headless: 'new',
       waitForInitialPage: true,
     });
+    const page = await getPuppeteerPage(browser, url);
     try {
-      const page = await browser.newPage();
-      await page.setRequestInterception(true);
-      page.on('request', (req) => {
-        if (
-          req.resourceType() === 'image' ||
-          req.resourceType() === 'font' ||
-          req.resourceType() === 'stylesheet' ||
-          req.resourceType() === 'script' ||
-          req.resourceType() === 'stylesheet' ||
-          req.resourceType() === 'media'
-        ) {
-          req.abort();
-        } else {
-          req.continue();
-        }
-      });
-      await page.goto(url, { waitUntil: 'networkidle2' });
-
       const weekDay = getLastMondayByDate(new Date());
 
       const meals: UniversityMeal[] = [];
       for (let i = 3; i < 8; i++) {
-        const elem1 = await page.$(
+        const courseA = await page.$eval(
           `#table1 > tbody > tr:nth-child(1) > td:nth-child(${i})`,
+          (elem) =>
+            elem.innerHTML
+              .replace(/&nbsp;/g, '')
+              .replace(/&amp;/g, '&')
+              .replace(/\((.*?)\)<br>/g, '')
+              .split('<br>'),
         );
-
-        const courseA = await page.evaluate((elem) => elem.textContent, elem1);
         meals.push(
           await this.universityMealRepository.create({
-            menu: courseA.split(','),
+            menu: courseA,
             course: MealCourseEnum.A,
             publishedAt: new Date(weekDay.valueOf()),
           }),
         );
 
-        const elem2 = await page.$(
+        const courseB = await page.$eval(
           `#table1 > tbody > tr:nth-child(2) > td:nth-child(${i})`,
+          (elem) =>
+            elem.innerHTML
+              .replace(/&nbsp;/g, '')
+              .replace(/&amp;/g, '&')
+              .replace(/\((.*?)\)<br>/g, '')
+              .split('<br>'),
         );
-        const courseB = await page.evaluate((elem) => elem.textContent, elem2);
 
         meals.push(
           await this.universityMealRepository.create({
-            menu: courseB.split(','),
+            menu: courseB,
             course: MealCourseEnum.B,
             publishedAt: new Date(weekDay.valueOf()),
           }),
         );
 
-        const elem3 = await page.$(
+        const courseC = await page.$eval(
           `#table1 > tbody > tr:nth-child(3) > td:nth-child(${i})`,
+          (elem) =>
+            elem.innerHTML
+              .replace(/&nbsp;/g, '')
+              .replace(/&amp;/g, '&')
+              .replace(/\((.*?)\)<br>/g, '')
+              .split('<br>'),
         );
-        const courseC = await page.evaluate((elem) => elem.textContent, elem3);
         meals.push(
           await this.universityMealRepository.create({
-            menu: courseC.split(','),
+            menu: courseC,
             course: MealCourseEnum.C,
             publishedAt: new Date(weekDay.valueOf()),
           }),

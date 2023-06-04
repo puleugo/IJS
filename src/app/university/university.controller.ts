@@ -87,9 +87,16 @@ export class UniversityController {
   @Get('finish-date')
   @ApiOperation({ summary: '학기 종료일(방학 시작일)을 가져옵니다.' })
   @ApiResponse({ type: UniversityFinishDateProfileResponse })
-  async getUniversityFinishDate(): Promise<UniversityFinishDateProfileResponse> {
+  @ApiQuery({
+    name: 'date',
+    description: '기준 날짜',
+    required: false,
+  })
+  async getUniversityFinishDate(
+    @Query('date') date?: string,
+  ): Promise<UniversityFinishDateProfileResponse> {
     const finishDate = await this.universityService.getUniversityFinishDate(
-      new Date(),
+      date ? new Date(date) : new Date(),
     );
     return new UniversityFinishDateProfileResponse(finishDate);
   }
