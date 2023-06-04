@@ -16,6 +16,7 @@ import { UserLecture } from '@domain/user/user-lecture.entity';
 import { UniversityMajor } from '@domain/university/university-major.entity';
 import { IsEmail } from 'class-validator';
 import { IUser } from '@domain/user/user.interface';
+import { Delivery } from '@domain/delivery/delivery.entity';
 
 @Entity('users')
 export class User implements IUser {
@@ -58,4 +59,7 @@ export class User implements IUser {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt: Date | null;
+
+  @ManyToOne(() => Delivery, (delivery) => delivery.users, { nullable: true })
+  delivery: Delivery | null;
 }
