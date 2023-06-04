@@ -210,7 +210,7 @@ describe('학교 정보 API e2e', () => {
   describe('학식 API 동작 테스트', () => {
     const url = '/universities/meals';
 
-    it('쿼리가 때제공되지 않았을 때 400을 반환해야 함', async () => {
+    it('쿼리가 제공되지 않았을 때 400을 반환해야 함', async () => {
       const response = await request(app.getHttpServer()).get(`${url}`);
       expect(response.status).toBe(400);
     });
@@ -253,7 +253,9 @@ describe('학교 정보 API e2e', () => {
 
     it('금주의 학식이 존재하지 않을 때 404를 반환해야 함', async () => {
       // given
-      const connection = app.get(Connection).getRepository('university_meals');
+      const connection = await app
+        .get(Connection)
+        .getRepository('university_meals');
       const meals = await connection.save(mealWeekArray);
       console.log(meals);
 
@@ -291,6 +293,147 @@ describe('학교 정보 API e2e', () => {
           courseC: ['firstMeal #15', 'lastMeal #15'],
         },
         time_range: 'weekly',
+      });
+    });
+  });
+
+  describe('학사 일정 API 동작 테스트', () => {
+    const url = '/universities/calendars';
+
+    const date = new Date('2023-01-01');
+
+    const universityEventArray = [];
+    for (let month = 0; month < 12; month++) {
+      universityEventArray.push({
+        title: `event #${month + 1}`,
+        startAt: new Date(date.getFullYear(), month, 1),
+        endAt: new Date(date.getFullYear(), month, 1),
+      });
+    }
+    universityEventArray.push({
+      title: `event #13`,
+      startAt: new Date(date.getFullYear() + 1, 0, 1),
+      endAt: new Date(date.getFullYear() + 1, 0, 1),
+    });
+    universityEventArray.push({
+      title: `event #14`,
+      startAt: new Date(date.getFullYear() + 1, 1, 1),
+      endAt: new Date(date.getFullYear() + 1, 1, 1),
+    });
+
+    it('API를 호출했을 때 200을 반환해야함.', async () => {
+      const response = await request(app.getHttpServer()).get(`${url}`);
+      expect(response.status).toBe(200);
+    });
+
+    it('시간표를 반환해야함.', async () => {
+      // given
+      const connection = await app
+        .get(Connection)
+        .getRepository('university_events');
+      await connection.save(universityEventArray);
+
+      // when
+      const response = await request(app.getHttpServer()).get(`${url}`);
+
+      // then
+      expect(response.body).toEqual({
+        Mar: [
+          {
+            endAt: '2023-03-01',
+            id: 3,
+            startAt: '2023-03-01',
+            title: 'event #3',
+          },
+        ],
+        Apr: [
+          {
+            endAt: '2023-04-01',
+            id: 4,
+            startAt: '2023-04-01',
+            title: 'event #4',
+          },
+        ],
+        May: [
+          {
+            endAt: '2023-05-01',
+            id: 5,
+            startAt: '2023-05-01',
+            title: 'event #5',
+          },
+        ],
+        Jun: [
+          {
+            endAt: '2023-06-01',
+            id: 6,
+            startAt: '2023-06-01',
+            title: 'event #6',
+          },
+        ],
+        Jul: [
+          {
+            endAt: '2023-07-01',
+            id: 7,
+            startAt: '2023-07-01',
+            title: 'event #7',
+          },
+        ],
+        Aug: [
+          {
+            id: 8,
+            startAt: '2023-08-01',
+            endAt: '2023-08-01',
+            title: 'event #8',
+          },
+        ],
+        Sep: [
+          {
+            endAt: '2023-09-01',
+            id: 9,
+            startAt: '2023-09-01',
+            title: 'event #9',
+          },
+        ],
+        Oct: [
+          {
+            endAt: '2023-10-01',
+            id: 10,
+            startAt: '2023-10-01',
+            title: 'event #10',
+          },
+        ],
+        Nov: [
+          {
+            endAt: '2023-11-01',
+            id: 11,
+            startAt: '2023-11-01',
+            title: 'event #11',
+          },
+        ],
+        Dec: [
+          {
+            endAt: '2023-12-01',
+            id: 12,
+            startAt: '2023-12-01',
+            title: 'event #12',
+          },
+        ],
+        Jan: [
+          {
+            endAt: '2024-01-01',
+            id: 13,
+            startAt: '2024-01-01',
+            title: 'event #13',
+          },
+        ],
+        Feb: [
+          {
+            endAt: '2024-02-01',
+            id: 14,
+            startAt: '2024-02-01',
+            title: 'event #14',
+          },
+        ],
       });
     });
   });
