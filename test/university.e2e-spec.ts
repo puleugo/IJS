@@ -438,4 +438,11 @@ describe('학교 정보 API e2e', () => {
       });
     });
   });
+
+  describe('종강 시계 API 동작 테스트', () => {
+    const url = '/universities/finish-date';
+    it('API를 호출했을 때 200을 반환해야 함', async () => {});
+    it('학기 중에 종강일이 조회되야 함', async () => {});
+    it('방학 중에 개강일이 조회되야 함', async () => {});
+  });
 });
