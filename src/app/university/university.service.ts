@@ -101,8 +101,11 @@ export class UniversityService {
     date: Date,
   ): Promise<UniversityFinishDateProfileResponseCommand> {
     const semester = await this.getUniversitySemesterByDate(date);
+
     if (!semester) {
       const comingSemester = await this.getUniversityComingSemesterByDate(date);
+      if (!comingSemester)
+        throw new NotFoundException('학기를 찾을 수 없습니다.');
       return {
         isFinished: true,
         semester: comingSemester.semesterNumber,
