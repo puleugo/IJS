@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CrawlerClient } from '@infrastructure/utils/crawler.client';
-import * as puppeteer from 'puppeteer';
 import { Repository } from 'typeorm';
 import { UniversityMajor } from '@domain/university/university-major.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UniversityDepartment } from '@domain/university/university-department.entity';
 import { Crawler } from '@domain/crawler/crawler.entity';
 import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
+import { generateChromeBrowser } from '@infrastructure/utils/generate-chrome-browser';
 
 @Injectable()
 export class UniversityMajorCrawlerClient implements CrawlerClient {
@@ -21,9 +21,7 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
 
   async crawl(): Promise<any> {
     const url = 'https://www.inje.ac.kr/kor/academics/academics.asp';
-    const browser = await puppeteer.launch({
-      headless: 'new',
-    });
+    const browser = await generateChromeBrowser();
     const page = await getPuppeteerPage(browser, url);
     try {
       const departments: {

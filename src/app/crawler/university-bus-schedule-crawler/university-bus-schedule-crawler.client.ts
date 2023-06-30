@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CrawlerClient } from '@infrastructure/utils/crawler.client';
-import * as puppeteer from 'puppeteer';
 import { Like, Repository } from 'typeorm';
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 import { IUniversityBusSchedule } from '@domain/university/university-bus-schedule.interface';
 import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
+import { generateChromeBrowser } from '@infrastructure/utils/generate-chrome-browser';
 
 @Injectable()
 export class UniversityBusScheduleCrawlerClient implements CrawlerClient {
@@ -18,10 +18,7 @@ export class UniversityBusScheduleCrawlerClient implements CrawlerClient {
   async crawl(): Promise<any> {
     await this.universityBusScheduleRepository.delete({});
     const url = 'https://www.inje.ac.kr/kor/campus-life/welfare-0102-1.asp';
-    const browser = await puppeteer.launch({
-      headless: false,
-      waitForInitialPage: true,
-    });
+    const browser = await generateChromeBrowser();
     const page = await getPuppeteerPage(browser, url);
     try {
       // 학교→인제대역
