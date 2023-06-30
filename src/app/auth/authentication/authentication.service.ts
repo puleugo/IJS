@@ -36,6 +36,9 @@ export class AuthenticationService {
       case OauthLoginProviderEnum.KAKAO:
         user = await this.kakaoOauthLogin(oauthLoginRequest.accessToken);
         break;
+      case OauthLoginProviderEnum.GOOGLE:
+        user = await this.googleOauthLogin(oauthLoginRequest.accessToken);
+        break;
       default:
         throw new UnauthorizedException();
     }
@@ -48,7 +51,42 @@ export class AuthenticationService {
     }
   }
 
-  async kakaoOauthLogin(accessToken: string): Promise<User> {
+  async googleOauthLogin(accessToken: string): Promise<User> {
+    try {
+      const googleUserInfo = await this.httpService.axiosRef.request({
+        method: 'GET',
+        url: 'https://people.googleapis.com/v1/people/me',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          personFields: 'names,metadata',
+        },
+      });
+
+      const user = await this.userService.findUserById(googleUserInfo.data.id, {
+        where: {
+          auth: {
+            provider: {
+              name: OauthLoginProviderEnum.GOOGLE,
+            },
+            username: googleUserInfo.data.id,
+          },
+        },
+      });
+      if (user) {
+        return user;
+      }
+      return await this.userService.joinUserByOauth({
+        providerUsername: googleUserInfo.data.id,
+        providerName: OauthLoginProviderEnum.GOOGLE,
+      });
+    } catch (e) {
+      throw new UnauthorizedException('인증 정보가 잘못되었습니다.');
+    }
+  }
+
+  async kakaoOauthLogin(code: string): Promise<User> {
     try {
       const kakaoUserInfo = await this.httpService.axiosRef.request({
         method: 'GET',
