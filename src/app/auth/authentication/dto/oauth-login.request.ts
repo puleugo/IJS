@@ -5,8 +5,8 @@ import { IsEnum, IsString } from 'class-validator';
 
 export class OauthLoginRequest implements OauthLoginRequestCommand {
   @IsString()
-  @ApiProperty({ default: '1234567890' })
-  code: string;
+  @ApiProperty({ default: 'aaa.bbb.ccc' })
+  accessToken: string;
 
   @IsEnum(OauthLoginProviderEnum)
   @ApiProperty({

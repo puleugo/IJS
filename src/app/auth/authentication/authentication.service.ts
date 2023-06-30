@@ -34,7 +34,7 @@ export class AuthenticationService {
     let user: User;
     switch (oauthLoginRequest.provider) {
       case OauthLoginProviderEnum.KAKAO:
-        user = await this.kakaoOauthLogin(oauthLoginRequest.code);
+        user = await this.kakaoOauthLogin(oauthLoginRequest.accessToken);
         break;
       default:
         throw new UnauthorizedException();
@@ -48,29 +48,13 @@ export class AuthenticationService {
     }
   }
 
-  async kakaoOauthLogin(code: string): Promise<User> {
+  async kakaoOauthLogin(accessToken: string): Promise<User> {
     try {
-      const kakaoTokenInfo = await this.httpService.axiosRef.request({
-        method: 'POST',
-        url: `https://kauth.kakao.com/oauth/token`,
-        data: {
-          grant_type: 'authorization_code',
-          client_id: `${process.env.KAKAO_API_KEY}`,
-          redirect_uri: `${process.env.KAKAO_REDIRECT_URI}`,
-          code,
-        },
-        headers: {
-          'Content-Type': "application/x-www-form-urlencoded;charset=utf-8'",
-        },
-      });
-
-      const kakaoAccessToken = kakaoTokenInfo.data.access_token;
-
       const kakaoUserInfo = await this.httpService.axiosRef.request({
         method: 'GET',
         url: `https://kapi.kakao.com/v2/user/me`,
         headers: {
-          Authorization: `Bearer ${kakaoAccessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const user = await this.userService.findUserById(kakaoUserInfo.data.id, {
