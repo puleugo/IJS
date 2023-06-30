@@ -42,7 +42,8 @@ export class AuthenticationController {
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Req() { user }: Request): Promise<UserProfileResponse> {
-    return new UserProfileResponse(user);
+    const foundUser = await this.authenticationService.getProfile(user.id);
+    return new UserProfileResponse(foundUser);
   }
 
   @Post('verify/school-id')

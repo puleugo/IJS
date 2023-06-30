@@ -12,7 +12,6 @@ import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
 import { ACCESS_TOKEN_EXPIRE, API_PREFIX } from '../../../contants';
 import { JwtSubjectType } from '@infrastructure/types/jwt.types';
-import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 import { MailerService } from '@nestjs-modules/mailer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
@@ -86,7 +85,7 @@ export class AuthenticationService {
     }
   }
 
-  async kakaoOauthLogin(code: string): Promise<User> {
+  async kakaoOauthLogin(accessToken: string): Promise<User> {
     try {
       const kakaoUserInfo = await this.httpService.axiosRef.request({
         method: 'GET',
@@ -114,11 +113,6 @@ export class AuthenticationService {
     } catch (e) {
       throw new UnauthorizedException('인증 정보가 잘못되었습니다.');
     }
-  }
-
-  async getMyProfile(userId: string): Promise<UserProfileResponse> {
-    const user = await this.userService.findUserById(userId);
-    return new UserProfileResponse(user);
   }
 
   async generateAccessToken(userId: string): Promise<string> {
