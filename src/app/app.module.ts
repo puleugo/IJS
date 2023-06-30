@@ -6,7 +6,6 @@ import { AuthModule } from '@app/auth/auth.module';
 import { DeliveryModule } from '@app/delivery/delivery.module';
 import { CrawlerModule } from '@app/crawler/crawler.module';
 
-
 @Module({
   imports: [
     UniversityModule,

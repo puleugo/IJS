@@ -37,10 +37,10 @@ export class AuthenticationController {
     return await this.authenticationService.oauthLogin(oauthLoginRequest);
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '회원 정보 조회' })
   @ApiBearerAuth()
   @Get('profile')
+  @UseGuards(JwtAuthGuard)
   async getProfile(@Req() { user }: Request): Promise<UserProfileResponse> {
     return new UserProfileResponse(user);
   }
