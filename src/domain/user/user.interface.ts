@@ -6,6 +6,7 @@ import { UniversityMajor } from '@domain/university/university-major.entity';
 
 export interface IUser {
   id: string;
+  isVerified: boolean;
   majorId: number | null;
   major: UniversityMajor;
   schoolId: string | null;

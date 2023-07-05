@@ -23,6 +23,9 @@ export class User implements IUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
+
   @Column('int', { nullable: true })
   majorId: number | null;
 

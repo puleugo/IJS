@@ -167,6 +167,7 @@ export class AuthenticationService {
       schoolEmail,
       schoolId,
       majorId,
+      isVerified: true,
     });
   }
 
