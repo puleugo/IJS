@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from '@app/user/user.module';
-import AuthenticationController from '@app/auth/authentication/authentication.controller';
 import { AuthenticationService } from '@app/auth/authentication/authentication.service';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,6 +7,7 @@ import { JwtStrategy } from '@app/auth/authentication/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { AuthenticationController } from '@app/auth/authentication/authentication.controller';
 
 @Module({
   imports: [
