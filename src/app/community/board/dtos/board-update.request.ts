@@ -1,4 +1,4 @@
-import { BoardUpdateCommand } from '@app/communities/board/commands/board-update.command';
+import { BoardUpdateCommand } from '@app/community/board/commands/board-update.command';
 
 export class BoardUpdateRequest implements Partial<BoardUpdateCommand> {
   readonly name?: string;

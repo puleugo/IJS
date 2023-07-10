@@ -1,8 +1,8 @@
-import { ArticlePreviewCommand } from '@app/communities/article/commands/article-preview.command';
-import { UserPreviewResponseCommand } from '@app/user/command/user-preview-response.command';
-import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
+import { ArticleProfileCommand } from '@app/community/article/commands/article-profile.command';
+import { UserProfileResponseCommand } from '@app/user/command/user-profile-response.command';
+import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 
-export class ArticlePreviewResponse implements ArticlePreviewCommand {
+export class ArticleProfileResponse implements ArticleProfileCommand {
   id: number;
   title: string;
   content: string;
@@ -10,8 +10,9 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
   boardId: number;
   likesCount: number;
   commentsCount: number;
-  author: UserPreviewResponseCommand | null;
+  author: UserProfileResponseCommand;
   createdAt: Date;
+  isUpdated: boolean;
   isAnonymous: boolean;
 
   constructor({
@@ -24,8 +25,9 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
     commentsCount,
     author,
     createdAt,
+    updatedAt,
     isAnonymous,
-  }: ArticlePreviewCommand) {
+  }: ArticleProfileCommand) {
     this.id = id;
     this.title = title;
     this.content = content;
@@ -33,8 +35,9 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
     this.boardId = boardId;
     this.likesCount = likesCount;
     this.commentsCount = commentsCount;
-    this.author = new UserPreviewResponse(author);
+    this.author = new UserProfileResponse(author);
     this.createdAt = createdAt;
+    this.isUpdated = createdAt !== updatedAt;
     this.isAnonymous = isAnonymous;
   }
 }

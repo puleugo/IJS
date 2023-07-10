@@ -1,4 +1,4 @@
-import { BoardProfileCommand } from '@app/communities/board/commands/board-profile.command';
+import { BoardProfileCommand } from '@app/community/board/commands/board-profile.command';
 
 export class BoardProfileResponse implements BoardProfileCommand {
   readonly id: number;

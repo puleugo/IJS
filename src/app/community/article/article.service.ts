@@ -6,20 +6,20 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ArticlePreviewResponse } from '@app/communities/article/dtos/article-preview.response';
+import { ArticlePreviewResponse } from '@app/community/article/dtos/article-preview.response';
 import { Article } from '@domain/communities/articles/article.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleProfileCommand } from '@app/communities/article/commands/article-profile.command';
-import { ArticleCreateCommand } from '@app/communities/article/commands/article-create.command';
-import { ArticleUpdateCommand } from '@app/communities/article/commands/article-update.command';
+import { ArticleProfileCommand } from '@app/community/article/commands/article-profile.command';
+import { ArticleCreateCommand } from '@app/community/article/commands/article-create.command';
+import { ArticleUpdateCommand } from '@app/community/article/commands/article-update.command';
 import { UserService } from '@app/user/user.service';
-import { ArticleLikeCommand } from '@app/communities/article/commands/article-like.command';
+import { ArticleLikeCommand } from '@app/community/article/commands/article-like.command';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
-import { ArticleDeleteCommand } from '@app/communities/article/commands/article-delete.command';
+import { ArticleDeleteCommand } from '@app/community/article/commands/article-delete.command';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { BoardService } from '@app/communities/board/board.service';
-import { ArticleImageUploadCommand } from '@app/communities/article/commands/article-image-upload.command';
+import { BoardService } from '@app/community/board/board.service';
+import { ArticleImageUploadCommand } from '@app/community/article/commands/article-image-upload.command';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
 
 @Injectable()

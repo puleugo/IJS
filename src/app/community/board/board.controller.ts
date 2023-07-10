@@ -8,10 +8,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { BoardProfileResponse } from '@app/communities/board/dtos/board-profile.response';
-import { BoardCreateCommand } from '@app/communities/board/commands/board-create.command';
-import { BoardService } from '@app/communities/board/board.service';
-import { BoardUpdateRequest } from '@app/communities/board/dtos/board-update.request';
+import { BoardProfileResponse } from '@app/community/board/dtos/board-profile.response';
+import { BoardCreateCommand } from '@app/community/board/commands/board-create.command';
+import { BoardService } from '@app/community/board/board.service';
+import { BoardUpdateRequest } from '@app/community/board/dtos/board-update.request';
 
 @Controller('board')
 export class BoardController {

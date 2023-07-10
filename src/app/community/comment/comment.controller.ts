@@ -10,15 +10,15 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CommentProfileResponse } from '@app/communities/comments/dtos/comment-profile.response';
-import { CommentsService } from '@app/communities/comments/comments.service';
+import { CommentProfileResponse } from '@app/community/comment/dtos/comment-profile.response';
+import { CommentService } from '@app/community/comment/comment.service';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
-import { CreateCommentRequest } from '@app/communities/comments/dtos/create-comment.request';
+import { CreateCommentRequest } from '@app/community/comment/dtos/create-comment.request';
 
-@Controller('board/:boardId/article/:articleId/comments')
-export class CommentsController {
-  constructor(private readonly commentService: CommentsService) {}
+@Controller('board/:boardId/article/:articleId/comment')
+export class CommentController {
+  constructor(private readonly commentService: CommentService) {}
 
   @Get()
   async getComments(

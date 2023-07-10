@@ -1,4 +1,4 @@
-import { BoardCreateCommand } from '@app/communities/board/commands/board-create.command';
+import { BoardCreateCommand } from '@app/community/board/commands/board-create.command';
 
 export class BoardCreateRequest implements BoardCreateCommand {
   readonly name: string;

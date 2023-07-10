@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { BoardCreateRequest } from '@app/communities/board/dtos/board-create.request';
+import { BoardCreateRequest } from '@app/community/board/dtos/board-create.request';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { Board } from '@domain/communities/boards/board.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BoardProfileCommand } from '@app/communities/board/commands/board-profile.command';
-import { BoardUpdateCommand } from '@app/communities/board/commands/board-update.command';
-import { BoardDeleteCommand } from '@app/communities/board/commands/board-delete.command';
+import { BoardProfileCommand } from '@app/community/board/commands/board-profile.command';
+import { BoardUpdateCommand } from '@app/community/board/commands/board-update.command';
+import { BoardDeleteCommand } from '@app/community/board/commands/board-delete.command';
 
 @Injectable()
 export class BoardService {

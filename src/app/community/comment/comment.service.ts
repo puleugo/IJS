@@ -6,19 +6,19 @@ import {
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from '@domain/communities/comments/comment.entity';
-import { CommentListQuery } from '@app/communities/comments/commands/comment-list-query';
-import { BoardService } from '@app/communities/board/board.service';
+import { CommentListQuery } from '@app/community/comment/commands/comment-list-query';
+import { BoardService } from '@app/community/board/board.service';
 
-import { CommentCreateCommand } from '@app/communities/comments/commands/comment-create.command';
-import { CommentResponseCommand } from '@app/communities/comments/commands/comment-response.command';
-import { CommentLikeCommand } from '@app/communities/comments/commands/comment-like.command';
+import { CommentCreateCommand } from '@app/community/comment/commands/comment-create.command';
+import { CommentResponseCommand } from '@app/community/comment/commands/comment-response.command';
+import { CommentLikeCommand } from '@app/community/comment/commands/comment-like.command';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
-import { ArticleService } from '@app/communities/article/article.service';
-import { CommentDeleteCommand } from '@app/communities/comments/commands/comment-delete.command';
+import { ArticleService } from '@app/community/article/article.service';
+import { CommentDeleteCommand } from '@app/community/comment/commands/comment-delete.command';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 
 @Injectable()
-export class CommentsService {
+export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,

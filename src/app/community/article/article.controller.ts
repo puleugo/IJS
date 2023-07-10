@@ -11,13 +11,13 @@ import {
   UploadedFiles,
   UseGuards,
 } from '@nestjs/common';
-import { ArticleService } from '@app/communities/article/article.service';
-import { ArticlePreviewResponse } from '@app/communities/article/dtos/article-preview.response';
-import { ArticleProfileResponse } from '@app/communities/article/dtos/article-profile.response';
-import { ArticleCreateRequest } from '@app/communities/article/dtos/article-create.request';
+import { ArticleService } from '@app/community/article/article.service';
+import { ArticlePreviewResponse } from '@app/community/article/dtos/article-preview.response';
+import { ArticleProfileResponse } from '@app/community/article/dtos/article-profile.response';
+import { ArticleCreateRequest } from '@app/community/article/dtos/article-create.request';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
-import { ArticleUpdateRequest } from '@app/communities/article/dtos/article-update.request';
+import { ArticleUpdateRequest } from '@app/community/article/dtos/article-update.request';
 
 @Controller('board/:boardId/article')
 export class ArticleController {
