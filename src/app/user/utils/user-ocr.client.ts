@@ -1,5 +1,7 @@
 import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class UserOcrClient {
   // TODO: OCR API 연동
   constructor(private readonly httpService: HttpService) {}

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -15,6 +16,8 @@ import { JwtSubjectType } from '@infrastructure/types/jwt.types';
 import { MailerService } from '@nestjs-modules/mailer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { PhotoClient } from '@infrastructure/utils/photo.client';
+import { UserNotFoundException } from '@domain/error/user.error';
 
 @Injectable()
 export class AuthenticationService {
@@ -25,6 +28,8 @@ export class AuthenticationService {
     private readonly mailerService: MailerService,
     @InjectRedis()
     private readonly redis: Redis,
+    @Inject('AuthPhotoClient')
+    private readonly authPhotoClient: PhotoClient,
   ) {}
 
   async oauthLogin(
@@ -156,19 +161,21 @@ export class AuthenticationService {
       schoolId: string;
       majorId: number;
     } = JSON.parse(await this.redis.get(`code_${code}`));
-    console.log('verifySchoolEmailByAuthenticationCode', code, '호출');
+
     const { userId, schoolEmail, schoolId, majorId } = userData;
     if (!userData) {
       throw new BadRequestException('인증 코드가 잘못되었습니다.');
     }
     await this.redis.del(`code_${code}`);
 
-    return await this.userService.updateUserProfile(userId, {
+    const affected = await this.userService.updateUserProfile(userId, {
       schoolEmail,
       schoolId,
       majorId,
       isVerified: true,
     });
+    if (!affected) throw new UserNotFoundException();
+    return true;
   }
 
   async verifySchoolEmail(
@@ -204,5 +211,30 @@ export class AuthenticationService {
 
   async getProfile(userId: string): Promise<User> {
     return await this.userService.findUserById(userId);
+  }
+
+  async uploadRegisterImage(photo: Buffer, user: User) {
+    const resizedPhoto = await this.authPhotoClient.resizePhoto(photo);
+    await this.authPhotoClient.uploadPhoto(resizedPhoto);
+    return;
+  }
+
+  async approveRegisterImage(
+    userId: string,
+    majorId?: number,
+    schoolId?: string,
+    schoolEmail?: string,
+  ): Promise<boolean> {
+    const user = await this.userService.findUserById(userId);
+    if (!user) throw new UserNotFoundException();
+
+    const affected = await this.userService.updateUserProfile(user.id, {
+      isVerified: true,
+      majorId,
+      schoolId,
+      schoolEmail,
+    });
+    if (!affected) throw new UserNotFoundException();
+    return;
   }
 }

@@ -2,10 +2,13 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticationService } from '@app/auth/authentication/authentication.service';
@@ -46,7 +49,7 @@ export class AuthenticationController {
     return new UserProfileResponse(foundUser);
   }
 
-  @Post('verify/school-id')
+  @Post('verify/mail')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
@@ -65,7 +68,9 @@ export class AuthenticationController {
     });
   }
 
-  @Get('mail-auth')
+  @Post('approve/mail')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
   async verifySchoolEmailByAuthenticationCode(
     @Query('code') code: string,
@@ -77,5 +82,28 @@ export class AuthenticationController {
     if (updated) {
       return '인증이 완료되었습니다.';
     }
+  }
+
+  @Post('verify/identification')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '학생 인증 이미지(학생증, 합격증명서) 업로드' })
+  async uploadRegisterImage(
+    @Req() { user }: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<string> {
+    await this.authenticationService.uploadRegisterImage(file.buffer, user);
+    return '인증 이미지가 업로드 되었습니다.';
+  }
+
+  @Post('approve/identification/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '학생 인증 이미지(학생증, 합격증명서) 승인' })
+  async approveRegisterImage(
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<string> {
+    await this.authenticationService.approveRegisterImage(userId);
+    return '인증이 완료되었습니다.';
   }
 }

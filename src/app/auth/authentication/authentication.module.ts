@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { AuthenticationController } from '@app/auth/authentication/authentication.controller';
+import { AuthPhotoClient } from '@app/auth/authentication/utils/auth-photo.client';
 
 @Module({
   imports: [
@@ -54,6 +55,13 @@ import { AuthenticationController } from '@app/auth/authentication/authenticatio
     }),
   ],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService, JwtStrategy],
+  providers: [
+    AuthenticationService,
+    JwtStrategy,
+    {
+      provide: 'AuthPhotoClient',
+      useClass: AuthPhotoClient,
+    },
+  ],
 })
 export class AuthenticationModule {}

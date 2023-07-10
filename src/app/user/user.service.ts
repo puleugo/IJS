@@ -1,10 +1,11 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from '@domain/user/user-auth.entity';
@@ -16,12 +17,12 @@ import { UserLecture } from '@domain/user/user-lecture.entity';
 import * as QRCode from 'qrcode';
 import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum';
 import { UserFollow } from '@domain/user/user-follow.entity';
-import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { UserUnauthenticated } from '@domain/error/user.error';
 import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
 import { IUser } from '@domain/user/user.interface';
+import { PhotoClient } from '@infrastructure/utils/photo.client';
 
 @Injectable()
 export class UserService {
@@ -42,9 +43,9 @@ export class UserService {
     private readonly userScheduleSetRepository: Repository<UserScheduleSet>,
     @InjectRepository(UniversityLecture)
     private readonly universityLectureRepository: Repository<UniversityLecture>,
-    private readonly dataSource: DataSource,
-    private readonly photoClient: UserPhotoClient,
-    private readonly ocrClient: UserOcrClient,
+    @Inject('UserPhotoClient')
+    private readonly userPhotoClient: PhotoClient,
+    private readonly userOcrClient: UserOcrClient,
   ) {}
 
   async joinUserByOauth(data: {
@@ -256,7 +257,6 @@ export class UserService {
     });
     if (!user) throw new NotFoundException('user not found');
     const { affected } = await this.userRepository.update({ id: userId }, data);
-    await console.log(affected);
     return affected > 0;
   }
 
@@ -297,8 +297,10 @@ export class UserService {
     userId: string,
     photo: Buffer,
   ): Promise<UniversityLecture[]> {
-    const resizedPhoto = await this.photoClient.resizePhoto(photo);
-    const ocrLectures = await this.ocrClient.getScheduleFromPhoto(resizedPhoto);
+    const resizedPhoto = await this.userPhotoClient.resizePhoto(photo);
+    const ocrLectures = await this.userOcrClient.getScheduleFromPhoto(
+      resizedPhoto,
+    );
 
     return [];
   }

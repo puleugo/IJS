@@ -12,6 +12,7 @@ import { UserLecture } from '@domain/user/user-lecture.entity';
 import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -25,8 +26,16 @@ import { UserOcrClient } from '@app/user/utils/user-ocr.client';
       UserScheduleSet,
       UniversityLecture,
     ]),
+    HttpModule,
   ],
-  providers: [UserService, UserPhotoClient, UserOcrClient],
+  providers: [
+    UserService,
+    {
+      provide: 'UserPhotoClient',
+      useClass: UserPhotoClient,
+    },
+    UserOcrClient,
+  ],
   controllers: [UserController],
   exports: [UserService],
 })
