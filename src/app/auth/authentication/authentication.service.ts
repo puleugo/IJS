@@ -11,7 +11,11 @@ import { UserService } from '@app/user/user.service';
 import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
-import { ACCESS_TOKEN_EXPIRE, API_PREFIX } from '../../../contants';
+import {
+  ACCESS_TOKEN_EXPIRE,
+  API_PREFIX,
+  REFRESH_TOKEN_EXPIRE,
+} from '../../../contants';
 import { JwtSubjectType } from '@infrastructure/types/jwt.types';
 import { MailerService } from '@nestjs-modules/mailer';
 import { v4 as uuidv4 } from 'uuid';
@@ -134,7 +138,7 @@ export class AuthenticationService {
     return await this.jwtService.signAsync(
       { user_id: userId },
       {
-        expiresIn: ACCESS_TOKEN_EXPIRE,
+        expiresIn: REFRESH_TOKEN_EXPIRE,
         subject: JwtSubjectType.REFRESH,
       },
     );
