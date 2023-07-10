@@ -4,9 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -42,8 +44,11 @@ export class UserController {
 
   @ApiOperation({ summary: '모바일 학생증을 발급합니다.' })
   @Get('my-student-qr')
-  async getMyQRCode(@Req() { user }: Request): Promise<string> {
-    return await this.userService.getStudentQRCode(user.schoolId);
+  async getMyQRCode(
+    @Req() { user }: Request,
+    @Query('native', ParseBoolPipe) nativeOption: boolean,
+  ): Promise<string> {
+    return await this.userService.getStudentQRCode(user.schoolId, nativeOption);
   }
 
   @ApiOperation({ summary: '입장해있는 시간표 집합의 목록을 조회합니다.' })

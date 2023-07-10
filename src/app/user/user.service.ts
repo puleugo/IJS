@@ -19,10 +19,11 @@ import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum'
 import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { UserUnauthenticated } from '@domain/error/user.error';
 import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
 import { IUser } from '@domain/user/user.interface';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
+import { JwtService } from '@nestjs/jwt';
+import { USER_QR_CODE_EXPIRE } from '../../contants';
 
 @Injectable()
 export class UserService {
@@ -46,6 +47,7 @@ export class UserService {
     @Inject('UserPhotoClient')
     private readonly userPhotoClient: PhotoClient,
     private readonly userOcrClient: UserOcrClient,
+    private readonly jwtService: JwtService,
   ) {}
 
   async joinUserByOauth(data: {
@@ -276,8 +278,11 @@ export class UserService {
     return follows.map((follow) => follow.user);
   }
 
-  async getStudentQRCode(studentId: string): Promise<string> {
-    if (!studentId) throw new UserUnauthenticated();
+  async getStudentQRCode(
+    studentId: string,
+    nativeOption?: boolean,
+  ): Promise<string> {
+    if (nativeOption) return this.generateNativeQRCode(studentId);
     return QRCode.toDataURL(`AA${studentId}`);
   }
 
@@ -286,6 +291,16 @@ export class UserService {
       userId: myId,
       toFollowId: userId,
     });
+  }
+
+  private async generateNativeQRCode(studentId: string): Promise<string> {
+    const token = await this.jwtService.signAsync(
+      { studentId },
+      {
+        expiresIn: USER_QR_CODE_EXPIRE,
+      },
+    );
+    return QRCode.toDataURL(token);
   }
 
   private async generateQrCodeByScheduleSetId(setId: string): Promise<string> {

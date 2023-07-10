@@ -13,6 +13,8 @@ import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { HttpModule } from '@nestjs/axios';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -27,6 +29,21 @@ import { HttpModule } from '@nestjs/axios';
       UniversityLecture,
     ]),
     HttpModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const issuer = configService.get<string>(
+          'APP_URL',
+          'https://localhost',
+        );
+        return {
+          secret: configService.get<string>('STUDENT_QR_SECRET', ''),
+          verifyOptions: { issuer },
+          signOptions: { issuer, notBefore: 0 },
+        };
+      },
+    }),
   ],
   providers: [
     UserService,
