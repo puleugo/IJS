@@ -1,14 +1,11 @@
 import {
-  BadRequestException,
   Inject,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ArticlePreviewResponse } from '@app/community/article/dtos/article-preview.response';
 import { Article } from '@domain/communities/articles/article.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArticleProfileCommand } from '@app/community/article/commands/article-profile.command';
 import { ArticleCreateCommand } from '@app/community/article/commands/article-create.command';
@@ -21,6 +18,12 @@ import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { BoardService } from '@app/community/board/board.service';
 import { ArticleImageUploadCommand } from '@app/community/article/commands/article-image-upload.command';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
+import { BoardNotFoundException } from '@domain/error/board.error';
+import {
+  ArticleNotFoundException,
+  ArticlePermissionDeniedException,
+  CanNotLikeOwnArticleException,
+} from '@domain/error/article.error';
 
 @Injectable()
 export class ArticleService {
@@ -39,8 +42,13 @@ export class ArticleService {
     boardId: number;
   }): Promise<ArticlePreviewResponse[]> {
     const { boardId } = params;
+    const board = await this.boardService.findById(boardId, {
+      select: { isAnonymous: true },
+    });
+    if (!board) throw new BoardNotFoundException();
+
     const articles = await this.articleRepository.find({
-      where: { boardId },
+      where: { boardId: board.id },
       relations: {
         author: true,
         board: true,
@@ -51,7 +59,7 @@ export class ArticleService {
       (article) =>
         new ArticlePreviewResponse({
           ...article,
-          isAnonymous: article.board.isAnonymous,
+          isAnonymous: board.isAnonymous,
         }),
     );
   }
@@ -60,62 +68,72 @@ export class ArticleService {
     boardId: number;
     articleId: number;
   }): Promise<ArticleProfileCommand> {
-    const { articleId } = params;
-
-    const article = await this.findById(articleId, {
-      relations: {
-        board: true,
-      },
+    const { articleId, boardId } = params;
+    const board = await this.boardService.findById(boardId, {
+      select: { isAnonymous: true },
     });
-    if (!article) throw new NotFoundException('Article not found');
+    if (!board) throw new BoardNotFoundException();
+
+    const article = await this.findById(articleId);
+    if (!article) throw new ArticleNotFoundException();
     await this.articleRepository.increment({ id: articleId }, 'viewsCount', 1);
 
-    return { ...article, isAnonymous: article.board.isAnonymous };
+    return {
+      ...article,
+      isAnonymous: board.isAnonymous,
+      author: { id: article.authorId },
+    };
   }
 
   async createArticle(
     articleCreateCommand: ArticleCreateCommand,
   ): Promise<ArticleProfileCommand> {
-    const board = await this.boardService.findById(
-      articleCreateCommand.boardId,
-      {
-        select: {
-          isAnonymous: true,
-        },
+    const { authorId, boardId } = articleCreateCommand;
+    const board = await this.boardService.findById(boardId, {
+      select: {
+        isAnonymous: true,
       },
-    );
+    });
+    if (!board) throw new BoardNotFoundException();
 
-    const createdArticle = await this.articleRepository.create(
-      articleCreateCommand,
-    );
-    const article = await this.articleRepository.save(createdArticle);
+    const createdArticle = await this.articleRepository.create({
+      ...articleCreateCommand,
+      authorId,
+    });
+    const [article, incrementResult] = await Promise.all([
+      this.articleRepository.save(createdArticle),
+      this.boardService.incrementArticleCount(boardId),
+    ]);
+    if (incrementResult.affected === 0)
+      throw new InternalServerErrorException();
 
-    return { ...article, isAnonymous: board.isAnonymous };
+    return {
+      ...article,
+      isAnonymous: board.isAnonymous,
+      author: { id: authorId },
+    };
   }
 
   async updateArticle(
     articleUpdateCommand: ArticleUpdateCommand,
   ): Promise<ArticleProfileCommand> {
-    const { id, userId, ...articleData } = articleUpdateCommand;
-    const user = await this.userService.findUserById(userId);
-    if (!user) throw new NotFoundException('User not found');
+    const { id, userId, boardId, ...articleData } = articleUpdateCommand;
+    const board = await this.boardService.findById(boardId, {
+      select: { isAnonymous: true },
+    });
+    if (!board) throw new BoardNotFoundException();
 
     const article = await this.findById(id);
-    if (!article) throw new NotFoundException('Article not found');
-    const isUserHasArticlePermission = await this.userHasArticlePermission(
-      user.id,
-      article,
-    );
-    if (!isUserHasArticlePermission)
-      throw new UnauthorizedException(
-        'User has no permission to update this article',
-      );
+    if (!article) throw new ArticleNotFoundException();
+    if (article.authorId !== userId)
+      throw new ArticlePermissionDeniedException();
 
     const updateResult = await this.articleRepository.update(
       { id: article.id },
       {
         ...article,
         ...articleData,
+        updatedAt: new Date(),
       },
     );
     if (!updateResult.affected) throw new InternalServerErrorException();
@@ -123,23 +141,17 @@ export class ArticleService {
     return {
       ...article,
       ...articleData,
-      isAnonymous: article.board.isAnonymous,
+      isAnonymous: board.isAnonymous,
     };
   }
 
   async hitArticleLike(params: ArticleLikeCommand): Promise<boolean> {
     const { id, userId } = params;
-    const user = await this.userService.findUserById(userId);
-    if (!user) throw new NotFoundException('User not found');
 
     const article = await this.findById(id);
-    if (!article) throw new NotFoundException('Article not found');
-    const isUserHasArticlePermission = await this.userHasArticlePermission(
-      user.id,
-      article,
-    );
-    if (isUserHasArticlePermission)
-      throw new BadRequestException('User cannot like own article');
+    if (!article) throw new ArticleNotFoundException();
+
+    if (article.authorId === userId) throw new CanNotLikeOwnArticleException();
 
     const articleLike = await this.articleLikeRepository.findOne({
       where: { articleId: id, authorId: userId },
@@ -147,44 +159,44 @@ export class ArticleService {
 
     if (!articleLike) {
       const [updateResult, _] = await Promise.all([
-        this.articleRepository.increment({ id }, 'likeCount', 1),
+        this.articleRepository.increment({ id }, 'likesCount', 1),
         this.articleLikeRepository.save({
           articleId: article.id,
-          authorId: user.id,
+          authorId: userId,
         }),
       ]);
 
-      return updateResult.affected > 1;
+      return updateResult.affected > 0;
     }
-
     const [updateResult, deleteResult] = await Promise.all([
-      this.articleRepository.decrement({ id }, 'likeCount', 1),
-      this.articleLikeRepository.delete({ id: articleLike.id }),
+      this.articleRepository.decrement({ id }, 'likesCount', 1),
+      this.articleLikeRepository.delete({
+        authorId: articleLike.authorId,
+        articleId: articleLike.articleId,
+      }),
     ]);
 
-    return updateResult.affected > 0 && deleteResult.affected > 0;
+    return !(updateResult.affected > 0 && deleteResult.affected > 0);
   }
 
   async deleteArticle(params: ArticleDeleteCommand): Promise<boolean> {
-    const { id, userId } = params;
-    const user = await this.userService.findUserById(userId);
-    if (!user) throw new NotFoundException('User not found');
-
-    const article = await this.findById(id, {
-      where: { board: true },
+    const { id, userId, boardId } = params;
+    const board = await this.boardService.findById(boardId, {
+      select: { id: true, isAnonymous: true },
     });
-    if (!article) throw new NotFoundException('Article not found');
-    const isUserHasArticlePermission = await this.userHasArticlePermission(
-      user.id,
-      article,
-    );
-    if (!isUserHasArticlePermission)
-      throw new UnauthorizedException(
-        'User has no permission to delete this article',
-      );
+    if (!board) throw new BoardNotFoundException();
 
-    const { affected } = await this.articleRepository.softDelete({ id });
-    return affected > 0;
+    const article = await this.findById(id, { where: { boardId: board.id } });
+    if (!article) throw new ArticleNotFoundException();
+    if (article.authorId !== userId)
+      throw new ArticlePermissionDeniedException();
+
+    const [softDeleteResult, decrementResult] = await Promise.all([
+      this.articleRepository.softDelete({ id }),
+      this.boardService.decrementArticleCount(board.id),
+    ]);
+
+    return softDeleteResult.affected > 0 && decrementResult.affected > 0;
   }
 
   async reportArticle(params: {
@@ -199,14 +211,10 @@ export class ArticleService {
     id: number,
     options?: FindOneOptions<Article>,
   ): Promise<Article> {
-    return await this.articleRepository.findOne({ where: { id }, ...options });
-  }
-
-  async userHasArticlePermission(
-    userId: string,
-    article: Article,
-  ): Promise<boolean> {
-    return article.authorId !== userId;
+    return await this.articleRepository.findOne({
+      ...options,
+      ...{ where: { id, ...options?.where } },
+    });
   }
 
   async uploadArticleImage(
@@ -220,5 +228,21 @@ export class ArticleService {
       resizedImages.map((image) => this.articlePhotoClient.uploadPhoto(image)),
     );
     return uploadedImages;
+  }
+
+  async incrementCommentsCount(articleId: number): Promise<UpdateResult> {
+    return await this.articleRepository.increment(
+      { id: articleId },
+      'commentsCount',
+      1,
+    );
+  }
+
+  async decrementCommentsCount(articleId: number): Promise<UpdateResult> {
+    return await this.articleRepository.decrement(
+      { id: articleId },
+      'commentsCount',
+      1,
+    );
   }
 }

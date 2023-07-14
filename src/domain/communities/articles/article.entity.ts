@@ -8,7 +8,6 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { IArticle } from '@domain/communities/articles/article.interface';
 import { Board } from '@domain/communities/boards/board.entity';
@@ -65,9 +64,10 @@ export class Article implements IArticle {
   @Index()
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @Column({ default: new Date(Date.now()) })
   updatedAt: Date;
 
   @DeleteDateColumn({ nullable: true })
+  @Index()
   deletedAt: Date | null;
 }

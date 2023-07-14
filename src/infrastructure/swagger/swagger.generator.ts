@@ -7,7 +7,7 @@ import { INestApplication } from '@nestjs/common';
 const document = new DocumentBuilder()
   .setTitle(`인제생 ${API_PREFIX} API`)
   .setDescription(`인제생 ${API_PREFIX} API 문서`)
-  .setContact('인제생 개발팀', 'https://localhost', 'puleugo@gmail.com')
+  .setContact('인제생 개발팀', 'https://localhost:3000', 'puleugo@gmail.com')
   .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
   .addServer(
     (process.env.APP_URL || 'http://localhost:3000') + '/' + API_PREFIX,

@@ -16,12 +16,19 @@ import {
   API_PREFIX,
   REFRESH_TOKEN_EXPIRE,
 } from '../../../contants';
-import { JwtSubjectType } from '@infrastructure/types/jwt.types';
+import {
+  JwtDecodedData,
+  JwtSubjectType,
+} from '@infrastructure/types/jwt.types';
 import { MailerService } from '@nestjs-modules/mailer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
 import { UserNotFoundException } from '@domain/error/user.error';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
+import { Repository } from 'typeorm';
+import { Request } from '@infrastructure/types/request.types';
 
 @Injectable()
 export class AuthenticationService {
@@ -34,6 +41,8 @@ export class AuthenticationService {
     private readonly redis: Redis,
     @Inject('AuthPhotoClient')
     private readonly authPhotoClient: PhotoClient,
+    @InjectRepository(UserAuthProvider)
+    private readonly userAuthProviderRepository: Repository<UserAuthProvider>,
   ) {}
 
   async oauthLogin(
@@ -72,7 +81,7 @@ export class AuthenticationService {
         },
       });
 
-      const user = await this.userService.findUserById(googleUserInfo.data.id, {
+      const user = await this.userService.findById(googleUserInfo.data.id, {
         where: {
           auth: {
             provider: {
@@ -95,33 +104,37 @@ export class AuthenticationService {
   }
 
   async kakaoOauthLogin(accessToken: string): Promise<User> {
+    let kakaoUserInfo;
     try {
-      const kakaoUserInfo = await this.httpService.axiosRef.request({
+      kakaoUserInfo = await this.httpService.axiosRef.request({
         method: 'GET',
         url: `https://kapi.kakao.com/v2/user/me`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      const user = await this.userService.findUserById(kakaoUserInfo.data.id, {
-        where: {
-          auth: {
-            provider: {
-              name: OauthLoginProviderEnum.KAKAO,
-            },
-            username: kakaoUserInfo.data.id,
-          },
-        },
-      });
-      if (user) return user;
-
-      return await this.userService.joinUserByOauth({
-        providerUsername: kakaoUserInfo.data.id,
-        providerName: OauthLoginProviderEnum.KAKAO,
-      });
     } catch (e) {
       throw new UnauthorizedException('인증 정보가 잘못되었습니다.');
     }
+    if (!kakaoUserInfo)
+      throw new UnauthorizedException('카카오 로그인에 실패했습니다.');
+
+    const user = await this.userService.findById(kakaoUserInfo.data.id, {
+      where: {
+        auth: {
+          provider: {
+            name: OauthLoginProviderEnum.KAKAO,
+          },
+          username: kakaoUserInfo.data.id,
+        },
+      },
+    });
+    if (user) return user;
+
+    return await this.userService.joinUserByOauth({
+      providerUsername: kakaoUserInfo.data.id,
+      providerName: OauthLoginProviderEnum.KAKAO,
+    });
   }
 
   async generateAccessToken(userId: string): Promise<string> {
@@ -214,7 +227,7 @@ export class AuthenticationService {
   }
 
   async getProfile(userId: string): Promise<User> {
-    return await this.userService.findUserById(userId);
+    return await this.userService.findById(userId);
   }
 
   async uploadRegisterImage(photo: Buffer, user: User) {
@@ -229,7 +242,7 @@ export class AuthenticationService {
     schoolId?: string,
     schoolEmail?: string,
   ): Promise<boolean> {
-    const user = await this.userService.findUserById(userId);
+    const user = await this.userService.findById(userId);
     if (!user) throw new UserNotFoundException();
 
     const affected = await this.userService.updateUserProfile(user.id, {
@@ -240,5 +253,44 @@ export class AuthenticationService {
     });
     if (!affected) throw new UserNotFoundException();
     return;
+  }
+
+  async initializeAuthProvider() {
+    const [providersName, foundProviders] = await Promise.all([
+      Object.values(OauthLoginProviderEnum),
+      this.userAuthProviderRepository.find({
+        select: { name: true },
+      }),
+    ]);
+
+    const missingProvidersName = providersName.filter(
+      (provider) =>
+        !foundProviders
+          .map((foundProvider) => foundProvider.name)
+          .includes(provider),
+    );
+
+    const createdProviders = missingProvidersName.map((provider) =>
+      this.userAuthProviderRepository.create({
+        name: provider,
+      }),
+    );
+    await this.userAuthProviderRepository.save(createdProviders);
+  }
+
+  async refreshAccessToken(request: Request): Promise<TokenResponse> {
+    const refreshToken = request.cookies['refresh_token'];
+    if (!refreshToken) throw new UnauthorizedException();
+
+    const token = <JwtDecodedData>this.jwtService.decode(refreshToken);
+
+    if (!token || token.sub !== JwtSubjectType.REFRESH) {
+      throw new UnauthorizedException('invalid token');
+    }
+
+    const account = await this.userService.findById(token.user_id);
+    const accessToken = await this.generateAccessToken(account.id);
+
+    return new TokenResponse(accessToken, refreshToken);
   }
 }

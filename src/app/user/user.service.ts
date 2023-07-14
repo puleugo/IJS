@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from '@domain/user/user-auth.entity';
-import { UserAuthProvider } from '@domain/user/user-auth-vendor.entity';
+import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { ScheduleSet } from '@domain/user/schedule-set.entity';
 import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UniversityLecture } from '@domain/university/university-lecture.entity';
@@ -99,7 +99,7 @@ export class UserService {
   async openScheduleSet(
     userId: string,
   ): Promise<ScheduleSetProfileResponseCommand> {
-    const owner = await this.findUserById(userId);
+    const owner = await this.findById(userId);
     const userScheduleSet = new UserScheduleSet();
     userScheduleSet.user = owner;
     userScheduleSet.scheduleSet = new ScheduleSet();
@@ -118,7 +118,7 @@ export class UserService {
     userId: string,
     scheduleSetId: string,
   ): Promise<ScheduleSet> {
-    const user = await this.findUserById(userId);
+    const user = await this.findById(userId);
     const scheduleSet = await this.findScheduleSetById(scheduleSetId);
     await this.userScheduleSetRepository.save({
       user,
@@ -135,10 +135,10 @@ export class UserService {
 
   // TODO: 팔로우 기능 구현
   async followUser(myId: string, userId: string): Promise<void> {
-    const user = await this.findUserById(myId);
+    const user = await this.findById(myId);
     if (!user) throw new NotFoundException('user not found');
 
-    const toFollowUser = await this.findUserById(userId);
+    const toFollowUser = await this.findById(userId);
     if (!toFollowUser) throw new NotFoundException('user not found');
 
     await this.userFollowRepository.save({
@@ -147,10 +147,7 @@ export class UserService {
     });
   }
 
-  async findUserById(
-    id: string,
-    options?: FindOneOptions<User>,
-  ): Promise<User> {
+  async findById(id: string, options?: FindOneOptions<User>): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
       ...options,

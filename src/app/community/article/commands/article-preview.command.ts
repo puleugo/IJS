@@ -11,6 +11,7 @@ export type ArticlePreviewCommand = Pick<
   | 'likesCount'
   | 'commentsCount'
   | 'createdAt'
+  | 'authorId'
 > & {
   author: UserPreviewResponseCommand | null;
   isAnonymous: boolean;

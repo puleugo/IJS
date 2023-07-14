@@ -8,7 +8,6 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
@@ -26,14 +25,12 @@ export class Comment implements IComment {
   articleId: number;
 
   @ManyToOne(() => Article, ({ comments }) => comments)
-  @JoinColumn({ name: 'article_id', referencedColumnName: 'id' })
   article: Article;
 
   @Column({ type: 'uuid' })
   authorId: string;
 
   @ManyToOne(() => User, ({ comments }) => comments)
-  @JoinColumn({ name: 'author_id ', referencedColumnName: 'id' })
   author: User;
 
   @Column({ type: 'int', default: 0 })
@@ -49,7 +46,7 @@ export class Comment implements IComment {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'reply_to_id', referencedColumnName: 'id' })
-  replyTo: Comment;
+  replyTo: Comment | null;
 
   @OneToMany(() => Comment, ({ replyTo }) => replyTo)
   replies: Comment[];
@@ -58,9 +55,7 @@ export class Comment implements IComment {
   @Index()
   createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @Column({ type: 'timestamp', nullable: true })
+  @Index()
   deletedAt: Date | null;
 }

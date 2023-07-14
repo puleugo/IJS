@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { UserModule } from '@app/user/user.module';
 import { AuthenticationService } from '@app/auth/authentication/authentication.service';
 import { HttpModule } from '@nestjs/axios';
@@ -9,9 +9,12 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { AuthenticationController } from '@app/auth/authentication/authentication.controller';
 import { AuthPhotoClient } from '@app/auth/authentication/utils/auth-photo.client';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([UserAuthProvider]),
     UserModule,
     HttpModule,
     JwtModule.registerAsync({
@@ -63,5 +66,12 @@ import { AuthPhotoClient } from '@app/auth/authentication/utils/auth-photo.clien
       useClass: AuthPhotoClient,
     },
   ],
+  exports: [AuthenticationService],
 })
-export class AuthenticationModule {}
+export class AuthenticationModule implements OnModuleInit {
+  constructor(private readonly authenticationService: AuthenticationService) {}
+
+  onModuleInit(): any {
+    Promise.all([this.authenticationService.initializeAuthProvider()]).then();
+  }
+}

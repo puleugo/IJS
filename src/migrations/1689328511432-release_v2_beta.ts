@@ -1,11 +1,23 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class ReleaseV2Beta1688982140871 implements MigrationInterface {
-  name = 'ReleaseV2Beta1688982140871';
+export class ReleaseV2Beta1689328511432 implements MigrationInterface {
+  name = 'ReleaseV2Beta1689328511432';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            CREATE TABLE "board" (
+            CREATE TABLE "deliveries" (
+                "id" SERIAL NOT NULL,
+                "order_name" character varying NOT NULL,
+                "store_url" character varying NOT NULL,
+                "order_url" character varying NOT NULL,
+                "delivery_url" character varying NOT NULL,
+                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+                "deleted_at" TIMESTAMP,
+                CONSTRAINT "PK_a6ef225c5c5f0974e503bfb731f" PRIMARY KEY ("id")
+            )
+        `);
+    await queryRunner.query(`
+            CREATE TABLE "boards" (
                 "id" SMALLSERIAL NOT NULL,
                 "name" character varying(255) NOT NULL,
                 "description" character varying(255) NOT NULL,
@@ -14,16 +26,18 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP,
-                CONSTRAINT "PK_865a0f2e22c140d261b1df80eb1" PRIMARY KEY ("id")
+                CONSTRAINT "PK_606923b0b068ef262dfdcd18f44" PRIMARY KEY ("id")
             )
         `);
     await queryRunner.query(`
+            CREATE INDEX "IDX_19ed7ce2fd82856a7038567174" ON "boards" ("deleted_at")
+        `);
+    await queryRunner.query(`
             CREATE TABLE "article_likes" (
-                "id" BIGSERIAL NOT NULL,
                 "article_id" integer NOT NULL,
                 "author_id" uuid NOT NULL,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "PK_c08c251499af785bf0ecf9d5d94" PRIMARY KEY ("id")
+                CONSTRAINT "PK_ea15135b89d8f907a4cc26c9752" PRIMARY KEY ("article_id", "author_id")
             )
         `);
     await queryRunner.query(`
@@ -44,14 +58,15 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
                 "likes_count" integer NOT NULL DEFAULT '0',
                 "reply_to_id" bigint,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP,
-                "author_id " uuid,
                 CONSTRAINT "PK_8bf68bc960f2b69e818bdb90dcb" PRIMARY KEY ("id")
             )
         `);
     await queryRunner.query(`
             CREATE INDEX "IDX_8e7c9a36c0ac867b543c6509aa" ON "comments" ("created_at")
+        `);
+    await queryRunner.query(`
+            CREATE INDEX "IDX_b6f97e2e112b5d7bad003655b7" ON "comments" ("deleted_at")
         `);
     await queryRunner.query(`
             CREATE TABLE "articles" (
@@ -65,7 +80,7 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
                 "comments_count" integer NOT NULL DEFAULT '0',
                 "likes_count" integer NOT NULL DEFAULT '0',
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
+                "updated_at" TIMESTAMP NOT NULL DEFAULT '"2023-07-14T09:55:18.163Z"',
                 "deleted_at" TIMESTAMP,
                 CONSTRAINT "PK_0a6e2c450d83e0b6052c2793334" PRIMARY KEY ("id")
             )
@@ -74,16 +89,7 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
             CREATE INDEX "IDX_766eaf03c57b40f88a205e0c7e" ON "articles" ("created_at")
         `);
     await queryRunner.query(`
-            CREATE TABLE "deliveries" (
-                "id" SERIAL NOT NULL,
-                "order_name" character varying NOT NULL,
-                "store_url" character varying NOT NULL,
-                "order_url" character varying NOT NULL,
-                "delivery_url" character varying NOT NULL,
-                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "deleted_at" TIMESTAMP,
-                CONSTRAINT "PK_a6ef225c5c5f0974e503bfb731f" PRIMARY KEY ("id")
-            )
+            CREATE INDEX "IDX_81584df35625f1e8b3af41daef" ON "articles" ("deleted_at")
         `);
     await queryRunner.query(`
             ALTER TABLE "users"
@@ -92,6 +98,10 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
     await queryRunner.query(`
             ALTER TABLE "users"
             ADD "delivery_id" integer
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "user_auth_providers"
+            ADD CONSTRAINT "UQ_3f703e2aeb5c14388c45cc6d669" UNIQUE ("name")
         `);
     await queryRunner.query(`
             ALTER TABLE "article_likes"
@@ -115,7 +125,7 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
         `);
     await queryRunner.query(`
             ALTER TABLE "comments"
-            ADD CONSTRAINT "FK_b6c532cc47aa1bfac517ef9f7e8" FOREIGN KEY ("author_id ") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_e6d38899c31997c45d128a8973b" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
     await queryRunner.query(`
             ALTER TABLE "comments"
@@ -123,7 +133,7 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
         `);
     await queryRunner.query(`
             ALTER TABLE "articles"
-            ADD CONSTRAINT "FK_24b7266824b3f842d9ada3d8245" FOREIGN KEY ("board_id") REFERENCES "board"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_24b7266824b3f842d9ada3d8245" FOREIGN KEY ("board_id") REFERENCES "boards"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
     await queryRunner.query(`
             ALTER TABLE "articles"
@@ -149,7 +159,7 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
             ALTER TABLE "comments" DROP CONSTRAINT "FK_06f316e1f2279bf691ed5f1fd52"
         `);
     await queryRunner.query(`
-            ALTER TABLE "comments" DROP CONSTRAINT "FK_b6c532cc47aa1bfac517ef9f7e8"
+            ALTER TABLE "comments" DROP CONSTRAINT "FK_e6d38899c31997c45d128a8973b"
         `);
     await queryRunner.query(`
             ALTER TABLE "comments" DROP CONSTRAINT "FK_e9b498cca509147e73808f9e593"
@@ -167,19 +177,25 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
             ALTER TABLE "article_likes" DROP CONSTRAINT "FK_78ef1e3144629e94df4e80baa34"
         `);
     await queryRunner.query(`
+            ALTER TABLE "user_auth_providers" DROP CONSTRAINT "UQ_3f703e2aeb5c14388c45cc6d669"
+        `);
+    await queryRunner.query(`
             ALTER TABLE "users" DROP COLUMN "delivery_id"
         `);
     await queryRunner.query(`
             ALTER TABLE "users" DROP COLUMN "is_verified"
         `);
     await queryRunner.query(`
-            DROP TABLE "deliveries"
+            DROP INDEX "public"."IDX_81584df35625f1e8b3af41daef"
         `);
     await queryRunner.query(`
             DROP INDEX "public"."IDX_766eaf03c57b40f88a205e0c7e"
         `);
     await queryRunner.query(`
             DROP TABLE "articles"
+        `);
+    await queryRunner.query(`
+            DROP INDEX "public"."IDX_b6f97e2e112b5d7bad003655b7"
         `);
     await queryRunner.query(`
             DROP INDEX "public"."IDX_8e7c9a36c0ac867b543c6509aa"
@@ -194,7 +210,13 @@ export class ReleaseV2Beta1688982140871 implements MigrationInterface {
             DROP TABLE "article_likes"
         `);
     await queryRunner.query(`
-            DROP TABLE "board"
+            DROP INDEX "public"."IDX_19ed7ce2fd82856a7038567174"
+        `);
+    await queryRunner.query(`
+            DROP TABLE "boards"
+        `);
+    await queryRunner.query(`
+            DROP TABLE "deliveries"
         `);
   }
 }

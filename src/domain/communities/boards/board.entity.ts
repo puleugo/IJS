@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -10,7 +11,7 @@ import {
 import { IBoard } from '@domain/communities/boards/board.interface';
 import { Article } from '@domain/communities/articles/article.entity';
 
-@Entity('board')
+@Entity('boards')
 export class Board implements IBoard {
   @PrimaryGeneratedColumn('increment', { type: 'smallint' })
   id: number;
@@ -34,6 +35,7 @@ export class Board implements IBoard {
   updatedAt: Date;
 
   @DeleteDateColumn({ nullable: true })
+  @Index()
   deletedAt: Date | null;
 
   @OneToMany(() => Article, ({ board }) => board, {

@@ -8,6 +8,7 @@ import {
   JwtSubjectType,
 } from '@infrastructure/types/jwt.types';
 import { UserProfileResponse } from '@app/user/dto/user-profile.response';
+import { UserTokenInValidate } from '@domain/error/user.error';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -27,11 +28,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    console.log(data);
-    const user = await this.userService.findUserById(data.user_id, {
-      // relations: ['profile'],
+    const user = await this.userService.findById(data.user_id, {
+      // relations: { profile: true },
     });
-    console.log(user);
+    if (!user) throw new UserTokenInValidate();
     return new UserProfileResponse(user);
   }
 }

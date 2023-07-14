@@ -33,11 +33,17 @@ export class AuthenticationController {
   @ApiOperation({ summary: 'Oauth 로그인' })
   @ApiBody({ type: OauthLoginRequest })
   @ApiResponse({ type: TokenResponse })
-  @Post('oauth')
+  @Post('oauth-login')
   async oauthLogin(
     @Body() oauthLoginRequest: OauthLoginRequest,
   ): Promise<TokenResponse> {
     return await this.authenticationService.oauthLogin(oauthLoginRequest);
+  }
+
+  @ApiOperation({ summary: '토큰 갱신' })
+  @Post('refresh')
+  async refreshAccessToken(@Req() request: Request): Promise<TokenResponse> {
+    return await this.authenticationService.refreshAccessToken(request);
   }
 
   @ApiOperation({ summary: '회원 정보 조회' })

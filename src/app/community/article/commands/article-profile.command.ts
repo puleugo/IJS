@@ -1,5 +1,5 @@
 import { IArticle } from '@domain/communities/articles/article.interface';
-import { UserProfileResponseCommand } from '@app/user/command/user-profile-response.command';
+import { UserPreviewResponseCommand } from '@app/user/command/user-preview-response.command';
 
 export type ArticleProfileCommand = Pick<
   IArticle,
@@ -9,10 +9,12 @@ export type ArticleProfileCommand = Pick<
   | 'images'
   | 'boardId'
   | 'likesCount'
+  | 'viewsCount'
   | 'commentsCount'
   | 'createdAt'
+  | 'authorId'
 > &
   Partial<Pick<IArticle, 'updatedAt'>> & {
-    author: UserProfileResponseCommand;
+    author: UserPreviewResponseCommand | null;
     isAnonymous: boolean;
   };

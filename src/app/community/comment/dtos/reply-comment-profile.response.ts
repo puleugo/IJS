@@ -1,9 +1,8 @@
-import { CommentProfileCommand } from '@app/community/comment/commands/comment-profile.command';
+import { ReplyCommentProfileCommand } from '@app/community/comment/commands/comment-profile.command';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { ApiProperty } from '@nestjs/swagger';
-import { ReplyCommentProfileResponse } from '@app/community/comment/dtos/reply-comment-profile.response';
 
-export class CommentProfileResponse implements CommentProfileCommand {
+export class ReplyCommentProfileResponse implements ReplyCommentProfileCommand {
   @ApiProperty({ example: 1, description: '댓글 아이디' })
   readonly id: number;
   @ApiProperty({
@@ -58,11 +57,11 @@ export class CommentProfileResponse implements CommentProfileCommand {
   readonly replyToId: number | null;
 
   @ApiProperty({
-    example: [ReplyCommentProfileResponse],
-    description: '자식 댓글 목록',
+    example: null,
+    description: '대댓글은 자식 댓글이 존재하지 않음',
     nullable: true,
   })
-  readonly replies: ReplyCommentProfileResponse[];
+  readonly replies: null;
 
   @ApiProperty({
     example: 1,
@@ -76,22 +75,18 @@ export class CommentProfileResponse implements CommentProfileCommand {
   })
   readonly isDeleted: boolean;
 
-  constructor(comment: CommentProfileCommand) {
+  constructor(comment: ReplyCommentProfileCommand) {
     this.id = comment.id;
     this.author = comment.isAnonymous
       ? null
       : new UserPreviewResponse(comment.author);
+    this.authorId = comment.isAnonymous ? null : comment.authorId;
     this.isDeleted = !!comment.deletedAt;
     this.content = this.isDeleted ? '삭제된 댓글입니다.' : comment.content;
-    this.authorId = comment.isAnonymous ? null : comment.authorId;
     this.createdAt = comment.createdAt;
     this.likesCount = comment.likesCount;
     this.isAnonymous = comment.isAnonymous;
     this.isArticleAuthor = comment.isArticleAuthor;
     this.replyToId = comment.replyToId;
-    this.replies =
-      comment.replies.length > 0
-        ? comment.replies.map((reply) => new ReplyCommentProfileResponse(reply))
-        : null;
   }
 }

@@ -4,7 +4,7 @@ import { UserController } from '@app/user/user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '@domain/user/user.entity';
 import { UserAuth } from '@domain/user/user-auth.entity';
-import { UserAuthProvider } from '@domain/user/user-auth-vendor.entity';
+import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { ScheduleSet } from '@domain/user/schedule-set.entity';
 import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UniversityLecture } from '@domain/university/university-lecture.entity';
