@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class ReleaseV2Beta1689328511432 implements MigrationInterface {
-  name = 'ReleaseV2Beta1689328511432';
+export class ReleaseV2Beta1689361006233 implements MigrationInterface {
+  name = 'ReleaseV2Beta1689361006233';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -42,11 +42,10 @@ export class ReleaseV2Beta1689328511432 implements MigrationInterface {
         `);
     await queryRunner.query(`
             CREATE TABLE "comment_likes" (
-                "id" BIGSERIAL NOT NULL,
                 "comment_id" bigint NOT NULL,
                 "author_id" uuid NOT NULL,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "PK_2c299aaf1f903c45ee7e6c7b419" PRIMARY KEY ("id")
+                CONSTRAINT "PK_1dd201afaf8adb6cdada49b9056" PRIMARY KEY ("comment_id", "author_id")
             )
         `);
     await queryRunner.query(`
@@ -80,7 +79,7 @@ export class ReleaseV2Beta1689328511432 implements MigrationInterface {
                 "comments_count" integer NOT NULL DEFAULT '0',
                 "likes_count" integer NOT NULL DEFAULT '0',
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMP NOT NULL DEFAULT '"2023-07-14T09:55:18.163Z"',
+                "updated_at" TIMESTAMP NOT NULL DEFAULT '"2023-07-14T18:56:51.635Z"',
                 "deleted_at" TIMESTAMP,
                 CONSTRAINT "PK_0a6e2c450d83e0b6052c2793334" PRIMARY KEY ("id")
             )

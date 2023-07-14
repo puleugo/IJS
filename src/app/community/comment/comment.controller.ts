@@ -24,7 +24,6 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { ReplyCommentProfileResponse } from '@app/community/comment/dtos/reply-comment-profile.response';
 
 @Controller('boards/:boardId/articles/:articleId/comments')
 @ApiTags('[커뮤니티] 댓글')
@@ -123,7 +122,7 @@ export class CommentController {
   @ApiParam({ name: 'commentId', description: '댓글 아이디', required: true })
   @ApiCreatedResponse({
     description: '대댓글 작성 성공',
-    type: ReplyCommentProfileResponse,
+    type: CommentProfileResponse,
   })
   @ApiNotFoundResponse({
     description: [
@@ -138,7 +137,7 @@ export class CommentController {
     @Param('commentId', ParseIntPipe) id: number,
     @Req() { user }: Request,
     @Body() createCommentRequest: CreateCommentRequest,
-  ): Promise<ReplyCommentProfileResponse> {
+  ): Promise<CommentProfileResponse> {
     const comment = await this.commentService.createComment({
       boardId,
       articleId,
@@ -146,7 +145,7 @@ export class CommentController {
       replyToId: id,
       authorId: user.id,
     });
-    return new ReplyCommentProfileResponse({ ...comment, replies: null });
+    return new CommentProfileResponse({ ...comment });
   }
 
   @Delete(':commentId')
@@ -173,7 +172,7 @@ export class CommentController {
     @Param('commentId', ParseIntPipe) id: number,
     @Req() { user }: Request,
   ): Promise<string> {
-    const isDeleted = await this.commentService.deleteComment({
+    await this.commentService.deleteComment({
       id,
       articleId,
       userId: user.id,
