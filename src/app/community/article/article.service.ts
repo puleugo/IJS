@@ -24,6 +24,8 @@ import {
   ArticlePermissionDeniedException,
   CanNotLikeOwnArticleException,
 } from '@domain/error/article.error';
+import { Pagination } from '@infrastructure/types/pagination.types';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class ArticleService {
@@ -40,28 +42,39 @@ export class ArticleService {
 
   async getArticles(params: {
     boardId: number;
-  }): Promise<ArticlePreviewResponse[]> {
-    const { boardId } = params;
-    const board = await this.boardService.findById(boardId, {
+    page: number;
+    limit: number;
+  }): Promise<Pagination<ArticlePreviewResponse>> {
+    const board = await this.boardService.findById(params.boardId, {
       select: { isAnonymous: true },
     });
     if (!board) throw new BoardNotFoundException();
 
-    const articles = await this.articleRepository.find({
-      where: { boardId: board.id },
-      relations: {
-        author: true,
-        board: true,
+    const { items, meta } = await paginate(
+      this.articleRepository,
+      {
+        page: params.page,
+        limit: params.limit,
       },
-      order: { createdAt: 'DESC' },
-    });
-    return articles.map(
-      (article) =>
-        new ArticlePreviewResponse({
-          ...article,
-          isAnonymous: board.isAnonymous,
-        }),
+      {
+        where: { boardId: board.id },
+        relations: {
+          author: true,
+          board: true,
+        },
+        order: { createdAt: 'DESC' },
+      },
     );
+    return {
+      items: items.map(
+        (article) =>
+          new ArticlePreviewResponse({
+            ...article,
+            isAnonymous: board.isAnonymous,
+          }),
+      ),
+      meta,
+    };
   }
 
   async getArticle(params: {

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFiles,
   UseGuards,
@@ -34,6 +35,7 @@ import {
   FileFastifyInterceptor,
   memoryStorage,
 } from 'fastify-file-interceptor';
+import { Pagination } from '@infrastructure/types/pagination.types';
 
 @Controller('boards/:boardId/articles')
 @UseGuards(JwtAuthGuard)
@@ -54,9 +56,10 @@ export class ArticleController {
   })
   async getArticles(
     @Param('boardId', ParseIntPipe) boardId: number,
-  ): Promise<ArticlePreviewResponse[]> {
-    const articles = await this.articleService.getArticles({ boardId });
-    return articles.map((article) => new ArticlePreviewResponse(article));
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+  ): Promise<Pagination<ArticlePreviewResponse>> {
+    return await this.articleService.getArticles({ boardId, page, limit });
   }
 
   @Get(':articleId')
