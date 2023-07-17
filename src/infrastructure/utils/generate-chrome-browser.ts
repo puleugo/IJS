@@ -1,8 +1,7 @@
 import * as puppeteer from 'puppeteer';
 
-export async function generateChromeBrowser(
-  isDevMode?: boolean,
-): Promise<puppeteer.Browser> {
+export async function generateChromeBrowser(): Promise<puppeteer.Browser> {
+  const isDevMode = process.env.ENV === 'dev';
   if (isDevMode) return await generateChromeBrowserDevMode();
   return await puppeteer.launch({
     headless: 'new',
