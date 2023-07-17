@@ -30,8 +30,13 @@ import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { Repository } from 'typeorm';
 import { Request } from '@infrastructure/types/request.types';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const TelegramBot = require('node-telegram-bot-api');
+
 @Injectable()
 export class AuthenticationService {
+  private readonly bot: any;
+
   constructor(
     private readonly userService: UserService,
     private readonly httpService: HttpService,
@@ -43,7 +48,11 @@ export class AuthenticationService {
     private readonly authPhotoClient: PhotoClient,
     @InjectRepository(UserAuthProvider)
     private readonly userAuthProviderRepository: Repository<UserAuthProvider>,
-  ) {}
+  ) {
+    this.bot = new TelegramBot(process.env.TELEGRAM_BOT_KEY, { polling: true });
+    this.bot.on('message', this.onReceiveMessage);
+    // this.bot.on('callback_query', this.approveVerification);
+  }
 
   async oauthLogin(
     oauthLoginRequest: OauthLoginRequestCommand,
@@ -232,7 +241,8 @@ export class AuthenticationService {
 
   async uploadRegisterImage(photo: Buffer, user: User) {
     const resizedPhoto = await this.authPhotoClient.resizePhoto(photo);
-    await this.authPhotoClient.uploadPhoto(resizedPhoto);
+    const photoUrl = await this.authPhotoClient.uploadPhoto(resizedPhoto);
+    await this.requestVerification(user.id, photoUrl);
     return;
   }
 
@@ -292,5 +302,34 @@ export class AuthenticationService {
     const accessToken = await this.generateAccessToken(account.id);
 
     return new TokenResponse(accessToken, refreshToken);
+  }
+
+  onReceiveMessage = (msg: any) => {
+    console.log(msg, msg.data);
+  };
+
+  async requestVerification(userId: string, photoUrl: string) {
+    this.bot.sendMessage(
+      process.env.TELEGRAM_CHAT_ID,
+      `인증 요청입니다 .\n${photoUrl}`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '수락',
+                callback_data: `${userId}:accept`,
+              },
+            ],
+            [
+              {
+                text: '거절',
+                callback_data: `${userId}:reject`,
+              },
+            ],
+          ],
+        },
+      },
+    );
   }
 }
