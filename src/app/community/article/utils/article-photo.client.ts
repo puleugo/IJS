@@ -40,6 +40,6 @@ export class ArticlePhotoClient implements PhotoClient {
     const timestampKey = format(new Date(), 'yyyyMMddHHmmss');
     const photoKey = uuid();
 
-    return `${photoKey}_${timestampKey}`;
+    return `${photoKey}_${timestampKey}.png`;
   }
 }
