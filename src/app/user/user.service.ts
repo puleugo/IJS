@@ -290,6 +290,23 @@ export class UserService {
     });
   }
 
+  async verifyUser(
+    userId: string,
+    params: { studentId: string; majorId: number },
+  ): Promise<boolean> {
+    const { affected } = await this.userRepository.update(
+      {
+        id: userId,
+      },
+      {
+        schoolId: params.studentId,
+        majorId: params.majorId,
+        isVerified: true,
+      },
+    );
+    return affected > 0;
+  }
+
   private async generateNativeQRCode(studentId: string): Promise<string> {
     const token = await this.jwtService.signAsync(
       { studentId },

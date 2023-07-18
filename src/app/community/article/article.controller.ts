@@ -31,11 +31,8 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  FileFastifyInterceptor,
-  memoryStorage,
-} from 'fastify-file-interceptor';
 import { Pagination } from '@infrastructure/types/pagination.types';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('boards/:boardId/articles')
 @UseGuards(JwtAuthGuard)
@@ -164,7 +161,7 @@ export class ArticleController {
     type: String,
     isArray: true,
   })
-  @UseInterceptors(FileFastifyInterceptor('file', { storage: memoryStorage() }))
+  @UseInterceptors(FilesInterceptor('files', 10))
   @ApiConsumes('multipart/form-data')
   async uploadArticleImage(
     @Param('boardId', ParseIntPipe) boardId: number,

@@ -11,12 +11,14 @@ import { AuthenticationController } from '@app/auth/authentication/authenticatio
 import { AuthPhotoClient } from '@app/auth/authentication/utils/auth-photo.client';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
+import { UniversityModule } from '@app/university/university.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserAuthProvider]),
     UserModule,
     HttpModule,
+    UniversityModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

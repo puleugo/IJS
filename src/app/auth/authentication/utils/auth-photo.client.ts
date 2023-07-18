@@ -20,7 +20,7 @@ export class AuthPhotoClient implements PhotoClient {
     return new Promise((resolve, reject) =>
       this.s3.upload(
         {
-          Bucket: this.configService.get('AWS_BUCKET_NAME', 'ijs-cdn'),
+          Bucket: this.configService.get('AWS_BUCKET_NAME', 'ijs-bucket'),
           Key: photoId,
           Body: photo,
         },
@@ -40,6 +40,6 @@ export class AuthPhotoClient implements PhotoClient {
     const timestampKey = format(new Date(), 'yyyyMMddHHmmss');
     const photoKey = uuid();
 
-    return `${photoKey}_${timestampKey}`;
+    return `${photoKey}_${timestampKey}.png`;
   }
 }

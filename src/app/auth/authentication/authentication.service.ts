@@ -23,12 +23,15 @@ import {
 import { MailerService } from '@nestjs-modules/mailer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { PhotoClient } from '@infrastructure/utils/photo.client';
 import { UserNotFoundException } from '@domain/error/user.error';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { Repository } from 'typeorm';
 import { Request } from '@infrastructure/types/request.types';
+import { PhotoClient } from '@infrastructure/utils/photo.client';
+import { RegisterRequest } from '@app/auth/authentication/dto/register-request';
+import { UniversityService } from '@app/university/university.service';
+import { ConfigService } from '@nestjs/config';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const TelegramBot = require('node-telegram-bot-api');
@@ -36,12 +39,15 @@ const TelegramBot = require('node-telegram-bot-api');
 @Injectable()
 export class AuthenticationService {
   private readonly bot: any;
+  private readonly chatId: string;
 
   constructor(
     private readonly userService: UserService,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    private readonly universityService: UniversityService,
+    private readonly configService: ConfigService,
     @InjectRedis()
     private readonly redis: Redis,
     @Inject('AuthPhotoClient')
@@ -50,8 +56,11 @@ export class AuthenticationService {
     private readonly userAuthProviderRepository: Repository<UserAuthProvider>,
   ) {
     this.bot = new TelegramBot(process.env.TELEGRAM_BOT_KEY, { polling: true });
-    this.bot.on('message', this.onReceiveMessage);
-    // this.bot.on('callback_query', this.approveVerification);
+    this.bot.on('callback_query', (msg) => {
+      this.answerVerification(msg);
+    });
+    this.bot.on('polling_error', console.log);
+    this.chatId = this.configService.get('TELEGRAM_CHAT_ID', '6279443618');
   }
 
   async oauthLogin(
@@ -239,10 +248,15 @@ export class AuthenticationService {
     return await this.userService.findById(userId);
   }
 
-  async uploadRegisterImage(photo: Buffer, user: User) {
+  async uploadRegisterImage(data: RegisterRequest, photo: Buffer, user: User) {
     const resizedPhoto = await this.authPhotoClient.resizePhoto(photo);
     const photoUrl = await this.authPhotoClient.uploadPhoto(resizedPhoto);
-    await this.requestVerification(user.id, photoUrl);
+    await this.requestVerification(
+      data.studentId,
+      data.majorId,
+      user.id,
+      photoUrl,
+    );
     return;
   }
 
@@ -304,27 +318,58 @@ export class AuthenticationService {
     return new TokenResponse(accessToken, refreshToken);
   }
 
-  onReceiveMessage = (msg: any) => {
-    console.log(msg, msg.data);
-  };
+  async uploadImage(buffer: Buffer): Promise<string> {
+    const image = await this.authPhotoClient.resizePhoto(buffer);
+    return await this.authPhotoClient.uploadPhoto(image);
+  }
 
-  async requestVerification(userId: string, photoUrl: string) {
-    this.bot.sendMessage(
-      process.env.TELEGRAM_CHAT_ID,
-      `인증 요청입니다 .\n${photoUrl}`,
+  answerVerification(callbackData: any) {
+    const data: string = callbackData.data;
+    const [userId, studentId, majorId, action] = data.split(':');
+    switch (action) {
+      case 'accept':
+        const isVerification = this.userService.verifyUser(userId, {
+          studentId,
+          majorId: parseInt(majorId),
+        });
+
+        if (isVerification) {
+          return this.bot.sendMessage(this.chatId, '인증이 완료되었습니다.');
+        }
+        return this.bot.sendMessage(this.chatId, '인증에 실패했습니다.');
+      case 'reject':
+        return this.bot.sendMessage(this.chatId, '인증이 거절되었습니다.');
+      default:
+        return this.bot.sendMessage(this.chatId, '응답에 실패했습니다.');
+    }
+  }
+
+  private async requestVerification(
+    studentId: string,
+    majorId: number,
+    userId: string,
+    photoUrl: string,
+  ) {
+    const majorName =
+      await this.universityService.getUniversityMajorNameByMajorId(majorId);
+    console.log(this.chatId);
+    this.bot.sendPhoto(
+      this.chatId,
+      `https://duscltkrckrf7.cloudfront.net/${photoUrl}`,
       {
+        caption: `인제생 회원가입 인증 요청입니다\n학번: ${studentId}\n전공 명: ${majorName}\n사용자 ID: ${userId}`,
         reply_markup: {
           inline_keyboard: [
             [
               {
                 text: '수락',
-                callback_data: `${userId}:accept`,
+                callback_data: `${userId}:${studentId}:${majorId}:accept`,
               },
             ],
             [
               {
                 text: '거절',
-                callback_data: `${userId}:reject`,
+                callback_data: `${userId}:${studentId}:${majorId}:reject`,
               },
             ],
           ],

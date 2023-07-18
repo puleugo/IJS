@@ -19,20 +19,19 @@ import { UserScheduleSetPreviewResponse } from '@app/user/dto/user-schedule-set-
 import { UserScheduleSetProfileResponse } from '@app/user/dto/user-schedule-set-profile.response';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  FileFastifyInterceptor,
-  memoryStorage,
-} from 'fastify-file-interceptor';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse } from '@app/user/dto/user-schedule-profile.response';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
 import { ScheduleSetProfileResponse } from '@app/user/dto/schedule-set-profile.response';
 import { LogResponseTypes } from '@infrastructure/types/log-respone.types';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageUploadRequest } from '@app/auth/authentication/dto/image-upload.request';
 
 // TODO 구현
 @ApiTags('User')
@@ -120,8 +119,11 @@ export class UserController {
 
   @ApiOperation({ summary: '특정 시간표 집합에 입장합니다.' })
   @Put('schedules')
-  @UseInterceptors(FileFastifyInterceptor('file', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: ImageUploadRequest,
+  })
   async updateUniversitySchedule(
     @Req() { user }: Request,
     @Body() data?: { lectureIds: number[] },

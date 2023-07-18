@@ -176,6 +176,18 @@ export class UniversityService {
     return busInfo.filter((bus) => bus.departedOn > currentTime);
   }
 
+  async getUniversityMajorNameByMajorId(majorId: number): Promise<string> {
+    const major = await this.universityMajorRepository.findOne({
+      where: {
+        id: majorId,
+      },
+      select: {
+        name: true,
+      },
+    });
+    return major.name;
+  }
+
   private async getUniversitySemesterByDate(
     date: Date,
   ): Promise<UniversitySemester> {

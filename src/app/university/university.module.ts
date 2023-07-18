@@ -24,5 +24,6 @@ import { UniversityService } from '@app/university/university.service';
   ],
   controllers: [UniversityController],
   providers: [UniversityService],
+  exports: [UniversityService],
 })
 export class UniversityModule {}
