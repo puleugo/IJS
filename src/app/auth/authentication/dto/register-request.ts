@@ -1,7 +1,13 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IUser } from '@domain/user/user.interface';
 
-export class RegisterRequest {
+export type UserVerificationRequestCommand = Pick<
+  IUser,
+  'name' | 'schoolId' | 'majorId'
+>;
+
+export class RegisterRequest implements UserVerificationRequestCommand {
   @IsOptional()
   @ApiProperty({ type: 'string', format: 'binary', description: '이미지' })
   file!: Buffer;
@@ -12,7 +18,7 @@ export class RegisterRequest {
 
   @IsNotEmpty()
   @ApiProperty({ type: 'string', description: '학번' })
-  studentId!: string;
+  schoolId!: string;
 
   @IsNotEmpty()
   @ApiProperty({ type: 'int', description: '학과 ID' })

@@ -29,7 +29,7 @@ import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { Repository } from 'typeorm';
 import { Request } from '@infrastructure/types/request.types';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
-import { RegisterRequest } from '@app/auth/authentication/dto/register-request';
+import { UserVerificationRequestCommand } from '@app/auth/authentication/dto/register-request';
 import { UniversityService } from '@app/university/university.service';
 import { ConfigService } from '@nestjs/config';
 
@@ -248,12 +248,15 @@ export class AuthenticationService {
     return await this.userService.findById(userId);
   }
 
-  async uploadRegisterImage(data: RegisterRequest, photo: Buffer, user: User) {
+  async uploadRegisterImage(
+    userVerificationRequestCommand: UserVerificationRequestCommand,
+    photo: Buffer,
+    user: User,
+  ) {
     const resizedPhoto = await this.authPhotoClient.resizePhoto(photo);
     const photoUrl = await this.authPhotoClient.uploadPhoto(resizedPhoto);
     await this.requestVerification(
-      data.studentId,
-      data.majorId,
+      userVerificationRequestCommand,
       user.id,
       photoUrl,
     );
@@ -345,31 +348,30 @@ export class AuthenticationService {
   }
 
   private async requestVerification(
-    studentId: string,
-    majorId: number,
+    userVerificationRequestCommand: UserVerificationRequestCommand,
     userId: string,
     photoUrl: string,
   ) {
+    const { name, schoolId, majorId } = userVerificationRequestCommand;
     const majorName =
       await this.universityService.getUniversityMajorNameByMajorId(majorId);
-    console.log(this.chatId);
     this.bot.sendPhoto(
       this.chatId,
       `https://duscltkrckrf7.cloudfront.net/${photoUrl}`,
       {
-        caption: `인제생 회원가입 인증 요청입니다\n학번: ${studentId}\n전공 명: ${majorName}\n사용자 ID: ${userId}`,
+        caption: `인제생 회원가입 인증 요청입니다\n사용자명: ${name}\n학번: ${schoolId}\n전공 명: ${majorName}`,
         reply_markup: {
           inline_keyboard: [
             [
               {
                 text: '수락',
-                callback_data: `${userId}:${studentId}:${majorId}:accept`,
+                callback_data: `${userId}:${schoolId}:${majorId}:accept`,
               },
             ],
             [
               {
                 text: '거절',
-                callback_data: `${userId}:${studentId}:${majorId}:reject`,
+                callback_data: `${userId}:${schoolId}:${majorId}:reject`,
               },
             ],
           ],

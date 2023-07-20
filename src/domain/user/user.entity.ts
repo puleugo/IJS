@@ -32,11 +32,14 @@ export class User implements IUser {
   @Column('int', { nullable: true })
   majorId: number | null;
 
-  @ManyToOne(() => UniversityMajor, (major) => major.notices)
-  major: UniversityMajor;
+  @Column('varchar', { nullable: true, length: 20 })
+  name: string | null;
 
   @Column('varchar', { unique: true, nullable: true, length: 20 })
   schoolId: string | null;
+
+  @ManyToOne(() => UniversityMajor, (major) => major.notices)
+  major: UniversityMajor;
 
   @Column('varchar', { unique: true, nullable: true, length: 255 })
   @IsEmail()

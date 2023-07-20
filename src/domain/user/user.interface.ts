@@ -11,6 +11,7 @@ import { ArticleLike } from '@domain/communities/articles/article-like.entity';
 export interface IUser {
   id: string;
   isVerified: boolean;
+  name: string | null;
   majorId: number | null;
   major: UniversityMajor;
   schoolId: string | null;
