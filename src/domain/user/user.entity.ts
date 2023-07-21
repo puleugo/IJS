@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -17,23 +16,30 @@ import { UniversityMajor } from '@domain/university/university-major.entity';
 import { IsEmail } from 'class-validator';
 import { IUser } from '@domain/user/user.interface';
 import { Delivery } from '@domain/delivery/delivery.entity';
+import { Article } from '@domain/communities/articles/article.entity';
+import { ArticleLike } from '@domain/communities/articles/article-like.entity';
+import { Comment } from '@domain/communities/comments/comment.entity';
+import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 
 @Entity('users')
 export class User implements IUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
+
   @Column('int', { nullable: true })
   majorId: number | null;
 
-  @ManyToOne(() => UniversityMajor, (major) => major.notices, {
-    nullable: true,
-  })
-  @JoinColumn({ name: 'major_id', referencedColumnName: 'id' })
-  major: UniversityMajor;
+  @Column('varchar', { nullable: true, length: 20 })
+  name: string | null;
 
   @Column('varchar', { unique: true, nullable: true, length: 20 })
   schoolId: string | null;
+
+  @ManyToOne(() => UniversityMajor, (major) => major.notices)
+  major: UniversityMajor;
 
   @Column('varchar', { unique: true, nullable: true, length: 255 })
   @IsEmail()
@@ -50,6 +56,18 @@ export class User implements IUser {
 
   @OneToMany(() => UserLecture, (lecture) => lecture.user)
   lectures: UserLecture[];
+
+  @OneToMany(() => Article, ({ author }) => author)
+  articles: Article[];
+
+  @OneToMany(() => ArticleLike, ({ author }) => author)
+  articleLikes: ArticleLike[];
+
+  @OneToMany(() => Comment, ({ author }) => author)
+  comments: Comment[];
+
+  @OneToMany(() => CommentLike, ({ author }) => author)
+  commentLikes: CommentLike[];
 
   @CreateDateColumn()
   createdAt: Date;

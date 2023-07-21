@@ -3,11 +3,11 @@ import { CrawlerClient } from '@infrastructure/utils/crawler.client';
 import { Between, LessThan, Like, MoreThan, Repository } from 'typeorm';
 import { UniversityEvent } from '@domain/university/university-event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as puppeteer from 'puppeteer';
 import { removeEscapeCharacters } from '@infrastructure/utils/remove-escape-characters';
 import { UniversitySemester } from '@domain/university/university-semester.entity';
 import { Crawler } from '@domain/crawler/crawler.entity';
 import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
+import { generateChromeBrowser } from '@infrastructure/utils/generate-chrome-browser';
 
 @Injectable()
 export class UniversityEventCrawlerClient implements CrawlerClient {
@@ -23,10 +23,7 @@ export class UniversityEventCrawlerClient implements CrawlerClient {
   async crawl(): Promise<void> {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=4&Ltype2=1&Ltype3=0&Tname=S_Schedule&Ldir=board/S_Schedule&Lpage=Tboard_L&d1n=4&d2n=2&d3n=1&d4n=1';
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      waitForInitialPage: true,
-    });
+    const browser = await generateChromeBrowser();
     const page = await getPuppeteerPage(browser, url);
 
     try {

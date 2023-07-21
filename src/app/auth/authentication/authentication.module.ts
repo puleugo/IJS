@@ -1,6 +1,5 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { UserModule } from '@app/user/user.module';
-import { AuthenticationController } from '@app/auth/authentication/authentication.controller';
 import { AuthenticationService } from '@app/auth/authentication/authentication.service';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,11 +7,18 @@ import { JwtStrategy } from '@app/auth/authentication/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { AuthenticationController } from '@app/auth/authentication/authentication.controller';
+import { AuthPhotoClient } from '@app/auth/authentication/utils/auth-photo.client';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
+import { UniversityModule } from '@app/university/university.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([UserAuthProvider]),
     UserModule,
     HttpModule,
+    UniversityModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -54,6 +60,20 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
     }),
   ],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService, JwtStrategy],
+  providers: [
+    AuthenticationService,
+    JwtStrategy,
+    {
+      provide: 'AuthPhotoClient',
+      useClass: AuthPhotoClient,
+    },
+  ],
+  exports: [AuthenticationService],
 })
-export class AuthenticationModule {}
+export class AuthenticationModule implements OnModuleInit {
+  constructor(private readonly authenticationService: AuthenticationService) {}
+
+  onModuleInit(): any {
+    Promise.all([this.authenticationService.initializeAuthProvider()]).then();
+  }
+}

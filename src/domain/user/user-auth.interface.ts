@@ -1,6 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
-import { UserAuthProvider } from './user-auth-vendor.entity';
+import { UserAuthProvider } from './user-auth-provider.entity';
 
 export interface IUserAuth {
   username: string;

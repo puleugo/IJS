@@ -1,14 +1,15 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from '@domain/user/user-auth.entity';
-import { UserAuthProvider } from '@domain/user/user-auth-vendor.entity';
+import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { ScheduleSet } from '@domain/user/schedule-set.entity';
 import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UniversityLecture } from '@domain/university/university-lecture.entity';
@@ -16,12 +17,13 @@ import { UserLecture } from '@domain/user/user-lecture.entity';
 import * as QRCode from 'qrcode';
 import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum';
 import { UserFollow } from '@domain/user/user-follow.entity';
-import { UserPhotoClient } from '@app/user/utils/user-photo.client';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { UserUnauthenticated } from '@domain/error/user.error';
 import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
 import { IUser } from '@domain/user/user.interface';
+import { PhotoClient } from '@infrastructure/utils/photo.client';
+import { JwtService } from '@nestjs/jwt';
+import { USER_QR_CODE_EXPIRE } from '../../contants';
 
 @Injectable()
 export class UserService {
@@ -42,9 +44,10 @@ export class UserService {
     private readonly userScheduleSetRepository: Repository<UserScheduleSet>,
     @InjectRepository(UniversityLecture)
     private readonly universityLectureRepository: Repository<UniversityLecture>,
-    private readonly dataSource: DataSource,
-    private readonly photoClient: UserPhotoClient,
-    private readonly ocrClient: UserOcrClient,
+    @Inject('UserPhotoClient')
+    private readonly userPhotoClient: PhotoClient,
+    private readonly userOcrClient: UserOcrClient,
+    private readonly jwtService: JwtService,
   ) {}
 
   async joinUserByOauth(data: {
@@ -96,7 +99,7 @@ export class UserService {
   async openScheduleSet(
     userId: string,
   ): Promise<ScheduleSetProfileResponseCommand> {
-    const owner = await this.findUserById(userId);
+    const owner = await this.findById(userId);
     const userScheduleSet = new UserScheduleSet();
     userScheduleSet.user = owner;
     userScheduleSet.scheduleSet = new ScheduleSet();
@@ -115,7 +118,7 @@ export class UserService {
     userId: string,
     scheduleSetId: string,
   ): Promise<ScheduleSet> {
-    const user = await this.findUserById(userId);
+    const user = await this.findById(userId);
     const scheduleSet = await this.findScheduleSetById(scheduleSetId);
     await this.userScheduleSetRepository.save({
       user,
@@ -132,10 +135,10 @@ export class UserService {
 
   // TODO: 팔로우 기능 구현
   async followUser(myId: string, userId: string): Promise<void> {
-    const user = await this.findUserById(myId);
+    const user = await this.findById(myId);
     if (!user) throw new NotFoundException('user not found');
 
-    const toFollowUser = await this.findUserById(userId);
+    const toFollowUser = await this.findById(userId);
     if (!toFollowUser) throw new NotFoundException('user not found');
 
     await this.userFollowRepository.save({
@@ -144,10 +147,7 @@ export class UserService {
     });
   }
 
-  async findUserById(
-    id: string,
-    options?: FindOneOptions<User>,
-  ): Promise<User> {
+  async findById(id: string, options?: FindOneOptions<User>): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
       ...options,
@@ -256,7 +256,6 @@ export class UserService {
     });
     if (!user) throw new NotFoundException('user not found');
     const { affected } = await this.userRepository.update({ id: userId }, data);
-    await console.log(affected);
     return affected > 0;
   }
 
@@ -276,8 +275,11 @@ export class UserService {
     return follows.map((follow) => follow.user);
   }
 
-  async getStudentQRCode(studentId: string): Promise<string> {
-    if (!studentId) throw new UserUnauthenticated();
+  async getStudentQRCode(
+    studentId: string,
+    nativeOption?: boolean,
+  ): Promise<string> {
+    if (nativeOption) return this.generateNativeQRCode(studentId);
     return QRCode.toDataURL(`AA${studentId}`);
   }
 
@@ -286,6 +288,33 @@ export class UserService {
       userId: myId,
       toFollowId: userId,
     });
+  }
+
+  async verifyUser(
+    userId: string,
+    params: { studentId: string; majorId: number },
+  ): Promise<boolean> {
+    const { affected } = await this.userRepository.update(
+      {
+        id: userId,
+      },
+      {
+        schoolId: params.studentId,
+        majorId: params.majorId,
+        isVerified: true,
+      },
+    );
+    return affected > 0;
+  }
+
+  private async generateNativeQRCode(studentId: string): Promise<string> {
+    const token = await this.jwtService.signAsync(
+      { studentId },
+      {
+        expiresIn: USER_QR_CODE_EXPIRE,
+      },
+    );
+    return QRCode.toDataURL(token);
   }
 
   private async generateQrCodeByScheduleSetId(setId: string): Promise<string> {
@@ -297,8 +326,10 @@ export class UserService {
     userId: string,
     photo: Buffer,
   ): Promise<UniversityLecture[]> {
-    const resizedPhoto = await this.photoClient.resizePhoto(photo);
-    const ocrLectures = await this.ocrClient.getScheduleFromPhoto(resizedPhoto);
+    const resizedPhoto = await this.userPhotoClient.resizePhoto(photo);
+    const ocrLectures = await this.userOcrClient.getScheduleFromPhoto(
+      resizedPhoto,
+    );
 
     return [];
   }

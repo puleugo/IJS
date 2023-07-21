@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 export const USER_ERRORS = {
@@ -9,6 +10,7 @@ export const USER_ERRORS = {
   USER_UNAUTHENTICATED: 'USER_UNAUTHENTICATED',
   USER_FOUND: 'USER_FOUND',
   USER_ALREADY_JOIN: 'USER_ALREADY_JOIN',
+  USER_TOKEN_INVALIDATE: 'USER_TOKEN_INVALIDATE',
 };
 
 export class UserNotFoundException extends NotFoundException {
@@ -32,5 +34,11 @@ export class DuplicatiedUserException extends ConflictException {
 export class UserAlreadyJoin extends ConflictException {
   constructor() {
     super('이미 참여한 회원입니다.', USER_ERRORS.USER_ALREADY_JOIN);
+  }
+}
+
+export class UserTokenInValidate extends UnauthorizedException {
+  constructor() {
+    super('옳바르지 않은 토큰입니다.', USER_ERRORS.USER_TOKEN_INVALIDATE);
   }
 }

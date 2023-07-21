@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
-import { UserAuthProvider } from './user-auth-vendor.entity';
+import { UserAuthProvider } from './user-auth-provider.entity';
 import { IUserAuth } from '@domain/user/user-auth.interface';
 
 @Entity('user_auth')

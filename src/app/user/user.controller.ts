@@ -4,9 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -17,20 +19,19 @@ import { UserScheduleSetPreviewResponse } from '@app/user/dto/user-schedule-set-
 import { UserScheduleSetProfileResponse } from '@app/user/dto/user-schedule-set-profile.response';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  FileFastifyInterceptor,
-  memoryStorage,
-} from 'fastify-file-interceptor';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse } from '@app/user/dto/user-schedule-profile.response';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
 import { ScheduleSetProfileResponse } from '@app/user/dto/schedule-set-profile.response';
 import { LogResponseTypes } from '@infrastructure/types/log-respone.types';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageUploadRequest } from '@app/auth/authentication/dto/image-upload.request';
 
 // TODO 구현
 @ApiTags('User')
@@ -42,8 +43,11 @@ export class UserController {
 
   @ApiOperation({ summary: '모바일 학생증을 발급합니다.' })
   @Get('my-student-qr')
-  async getMyQRCode(@Req() { user }: Request): Promise<string> {
-    return await this.userService.getStudentQRCode(user.schoolId);
+  async getMyQRCode(
+    @Req() { user }: Request,
+    @Query('native', ParseBoolPipe) nativeOption: boolean,
+  ): Promise<string> {
+    return await this.userService.getStudentQRCode(user.schoolId, nativeOption);
   }
 
   @ApiOperation({ summary: '입장해있는 시간표 집합의 목록을 조회합니다.' })
@@ -115,8 +119,11 @@ export class UserController {
 
   @ApiOperation({ summary: '특정 시간표 집합에 입장합니다.' })
   @Put('schedules')
-  @UseInterceptors(FileFastifyInterceptor('file', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: ImageUploadRequest,
+  })
   async updateUniversitySchedule(
     @Req() { user }: Request,
     @Body() data?: { lectureIds: number[] },
