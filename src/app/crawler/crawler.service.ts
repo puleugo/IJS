@@ -1,4 +1,8 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +15,7 @@ import { UniversityMealCrawlerClient } from '@app/crawler/university-meal-crawle
 import { UniversityMajorNoticeCrawlerClient } from '@app/crawler/university-major-notice-crawler/university-major-notice-crawler.client';
 import { UniversityLectureCrawlerClient } from '@app/crawler/university-lecture-crawler/university-lecture-crawler.client';
 import { UniversityMajorCrawlerClient } from '@app/crawler/university-major-crawler/university-major-crawler.client';
+import { CrawlerEnum } from '@app/crawler/utils/crawler.types';
 
 @Injectable()
 export class CrawlerService implements OnApplicationBootstrap {
@@ -28,6 +33,7 @@ export class CrawlerService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
+    await this.initializeCrawlers();
     await this.runCrawlers();
   }
 
@@ -37,21 +43,22 @@ export class CrawlerService implements OnApplicationBootstrap {
       return crawler;
     }
     const job = new CronJob(crawler.cronTime, () => {
-      this.executeCrawlerByName(crawler.name);
+      this.validateCrawlerName(crawler.name);
+      this.executeCrawlerByName(crawler.name as CrawlerEnum);
     });
 
-    await this.schedulerRegistry.addCronJob(crawler.name, job);
+    this.schedulerRegistry.addCronJob(crawler.name, job);
     await this.crawlerRepository.update(crawler.id, {
       state: 'RUNNING',
     });
-    await job.start();
+    job.start();
     return crawler;
   }
 
   async stopCronJob(crawler: Crawler): Promise<Crawler> {
     const isExist = this.schedulerRegistry.doesExist('cron', crawler.name);
     if (isExist) {
-      await this.schedulerRegistry.deleteCronJob(crawler.name);
+      this.schedulerRegistry.deleteCronJob(crawler.name);
       return crawler;
     }
     await this.crawlerRepository.update(crawler.id, {
@@ -73,7 +80,8 @@ export class CrawlerService implements OnApplicationBootstrap {
     await Promise.all(
       crawlers.map((crawler) => {
         const job = new CronJob(crawler.cronTime, () => {
-          this.executeCrawlerByName(crawler.name);
+          this.validateCrawlerName(crawler.name);
+          this.executeCrawlerByName(crawler.name as CrawlerEnum);
         });
 
         this.schedulerRegistry.addCronJob(crawler.name, job);
@@ -82,25 +90,51 @@ export class CrawlerService implements OnApplicationBootstrap {
     );
   }
 
-  private executeCrawlerByName(crawlerName: string): Promise<void> {
+  private executeCrawlerByName(crawlerName: CrawlerEnum): Promise<void> {
     switch (crawlerName) {
-      case 'university-bus-schedule-crawler':
+      case CrawlerEnum.BUS_SCHEDULES:
         return this.universityBusScheduleCrawlerClient.crawl();
-      case 'university-event-crawler':
+      case CrawlerEnum.EVENTS:
         return this.universityEventCrawlerClient.crawl();
-      case 'university-lecture-crawler':
+      case CrawlerEnum.LECTURES:
         return this.universityLectureCrawlerClient.crawl();
-      case 'university-major-crawler':
+      case CrawlerEnum.MAJORS:
         return this.universityMajorCrawlerClient.crawl();
-      case 'university-major-notice-crawler':
+      case CrawlerEnum.MAJOR_NOTICES:
         return this.universityMajorNoticeCrawlerClient.crawl();
-      case 'university-meal-crawler':
+      case CrawlerEnum.MEALS:
         return this.universityMealCrawlerClient.crawl();
-      case 'university-program-crawler':
+      case CrawlerEnum.PROGRAMS:
         return this.universityProgramCrawlerClient.crawl();
       default:
         console.log('Crawler not found');
         return;
     }
+  }
+
+  private async initializeCrawlers(): Promise<void> {
+    const crawlers = await this.crawlerRepository.find({
+      select: {
+        name: true,
+      },
+    });
+    const doesNotExistCrawlersName = crawlers.map(({ name }) => {
+      if (Object.values(CrawlerEnum)?.includes(name as CrawlerEnum)) return;
+      return name;
+    });
+
+    const createdCrawlers = await Promise.all(
+      doesNotExistCrawlersName.map(async (name: string) => {
+        return this.crawlerRepository.create({ name });
+      }),
+    );
+    await this.crawlerRepository.save(createdCrawlers);
+  }
+
+  private validateCrawlerName(name: string): Promise<void> {
+    if (!Object.values(CrawlerEnum)?.includes(name as CrawlerEnum)) {
+      throw new BadRequestException(`unvalidated crawler name: ${name}`);
+    }
+    return;
   }
 }

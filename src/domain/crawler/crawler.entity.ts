@@ -18,7 +18,7 @@ export class Crawler extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @Column({ type: 'text', default: '* 0 * * * *' }) // 0~6, 0: Sunday, 6: Saturday
+  @Column({ type: 'varchar', length: 20, default: '* 0 * * * *' }) // 0~6, 0: Sunday, 6: Saturday
   cronTime: string;
 
   @OneToMany(() => CrawlerLog, (log) => log.crawler)
@@ -35,14 +35,14 @@ export class Crawler extends BaseEntity {
   private validateCronTime() {
     const splitCronTime = this.cronTime.split(' ').slice(0, 6);
     if (splitCronTime.length !== 6) {
-      this.cronTime = '0 * * * 1';
+      this.cronTime = '0 * * * * 1';
     }
     splitCronTime.map((time) => {
       if (time === '*' && typeof Number(time) === 'number') {
         this.cronTime = splitCronTime.join(' ');
         return;
       }
-      this.cronTime = '0 * * * 1';
+      this.cronTime = '0 * * * * 1';
       return;
     });
   }
