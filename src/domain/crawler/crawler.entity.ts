@@ -33,6 +33,7 @@ export class Crawler extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   private validateCronTime() {
+    if (!this.cronTime) return;
     const splitCronTime = this.cronTime.split(' ').slice(0, 6);
     if (splitCronTime.length !== 6) {
       this.cronTime = '0 * * * * 1';
