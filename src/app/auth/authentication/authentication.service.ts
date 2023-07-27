@@ -321,12 +321,7 @@ export class AuthenticationService {
     return new TokenResponse(accessToken, refreshToken);
   }
 
-  async uploadImage(buffer: Buffer): Promise<string> {
-    const image = await this.authPhotoClient.resizePhoto(buffer);
-    return await this.authPhotoClient.uploadPhoto(image);
-  }
-
-  answerVerification(callbackData: any) {
+  private answerVerification(callbackData: any) {
     const data: string = callbackData.data;
     const [userId, studentId, majorId, action] = data.split(':');
     switch (action) {

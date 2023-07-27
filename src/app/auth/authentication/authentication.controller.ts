@@ -27,7 +27,6 @@ import { UserProfileResponse } from '@app/user/dto/user-profile.response';
 import { Request } from '@infrastructure/types/request.types';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageUploadRequest } from '@app/auth/authentication/dto/image-upload.request';
 import { RegisterRequest } from '@app/auth/authentication/dto/register-request';
 
 @ApiTags('Auth')
@@ -126,19 +125,5 @@ export class AuthenticationController {
   ): Promise<string> {
     await this.authenticationService.approveRegisterImage(userId);
     return '인증이 완료되었습니다.';
-  }
-
-  @Post('images')
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: ImageUploadRequest,
-  })
-  @ApiOperation({ summary: '이미지 업로드' })
-  async uploadImage(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<string> {
-    console.log(file);
-    return await this.authenticationService.uploadImage(file.buffer);
   }
 }
