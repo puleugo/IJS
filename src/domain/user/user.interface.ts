@@ -7,6 +7,7 @@ import { IArticle } from '@domain/communities/articles/article.interface';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 import { IComment } from '@domain/communities/comments/comment.interface';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
+import { RoleEnum } from '@app/auth/authorization/types';
 
 export interface IUser {
   id: string;
@@ -16,6 +17,7 @@ export interface IUser {
   major: UniversityMajor;
   schoolId: string | null;
   schoolEmail: string | null;
+  role: RoleEnum[];
   auth: UserAuth[];
   userScheduleSets: UserScheduleSet[];
   createdScheduleSets: ScheduleSet[];

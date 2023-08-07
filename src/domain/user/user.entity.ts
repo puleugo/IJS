@@ -20,6 +20,7 @@ import { Article } from '@domain/communities/articles/article.entity';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
 import { Comment } from '@domain/communities/comments/comment.entity';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
+import { RoleEnum } from '@app/auth/authorization/types';
 
 @Entity('users')
 export class User implements IUser {
@@ -37,6 +38,9 @@ export class User implements IUser {
 
   @Column('varchar', { unique: true, nullable: true, length: 20 })
   schoolId: string | null;
+
+  @Column('varchar', { array: true, length: 20, default: RoleEnum.USER })
+  role: RoleEnum[];
 
   @ManyToOne(() => UniversityMajor, (major) => major.notices)
   major: UniversityMajor;

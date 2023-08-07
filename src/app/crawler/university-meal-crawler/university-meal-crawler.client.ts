@@ -38,7 +38,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
               .replace(/\((.*?)\)<br>/g, '')
               .split('<br>'),
         );
-        const mealA = await this.universityMealRepository.create({
+        const mealA = this.universityMealRepository.create({
           menu: courseA,
           course: MealCourseEnum.A,
           publishedAt: new Date(weekDay.valueOf()),
@@ -55,7 +55,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
               .split('<br>'),
         );
 
-        const mealB = await this.universityMealRepository.create({
+        const mealB = this.universityMealRepository.create({
           menu: courseB,
           course: MealCourseEnum.B,
           publishedAt: new Date(weekDay.valueOf()),
@@ -71,7 +71,7 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
               .replace(/\((.*?)\)<br>/g, '')
               .split('<br>'),
         );
-        const mealC = await this.universityMealRepository.create({
+        const mealC = this.universityMealRepository.create({
           menu: courseC,
           course: MealCourseEnum.C,
           publishedAt: new Date(weekDay.valueOf()),
@@ -88,10 +88,10 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
       });
       await Promise.all(
         meals.map(async (meal) => {
-          const meal1 = await this.universityMealRepository.create(meal);
-          await this.universityMealRepository.save(meal1);
+          this.universityMealRepository.create(meal);
         }),
       );
+      await this.universityMealRepository.save(meals);
     } catch (e) {
       console.log(meals);
       console.log(e);
