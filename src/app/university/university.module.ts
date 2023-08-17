@@ -5,7 +5,7 @@ import { UniversitySemester } from '@domain/university/university-semester.entit
 import { UniversityEvent } from '@domain/university/university-event.entity';
 import { UniversityMeal } from '@domain/university/university-meal.entity';
 import { UniversityProgram } from '@domain/university/university-program.entity';
-import { UniversityMajorNotice } from '@domain/university/university-major-notice.entity';
+import { UniversityNotice } from '@domain/university/university-notice.entity';
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
 import { UniversityController } from '@app/university/university.controller';
 import { UniversityService } from '@app/university/university.service';
@@ -18,7 +18,7 @@ import { UniversityService } from '@app/university/university.service';
       UniversityEvent,
       UniversityMeal,
       UniversityProgram,
-      UniversityMajorNotice,
+      UniversityNotice,
       UniversityBusSchedule,
     ]),
   ],

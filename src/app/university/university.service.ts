@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { UniversityMealSearchQuery } from '@app/university/command/university-meal-info-profile-response.command';
 import { UniversityProgramProfileResponseCommand } from '@app/university/command/university-program-profile-response.command';
-import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
 import { UniversityNearBusResponseCommand } from '@app/university/command/university-near-bus-response.command';
 import { UniversityFinishDateProfileResponseCommand } from '@app/university/command/university-finished-date-profile-response.command';
 import { UniversityCalendarResponseCommand } from '@app/university/command/university-calendar-response.command';
@@ -26,7 +25,7 @@ import { UniversitySemester } from '@domain/university/university-semester.entit
 import { UniversityEvent } from '@domain/university/university-event.entity';
 import { UniversityMeal } from '@domain/university/university-meal.entity';
 import { UniversityProgram } from '@domain/university/university-program.entity';
-import { UniversityMajorNotice } from '@domain/university/university-major-notice.entity';
+import { UniversityNotice } from '@domain/university/university-notice.entity';
 import { UniversityBusSchedule } from '@domain/university/university-bus-schedule.entity';
 import {
   IUniversityMealInfo,
@@ -34,6 +33,8 @@ import {
 } from '@domain/university/university-meal.interface';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
+import { UniversityNoticePreviewResponseCommand } from '@app/university/command/university-notice-preview-response.command';
+import { UniversityNoticeSlugArrayResponseCommand } from '@app/university/command/university-notice-slug-array-response.command';
 
 @Injectable()
 export class UniversityService {
@@ -48,8 +49,8 @@ export class UniversityService {
     private readonly universityMealRepository: Repository<UniversityMeal>,
     @InjectRepository(UniversityProgram)
     private readonly universityProgramRepository: Repository<UniversityProgram>,
-    @InjectRepository(UniversityMajorNotice)
-    private readonly universityMajorNoticeRepository: Repository<UniversityMajorNotice>,
+    @InjectRepository(UniversityNotice)
+    private readonly universityNoticeRepository: Repository<UniversityNotice>,
     @InjectRepository(UniversityBusSchedule)
     private readonly universityBusScheduleRepository: Repository<UniversityBusSchedule>,
   ) {}
@@ -79,15 +80,11 @@ export class UniversityService {
     });
   }
 
-  async getUniversityNotices(data: {
-    slug: string;
-  }): Promise<UniversityNoticeProfileResponseCommand[]> {
-    const major = await this.universityMajorRepository.findOne({
-      where: { slug: data.slug },
-    });
-    if (!major) throw new NotFoundException('학과를 찾을 수 없습니다.');
-    return await this.universityMajorNoticeRepository.find({
-      where: { major },
+  async getUniversityNotices(
+    slug: string,
+  ): Promise<UniversityNoticePreviewResponseCommand[]> {
+    return await this.universityNoticeRepository.find({
+      where: { slug },
     });
   }
 
@@ -186,6 +183,15 @@ export class UniversityService {
       },
     });
     return major.name;
+  }
+
+  async getUniversityNoticesSlug(): Promise<
+    UniversityNoticeSlugArrayResponseCommand[]
+  > {
+    const notices = await this.universityNoticeRepository.find({
+      select: { id: true, slug: true },
+    });
+    return notices;
   }
 
   private async getUniversitySemesterByDate(

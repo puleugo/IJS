@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { UniversityMajorNotice } from './university-major-notice.entity';
+import { UniversityNotice } from './university-notice.entity';
 import { UniversityEvent } from './university-event.entity';
 import { IUniversityMajor } from './university-major.interface';
 import { UniversityDepartment } from '@domain/university/university-department.entity';
@@ -34,8 +34,8 @@ export class UniversityMajor implements IUniversityMajor {
   @JoinColumn({ name: 'department_id', referencedColumnName: 'id' })
   department: UniversityDepartment;
 
-  @OneToMany(() => UniversityMajorNotice, (notice) => notice.major)
-  notices: UniversityMajorNotice[];
+  @OneToMany(() => UniversityNotice, (notice) => notice.major)
+  notices: UniversityNotice[];
 
   @OneToMany(() => UniversityEvent, (event) => event.major)
   events: UniversityEvent[];
