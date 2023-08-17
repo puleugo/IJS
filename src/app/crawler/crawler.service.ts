@@ -120,17 +120,20 @@ export class CrawlerService implements OnApplicationBootstrap {
     });
     const crawlersName = crawlers.map(({ name }) => name);
     const doesNotExistCrawlersName = Object.values(CrawlerEnum).map(
-      (name: string) => {
-        if (crawlersName.includes(name)) return;
-        return name;
+      (name: string): string => {
+        if (!crawlersName.includes(name)) return name;
+        return;
       },
     );
 
     const createdCrawlers = await Promise.all(
-      doesNotExistCrawlersName.map(async (name: string) => {
-        return this.crawlerRepository.create({ name });
-      }),
+      doesNotExistCrawlersName.reduce((result: Crawler[], name: string) => {
+        if (!name) return result;
+        result.push(this.crawlerRepository.create({ name }));
+        return result;
+      }, []),
     );
+
     await this.crawlerRepository.save(createdCrawlers);
   }
 
