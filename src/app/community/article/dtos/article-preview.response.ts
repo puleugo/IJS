@@ -40,6 +40,12 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
   @ApiProperty({ description: '작성일', example: '2023-01-01T00:00:00.000Z' })
   readonly createdAt: Date;
 
+  @ApiProperty({ description: '학생회 게시글 여부', example: false })
+  readonly isCouncil: boolean;
+
+  @ApiProperty()
+  readonly majorId?: number;
+
   constructor({
     id,
     title,
@@ -51,6 +57,8 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
     author,
     createdAt,
     isAnonymous,
+    isCouncil,
+    majorId,
   }: ArticlePreviewCommand) {
     this.id = id;
     this.title = title;
@@ -63,5 +71,7 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
     this.authorId = isAnonymous ? '' : author.id;
     this.createdAt = createdAt;
     this.isAnonymous = isAnonymous;
+    this.isCouncil = isCouncil;
+    this.majorId = isCouncil ? null : majorId;
   }
 }

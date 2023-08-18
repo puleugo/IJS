@@ -11,7 +11,7 @@ import { IsUrl } from 'class-validator';
 import { IUniversityNotice } from '@domain/university/university-major-notice.interface';
 
 @Entity('university_notices')
-@Index(['title', 'majorId', 'slug'])
+@Index(['title', 'majorId'])
 export class UniversityNotice implements IUniversityNotice {
   @PrimaryGeneratedColumn('increment')
   id: number;
@@ -28,9 +28,6 @@ export class UniversityNotice implements IUniversityNotice {
 
   @Column()
   author: string;
-
-  @Column({ unique: true })
-  slug: string;
 
   @Column({ type: 'simple-array' })
   files: string[];

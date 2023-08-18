@@ -2,5 +2,5 @@ import { IUniversityNotice } from '@domain/university/university-major-notice.in
 
 export type UniversityNoticePreviewResponseCommand = Pick<
   IUniversityNotice,
-  'id' | 'title' | 'viewsCount' | 'wroteAt' | 'author'
+  'id' | 'title' | 'wroteAt'
 >;

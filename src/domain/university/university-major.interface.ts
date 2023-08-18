@@ -5,7 +5,6 @@ import { IUniversityDepartment } from '@domain/university/university-department.
 export interface IUniversityMajor {
   id: number;
   name: string;
-  slug: string;
   noticeUrl: string;
   departmentId: number;
   notices: IUniversityNotice[];

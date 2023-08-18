@@ -15,4 +15,6 @@ export type ArticlePreviewCommand = Pick<
 > & {
   author: UserPreviewResponseCommand | null;
   isAnonymous: boolean;
+  isCouncil: boolean;
+  majorId?: number;
 };

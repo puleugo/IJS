@@ -9,20 +9,15 @@ export class UniversityMajorProfileResponse
     description: '학과 식별자',
   })
   id: number;
+
   @ApiProperty({
     example: '컴퓨터공학과',
     description: '학과명',
   })
   name: string;
-  @ApiProperty({
-    example: 'CS',
-    description: '간략한 학과 식별자',
-  })
-  slug: string;
 
-  constructor({ id, name, slug }: UniversityMajorProfileResponseCommand) {
+  constructor({ id, name }: UniversityMajorProfileResponseCommand) {
     this.id = id;
     this.name = name;
-    this.slug = slug;
   }
 }

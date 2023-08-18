@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { IBoard } from '@domain/communities/boards/board.interface';
 import { Article } from '@domain/communities/articles/article.entity';
+import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
 
 @Entity('boards')
 export class Board implements IBoard {
@@ -28,6 +29,9 @@ export class Board implements IBoard {
   @Column({ type: 'boolean', default: false })
   isAnonymous: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isCouncil: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -42,4 +46,9 @@ export class Board implements IBoard {
     cascade: true,
   })
   articles: Article[];
+
+  @OneToMany(() => CouncilArticle, ({ board }) => board, {
+    cascade: true,
+  })
+  councilArticles: CouncilArticle[];
 }

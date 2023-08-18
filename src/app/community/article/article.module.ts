@@ -7,10 +7,11 @@ import { Article } from '@domain/communities/articles/article.entity';
 import { BoardModule } from '@app/community/board/board.module';
 import { UserModule } from '@app/user/user.module';
 import { ArticlePhotoClient } from '@app/community/article/utils/article-photo.client';
+import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Article, ArticleLike]),
+    TypeOrmModule.forFeature([Article, CouncilArticle, ArticleLike]),
     BoardModule,
     UserModule,
   ],

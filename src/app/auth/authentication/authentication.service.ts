@@ -203,7 +203,7 @@ export class AuthenticationService {
     }
     await this.redis.del(`code_${code}`);
 
-    const affected = await this.userService.updateUserProfile(userId, {
+    const affected = await this.userService.updateUserById(userId, {
       schoolEmail,
       schoolId,
       majorId,
@@ -272,7 +272,7 @@ export class AuthenticationService {
     const user = await this.userService.findById(userId);
     if (!user) throw new UserNotFoundException();
 
-    const affected = await this.userService.updateUserProfile(user.id, {
+    const affected = await this.userService.updateUserById(user.id, {
       isVerified: true,
       majorId,
       schoolId,

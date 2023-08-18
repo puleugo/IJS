@@ -11,6 +11,7 @@ import { UniversityNotice } from './university-notice.entity';
 import { UniversityEvent } from './university-event.entity';
 import { IUniversityMajor } from './university-major.interface';
 import { UniversityDepartment } from '@domain/university/university-department.entity';
+import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
 
 @Entity('university_majors')
 @Unique(['name', 'departmentId'])
@@ -20,9 +21,6 @@ export class UniversityMajor implements IUniversityMajor {
 
   @Column('varchar', { length: 50 })
   name: string;
-
-  @Column('varchar', { length: 50, unique: true, nullable: true })
-  slug: string;
 
   @Column('int')
   departmentId: number;
@@ -36,6 +34,9 @@ export class UniversityMajor implements IUniversityMajor {
 
   @OneToMany(() => UniversityNotice, (notice) => notice.major)
   notices: UniversityNotice[];
+
+  @OneToMany(() => CouncilArticle, ({ major }) => major)
+  councilArticle: CouncilArticle[];
 
   @OneToMany(() => UniversityEvent, (event) => event.major)
   events: UniversityEvent[];

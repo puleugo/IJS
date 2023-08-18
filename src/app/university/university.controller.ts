@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { UniversityCalendarResponse } from '@app/university/dto/university-calendar.response';
 import { UniversityProgramProfileResponse } from '@app/university/dto/university-program-profile.response';
 import { UniversityMealInfoProfileResponse } from '@app/university/dto/university-meal-info-profile.response';
@@ -10,7 +10,7 @@ import { UniversityBusProfileResponse } from '@app/university/dto/university-bus
 import { UniversityFinishDateProfileResponse } from '@app/university/dto/university-finish-date-profile.response';
 import { UniversityMealSearchQuery } from '@app/university/command/university-meal-info-profile-response.command';
 import { UniversityNoticePreviewResponse } from '@app/university/dto/university-notice-preview.response';
-import { UniversityNoticeSlugArrayResponse } from '@app/university/dto/university-notice-slug-array.response';
+import { UniversityNoticeProfileResponse } from '@app/university/dto/university-notice-profile.response';
 
 @ApiTags('University')
 @Controller('universities')
@@ -67,23 +67,23 @@ export class UniversityController {
     return majors.map((major) => new UniversityMajorProfileResponse(major));
   }
 
-  @Get('notices/slug')
-  @ApiOperation({ summary: '존재하는 공지사항 게시판 목록을 가져옵니다.' })
-  async getUniversityNoticesSlug(): Promise<
-    UniversityNoticeSlugArrayResponse[]
-  > {
-    const slugs = await this.universityService.getUniversityNoticesSlug();
-    return slugs.map((slug) => new UniversityNoticeSlugArrayResponse(slug));
+  @Get('notices')
+  @ApiOperation({ summary: '공지사항 게시글 목록을 조회합니다.' })
+  async getUniversityNoticesSlug(): Promise<UniversityNoticePreviewResponse[]> {
+    const slugs = await this.universityService.getUniversityNotices();
+    return slugs.map((slug) => new UniversityNoticePreviewResponse(slug));
   }
 
-  @Get('notices/:slug')
-  @ApiOperation({ summary: '해당 게시판의 공지사항 목록을 가져옵니다.' })
-  @ApiResponse({ type: [UniversityNoticePreviewResponse] })
+  @Get('notices/:id')
+  @ApiOperation({ summary: '특정 공지사항을 가져옵니다.' })
+  @ApiResponse({ type: [UniversityNoticeProfileResponse] })
   async getUniversityNotices(
-    @Param('slug') slug: string,
-  ): Promise<UniversityNoticePreviewResponse[]> {
-    const notices = await this.universityService.getUniversityNotices(slug);
-    return notices.map((notice) => new UniversityNoticePreviewResponse(notice));
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<UniversityNoticeProfileResponse[]> {
+    const notices = await this.universityService.getUniversityNoticeProfileById(
+      id,
+    );
+    return notices.map((notice) => new UniversityNoticeProfileResponse(notice));
   }
 
   // @Get()

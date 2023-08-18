@@ -8,6 +8,8 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  TableInheritance,
+  UpdateDateColumn,
 } from 'typeorm';
 import { IArticle } from '@domain/communities/articles/article.interface';
 import { Board } from '@domain/communities/boards/board.entity';
@@ -16,6 +18,7 @@ import { ArticleLike } from '@domain/communities/articles/article-like.entity';
 import { Comment } from '@domain/communities/comments/comment.entity';
 
 @Entity('articles')
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class Article implements IArticle {
   @PrimaryGeneratedColumn('increment', { type: 'int' })
   id: number;
@@ -64,7 +67,7 @@ export class Article implements IArticle {
   @Index()
   createdAt: Date;
 
-  @Column({ default: new Date(Date.now()) })
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @DeleteDateColumn({ nullable: true })

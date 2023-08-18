@@ -6,7 +6,6 @@ export interface IUniversityNotice {
   content: string;
   url: string;
   author: string;
-  slug: string;
   files: string[];
   viewsCount: number;
   wroteAt: Date;

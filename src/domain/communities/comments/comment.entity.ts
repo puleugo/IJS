@@ -12,6 +12,7 @@ import {
 import { User } from '@domain/user/user.entity';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 import { Article } from '@domain/communities/articles/article.entity';
+import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
 
 @Entity('comments')
 export class Comment implements IComment {
@@ -26,6 +27,9 @@ export class Comment implements IComment {
 
   @ManyToOne(() => Article, ({ comments }) => comments)
   article: Article;
+
+  @ManyToOne(() => CouncilArticle, ({ comments }) => comments)
+  councilArticle: CouncilArticle;
 
   @Column({ type: 'uuid' })
   authorId: string;

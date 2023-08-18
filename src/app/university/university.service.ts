@@ -34,7 +34,7 @@ import {
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 import { UniversityNoticePreviewResponseCommand } from '@app/university/command/university-notice-preview-response.command';
-import { UniversityNoticeSlugArrayResponseCommand } from '@app/university/command/university-notice-slug-array-response.command';
+import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
 
 @Injectable()
 export class UniversityService {
@@ -80,11 +80,17 @@ export class UniversityService {
     });
   }
 
-  async getUniversityNotices(
-    slug: string,
-  ): Promise<UniversityNoticePreviewResponseCommand[]> {
-    return await this.universityNoticeRepository.find({
-      where: { slug },
+  async getUniversityNoticeProfileById(
+    id: number,
+  ): Promise<UniversityNoticeProfileResponseCommand[]> {
+    const notices = await this.universityNoticeRepository.find({
+      where: { id },
+      relations: {
+        major: true,
+      },
+    });
+    return notices.map((notice): UniversityNoticeProfileResponseCommand => {
+      return { ...notice, majorName: notice.major.name };
     });
   }
 
@@ -185,11 +191,11 @@ export class UniversityService {
     return major.name;
   }
 
-  async getUniversityNoticesSlug(): Promise<
-    UniversityNoticeSlugArrayResponseCommand[]
+  async getUniversityNotices(): Promise<
+    UniversityNoticePreviewResponseCommand[]
   > {
     const notices = await this.universityNoticeRepository.find({
-      select: { id: true, slug: true },
+      select: { id: true },
     });
     return notices;
   }

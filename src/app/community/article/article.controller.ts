@@ -3,10 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   UploadedFiles,
@@ -33,13 +34,24 @@ import {
 } from '@nestjs/swagger';
 import { Pagination } from '@infrastructure/types/pagination.types';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { BoardService } from '@app/community/board/board.service';
+import { CouncilArticleCreateRequest } from '@app/community/article/dtos/council-article-create.request';
+import { BoardNotFoundException } from '@domain/error/board.error';
+import {
+  ArticleNotFoundException,
+  ArticlePermissionDeniedException,
+  CanNotLikeOwnArticleException,
+} from '@domain/error/article.error';
 
 @Controller('boards/:boardId/articles')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('[커뮤니티] 게시글')
 export class ArticleController {
-  constructor(private readonly articleService: ArticleService) {}
+  constructor(
+    private readonly boardService: BoardService,
+    private readonly articleService: ArticleService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: '게시글 목록 조회' })
@@ -56,7 +68,44 @@ export class ArticleController {
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
   ): Promise<Pagination<ArticlePreviewResponse>> {
-    return await this.articleService.getArticles({ boardId, page, limit });
+    const board = await this.boardService.findById(boardId);
+    if (!board) throw new BoardNotFoundException();
+
+    if (board.isCouncil) {
+      const articles = await this.articleService.getPaginatedCouncilArticles({
+        boardId,
+        page,
+        limit,
+      });
+
+      return {
+        items: articles.items.map((article) => {
+          return new ArticlePreviewResponse({
+            ...article,
+            isCouncil: true,
+            isAnonymous: board.isAnonymous,
+          });
+        }),
+        meta: articles.meta,
+      };
+    }
+
+    const articles = await this.articleService.getPaginatedArticles({
+      boardId,
+      page,
+      limit,
+    });
+
+    return {
+      items: articles.items.map((article) => {
+        return new ArticlePreviewResponse({
+          ...article,
+          isCouncil: false,
+          isAnonymous: board.isAnonymous,
+        });
+      }),
+      meta: articles.meta,
+    };
   }
 
   @Get(':articleId')
@@ -71,14 +120,29 @@ export class ArticleController {
     ].join('<br>'),
   })
   async getArticle(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('articleId', ParseIntPipe) articleId: number,
+    @Param('boardId', ParseIntPipe)
+    boardId: number,
+    @Param('articleId', ParseIntPipe)
+    articleId: number,
   ): Promise<ArticleProfileResponse> {
-    const article = await this.articleService.getArticle({
-      articleId,
-      boardId,
+    const board = await this.boardService.findById(boardId);
+    if (!board) throw new BoardNotFoundException();
+
+    if (board.isCouncil) {
+      const article = await this.articleService.getCouncilArticle(articleId);
+      return new ArticleProfileResponse({
+        ...article,
+        isAnonymous: board.isAnonymous,
+        isCouncil: board.isCouncil,
+      });
+    }
+
+    const article = await this.articleService.getArticle(articleId);
+    return new ArticleProfileResponse({
+      ...article,
+      isAnonymous: board.isAnonymous,
+      isCouncil: board.isCouncil,
     });
-    return new ArticleProfileResponse(article);
   }
 
   @Post()
@@ -92,16 +156,38 @@ export class ArticleController {
     ].join('<br>'),
   })
   async createArticle(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Body() articleCreateRequest: ArticleCreateRequest,
+    @Param('boardId', ParseIntPipe)
+    boardId: number,
+    @Body()
+    articleCreateRequest: ArticleCreateRequest | CouncilArticleCreateRequest,
     @Req() { user }: Request,
   ): Promise<ArticleProfileResponse> {
+    const board = await this.boardService.findById(boardId);
+    if (!board) throw new BoardNotFoundException();
+
+    if (board.isCouncil) {
+      const article = await this.articleService.createCouncilArticle({
+        ...articleCreateRequest,
+        boardId,
+        authorId: user.id,
+      });
+      return new ArticleProfileResponse({
+        ...article,
+        isAnonymous: board.isAnonymous,
+        isCouncil: board.isCouncil,
+      });
+    }
+
     const article = await this.articleService.createArticle({
       ...articleCreateRequest,
       boardId,
       authorId: user.id,
     });
-    return new ArticleProfileResponse(article);
+    return new ArticleProfileResponse({
+      ...article,
+      isAnonymous: board.isAnonymous,
+      isCouncil: board.isCouncil,
+    });
   }
 
   @Post(':articleId/likes')
@@ -119,15 +205,21 @@ export class ArticleController {
     description: '자신의 댓글에는 좋아요를 누를 수 없습니다.',
   })
   async likeArticle(
-    @Param('boardId', ParseIntPipe) _,
-    @Param('articleId', ParseIntPipe) id: number,
-    @Req() { user }: Request,
-  ): Promise<string> {
+    @Param('articleId', ParseIntPipe)
+    id: number,
+    @Req()
+    { user }: Request,
+  ): Promise<void> {
+    const article = await this.articleService.findById(id);
+    if (!article) throw new ArticleNotFoundException();
+    if (article.authorId === user.id) throw new CanNotLikeOwnArticleException();
+
     const isHitArticle = await this.articleService.hitArticleLike({
       id,
       userId: user.id,
     });
-    return isHitArticle ? 'hit' : 'unhit';
+    if (!isHitArticle) throw new InternalServerErrorException();
+    return;
   }
 
   @Post(':articleId/reports')
@@ -139,10 +231,18 @@ export class ArticleController {
     type: String,
   })
   async reportArticle(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('articleId', ParseIntPipe) articleId: number,
-    @Req() { user }: Request,
-    @Body() { reportReason }: { reportReason: string },
+    @Param('boardId', ParseIntPipe)
+    _: number,
+    @Param('articleId', ParseIntPipe)
+    articleId: number,
+    @Req()
+    { user }: Request,
+    @Body()
+    {
+      reportReason,
+    }: {
+      reportReason: string;
+    },
   ): Promise<string> {
     const isReported = await this.articleService.reportArticle({
       id: articleId,
@@ -157,26 +257,28 @@ export class ArticleController {
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
   @ApiCreatedResponse({
-    description: '게시글 이미지 업로드 성공',
+    description: '게시글 이미지 업로드에 성공하여 이미지 URL을 반환합니다.',
     type: String,
     isArray: true,
   })
   @UseInterceptors(FilesInterceptor('files', 10))
   @ApiConsumes('multipart/form-data')
   async uploadArticleImage(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('articleId', ParseIntPipe) articleId: number,
-    @Req() { user }: Request,
-    @UploadedFiles() files: Express.Multer.File[],
+    @Param('boardId', ParseIntPipe)
+    boardId: number,
+    @Param('articleId', ParseIntPipe)
+    articleId_: number,
+    @Req()
+    { user }: Request,
+    @UploadedFiles()
+    files: Express.Multer.File[],
   ): Promise<string[]> {
-    const imageUrls = await this.articleService.uploadArticleImage({
-      userId: user.id,
+    return await this.articleService.uploadArticleImage({
       images: files.map((file) => file.buffer),
     });
-    return imageUrls;
   }
 
-  @Put(':articleId')
+  @Patch(':articleId')
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
@@ -194,18 +296,23 @@ export class ArticleController {
     description: '게시글에 대한 권한이 없습니다.',
   })
   async updateArticle(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('articleId', ParseIntPipe) id: number,
-    @Body() articleUpdateRequest: ArticleUpdateRequest,
+    @Param('boardId', ParseIntPipe)
+    boardId: number,
+    @Param('articleId', ParseIntPipe)
+    id: number,
+    @Body()
+    articleUpdateRequest: ArticleUpdateRequest,
     @Req() { user }: Request,
-  ): Promise<ArticleProfileResponse> {
-    const article = await this.articleService.updateArticle({
-      ...articleUpdateRequest,
-      id,
-      userId: user.id,
-      boardId,
-    });
-    return new ArticleProfileResponse(article);
+  ): Promise<void> {
+    const board = await this.boardService.findById(boardId);
+    if (!board) throw new BoardNotFoundException();
+
+    const article = await this.articleService.findById(id);
+    if (!article) throw new ArticleNotFoundException();
+    if (article.authorId !== user.id)
+      throw new ArticlePermissionDeniedException();
+
+    return await this.articleService.updateArticle(id, articleUpdateRequest);
   }
 
   @Delete(':articleId')
@@ -226,10 +333,25 @@ export class ArticleController {
     description: '게시글에 대한 권한이 없습니다.',
   })
   async deleteArticle(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('articleId', ParseIntPipe) id: number,
-    @Req() { user }: Request,
+    @Param('boardId', ParseIntPipe)
+    boardId: number,
+    @Param('articleId', ParseIntPipe)
+    id: number,
+    @Req()
+    { user }: Request,
   ): Promise<string> {
+    const board = await this.boardService.findById(boardId, {
+      select: { id: true, isAnonymous: true },
+    });
+    if (!board) throw new BoardNotFoundException();
+
+    const article = await this.articleService.findById(id, {
+      where: { boardId: board.id },
+    });
+    if (!article) throw new ArticleNotFoundException();
+    if (article.authorId !== user.id)
+      throw new ArticlePermissionDeniedException();
+
     const isDeleted = await this.articleService.deleteArticle({
       id,
       userId: user.id,

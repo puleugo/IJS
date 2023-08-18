@@ -17,4 +17,6 @@ export type ArticleProfileCommand = Pick<
   Partial<Pick<IArticle, 'updatedAt'>> & {
     author: UserPreviewResponseCommand | null;
     isAnonymous: boolean;
+    isCouncil: boolean;
+    majorId?: number | null;
   };
