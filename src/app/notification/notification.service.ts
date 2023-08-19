@@ -1,0 +1,95 @@
+import { Injectable } from '@nestjs/common';
+import { NotificationCreateRequest } from '@app/notification/dto/notification-create.request';
+import { NotificationToken } from '@domain/user/notification/notification-token.entity';
+import { Notification } from '@domain/user/notification/notification.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { NotificationUpdateRequest } from '@app/notification/dto/notification-update.request';
+import * as firebase from 'firebase-admin';
+import * as path from 'path';
+import { NotificationProfileResponse } from '@app/notification/dto/notification-profile-response';
+import { NotificationCategoryEnum } from '@app/notification/notification-category.enum';
+
+firebase.initializeApp({
+  credential: firebase.credential.cert(
+    path.join(__dirname, '..', '..', '..', 'firebase-admin-sdk.json'),
+  ),
+});
+
+@Injectable()
+export class NotificationService {
+  constructor(
+    @InjectRepository(NotificationToken)
+    private readonly notificationTokenRepository: Repository<NotificationToken>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
+  ) {}
+
+  async acceptPushNotification(
+    userId: string,
+    notificationCreateRequest: NotificationCreateRequest,
+  ): Promise<NotificationToken> {
+    const notificationToken = this.notificationTokenRepository.create({
+      userId,
+      deviceType: notificationCreateRequest.deviceType,
+      notificationToken: notificationCreateRequest.notificationToken,
+    });
+
+    return await this.notificationTokenRepository.save(notificationToken);
+  }
+
+  async disablePushNotification(
+    userId: string,
+    notificationUpdateRequest: NotificationUpdateRequest,
+  ): Promise<void> {
+    await this.notificationTokenRepository.update(
+      { userId, deviceType: notificationUpdateRequest.deviceType },
+      {
+        isDisable: true,
+      },
+    );
+  }
+
+  async getNotifications(userId: string): Promise<Notification[]> {
+    return await this.notificationRepository.find({
+      where: { notificationToken: { userId } },
+    });
+  }
+
+  async sendPush(
+    userId: string,
+    title: string,
+    body: string,
+    category: NotificationCategoryEnum,
+  ): Promise<void> {
+    try {
+      const notificationToken = await this.notificationTokenRepository.findOne({
+        where: { userId, isDisable: false },
+      });
+      if (notificationToken) {
+        await this.notificationRepository.save({
+          notificationToken,
+          title,
+          body,
+          category,
+        });
+        await firebase
+          .messaging()
+          .send({
+            notification: new NotificationProfileResponse({
+              title,
+              body,
+              category,
+            }),
+            token: notificationToken.notificationToken,
+            android: { priority: 'high' },
+          })
+          .catch((error: any) => {
+            console.error(error);
+          });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { AuthModule } from '@app/auth/auth.module';
 import { DeliveryModule } from '@app/delivery/delivery.module';
 import { CrawlerModule } from '@app/crawler/crawler.module';
 import { CommunityModule } from '@app/community/community.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CommunityModule } from '@app/community/community.module';
     DeliveryModule,
     CrawlerModule,
     CommunityModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}
