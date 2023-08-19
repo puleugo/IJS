@@ -18,9 +18,11 @@ import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { BoardNotFoundException } from '@domain/error/board.error';
 import { ArticleNotFoundException } from '@domain/error/article.error';
 import {
+  AlreadyLikedCommentException,
   CantLikeOwnCommentException,
   CommentNotFoundException,
   CommentPermissionDeniedException,
+  FailedToLikeCommentException,
 } from '@domain/error/comment.error';
 
 @Injectable()
@@ -159,7 +161,7 @@ export class CommentService {
     };
   }
 
-  async hitCommentLike(params: CommentLikeCommand): Promise<boolean> {
+  async hitCommentLike(params: CommentLikeCommand): Promise<void> {
     const { articleId, id, userId } = params;
 
     const comment = await this.commentRepository.findOne({
@@ -171,9 +173,8 @@ export class CommentService {
     if (!comment) throw new CommentNotFoundException();
     if (comment.authorId === userId) throw new CantLikeOwnCommentException();
 
-    if (comment.likes.find((like) => like.authorId === userId)) {
-      return false;
-    }
+    if (comment.likes.find((like) => like.authorId === userId))
+      throw new AlreadyLikedCommentException();
 
     const [commentLike, updateResult] = await Promise.all([
       this.commentLikeRepository.save({
@@ -183,7 +184,8 @@ export class CommentService {
       this.commentRepository.increment({ id: comment.id }, 'likesCount', 1),
     ]);
 
-    return commentLike && updateResult.affected > 0;
+    if (!(commentLike && updateResult.affected > 0))
+      throw new FailedToLikeCommentException();
   }
 
   async deleteComment(

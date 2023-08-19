@@ -1,7 +1,7 @@
 import { CommentProfileCommand } from '@app/community/comment/commands/comment-profile.command';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { ApiProperty } from '@nestjs/swagger';
-import { ReplyCommentProfileResponse } from '@app/community/comment/dtos/reply-comment-profile.response';
+import { ReplyCommentProfileResponse } from '@app/community/comment/dto/reply-comment-profile.response';
 
 export class CommentProfileResponse implements CommentProfileCommand {
   @ApiProperty({ example: 1, description: '댓글 아이디' })

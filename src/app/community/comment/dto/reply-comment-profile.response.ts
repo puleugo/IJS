@@ -5,6 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ReplyCommentProfileResponse implements ReplyCommentProfileCommand {
   @ApiProperty({ example: 1, description: '댓글 아이디' })
   readonly id: number;
+
   @ApiProperty({
     example: 'acc954b7-4081-4beb-ab0c-19325004a4fd',
     description: '댓글 작성자 아이디',

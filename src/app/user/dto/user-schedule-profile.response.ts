@@ -1,5 +1,4 @@
 import { UniversityLectureProfileResponse } from '@app/university/dto/university-lecture-profile.response';
-import { UniversityLecture } from '@domain/university/university-lecture.entity';
 import { UserScheduleProfileResponseCommand } from '@app/user/command/user-schedule-profile-response.command';
 import { IUniversityLecture } from '@domain/university/university-lecture.interface';
 

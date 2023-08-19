@@ -9,11 +9,17 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
-import { BoardProfileResponse } from '@app/community/board/dtos/board-profile.response';
+import { BoardProfileResponse } from '@app/community/board/dto/board-profile.response';
 import { BoardService } from '@app/community/board/board.service';
-import { BoardUpdateRequest } from '@app/community/board/dtos/board-update.request';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { BoardCreateRequest } from '@app/community/board/dtos/board-create.request';
+import { BoardUpdateRequest } from '@app/community/board/dto/board-update.request';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { BoardCreateRequest } from '@app/community/board/dto/board-create.request';
 import { Request } from '@infrastructure/types/request.types';
 
 @Controller('boards')
@@ -23,7 +29,11 @@ export class BoardController {
 
   @Get()
   @ApiOperation({ summary: '게시판 목록 조회' })
-  @ApiResponse({ status: 200, description: '성공', type: BoardProfileResponse })
+  @ApiOkResponse({
+    description: '성공',
+    type: BoardProfileResponse,
+    isArray: true,
+  })
   async getBoards(): Promise<BoardProfileResponse[]> {
     const boards = await this.boardsService.getBoards();
     return boards.map((board) => new BoardProfileResponse(board));
@@ -32,7 +42,10 @@ export class BoardController {
   @Post()
   @ApiOperation({ summary: '게시판 생성' })
   @ApiBody({ type: BoardCreateRequest })
-  @ApiResponse({ status: 200, description: '성공', type: BoardProfileResponse })
+  @ApiCreatedResponse({
+    description: '성공',
+    type: BoardProfileResponse,
+  })
   async createBoard(
     @Body() boardCreateRequest: BoardCreateRequest,
   ): Promise<BoardProfileResponse> {
@@ -43,7 +56,7 @@ export class BoardController {
   @Put(':boardId')
   @ApiOperation({ summary: '게시판 수정' })
   @ApiBody({ type: BoardUpdateRequest })
-  @ApiResponse({ status: 200, description: '성공', type: BoardProfileResponse })
+  @ApiCreatedResponse({ description: '성공', type: BoardProfileResponse })
   async updateBoard(
     @Param('boardId', ParseIntPipe) id: number,
     @Body() boardUpdateRequest: BoardUpdateRequest,
@@ -57,12 +70,11 @@ export class BoardController {
 
   @Delete(':boardId')
   @ApiOperation({ summary: '게시판 삭제' })
-  @ApiResponse({ status: 200, description: '성공', type: String })
+  @ApiCreatedResponse({ description: '성공' })
   async deleteBoard(
     @Param('boardId', ParseIntPipe) id: number,
     @Req() { user }: Request,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.boardsService.deleteBoard({ id });
-    return 'success';
   }
 }

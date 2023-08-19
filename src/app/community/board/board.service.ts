@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BoardCreateRequest } from '@app/community/board/dtos/board-create.request';
+import { BoardCreateRequest } from '@app/community/board/dto/board-create.request';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { Board } from '@domain/communities/boards/board.entity';
 import { Repository, UpdateResult } from 'typeorm';

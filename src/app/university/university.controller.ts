@@ -3,7 +3,13 @@ import { UniversityCalendarResponse } from '@app/university/dto/university-calen
 import { UniversityProgramProfileResponse } from '@app/university/dto/university-program-profile.response';
 import { UniversityMealInfoProfileResponse } from '@app/university/dto/university-meal-info-profile.response';
 import { UniversityBusResponse } from '@app/university/dto/university-bus.response';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UniversityMajorProfileResponse } from '@app/university/dto/university-major-profile.response';
 import { UniversityService } from '@app/university/university.service';
 import { UniversityBusProfileResponse } from '@app/university/dto/university-bus-profile.response';
@@ -19,7 +25,7 @@ export class UniversityController {
 
   @Get('meals')
   @ApiOperation({ summary: '오늘의 식단 정보를 가져옵니다.' })
-  @ApiResponse({ type: UniversityMealInfoProfileResponse })
+  @ApiOkResponse({ type: UniversityMealInfoProfileResponse })
   @ApiQuery({
     name: 'time_range',
     enum: ['today', 'weekly'],
@@ -46,7 +52,7 @@ export class UniversityController {
   @ApiOperation({
     summary: '신청할 수 있는 비교과 프로그램 목록을 가져옵니다.',
   })
-  @ApiResponse({ type: [UniversityProgramProfileResponse] })
+  @ApiOkResponse({ type: UniversityProgramProfileResponse, isArray: true })
   async getUniversityPrograms(): Promise<UniversityProgramProfileResponse[]> {
     const programs = await this.universityService.getUniversityProgramsByDate(
       new Date(),
@@ -61,7 +67,7 @@ export class UniversityController {
   @ApiOperation({
     summary: '학과 목록을 가져옵니다.',
   })
-  @ApiResponse({ type: [UniversityMajorProfileResponse] })
+  @ApiOkResponse({ type: UniversityMajorProfileResponse, isArray: true })
   async getMajorProfiles(): Promise<UniversityMajorProfileResponse[]> {
     const majors = await this.universityService.getMajors();
     return majors.map((major) => new UniversityMajorProfileResponse(major));
@@ -69,7 +75,7 @@ export class UniversityController {
 
   @Get('notices')
   @ApiOperation({ summary: '공지사항 게시글 목록을 조회합니다.' })
-  @ApiResponse({ type: [UniversityNoticePreviewResponse] })
+  @ApiOkResponse({ type: UniversityNoticePreviewResponse, isArray: true })
   async getUniversityNotices(): Promise<UniversityNoticePreviewResponse[]> {
     const notices = await this.universityService.getUniversityNotices();
     return notices.map((notice) => new UniversityNoticePreviewResponse(notice));
@@ -77,7 +83,7 @@ export class UniversityController {
 
   @Get('notices/:id')
   @ApiOperation({ summary: '특정 공지사항 상세를 가져옵니다.' })
-  @ApiResponse({ type: [UniversityNoticeProfileResponse] })
+  @ApiOkResponse({ type: UniversityNoticeProfileResponse, isArray: true })
   async getUniversityNotice(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UniversityNoticeProfileResponse[]> {
@@ -95,7 +101,7 @@ export class UniversityController {
 
   @Get('finish-date')
   @ApiOperation({ summary: '학기 종료일(방학 시작일)을 가져옵니다.' })
-  @ApiResponse({ type: UniversityFinishDateProfileResponse })
+  @ApiOkResponse({ type: UniversityFinishDateProfileResponse })
   @ApiQuery({
     name: 'date',
     description: '기준 날짜',
@@ -129,7 +135,7 @@ export class UniversityController {
   @ApiOperation({
     summary: '금일 학교에서 아직 탈 수 있는 버스 정보를 가져옵니다.',
   })
-  @ApiResponse({ type: [UniversityBusProfileResponse] })
+  @ApiOkResponse({ type: UniversityBusProfileResponse, isArray: true })
   async getUniversityNextBusInfo(
     @Query('stationName') stationName?: string,
   ): Promise<UniversityBusProfileResponse[]> {
@@ -142,7 +148,7 @@ export class UniversityController {
 
   @Get('bus-info')
   @ApiOperation({ summary: '통학 버스 정보를 가져옵니다.' })
-  @ApiResponse({ type: UniversityBusResponse })
+  @ApiOkResponse({ type: UniversityBusResponse })
   async getUniversityBusInfo(): Promise<UniversityBusResponse> {
     const busInfo = await this.universityService.getUniversityBusInfo();
     return new UniversityBusResponse(busInfo);

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
@@ -46,6 +47,7 @@ export class AuthenticationController {
 
   @ApiOperation({ summary: '토큰 갱신' })
   @Post('refresh')
+  @ApiResponse({ type: TokenResponse })
   async refreshAccessToken(@Req() request: Request): Promise<TokenResponse> {
     return await this.authenticationService.refreshAccessToken(request);
   }
@@ -54,6 +56,7 @@ export class AuthenticationController {
   @ApiBearerAuth()
   @Get('profile')
   @UseGuards(JwtAuthGuard)
+  @ApiResponse({ type: UserProfileResponse })
   async getProfile(@Req() { user }: Request): Promise<UserProfileResponse> {
     const foundUser = await this.authenticationService.getProfile(user.id);
     return new UserProfileResponse(foundUser);
@@ -69,7 +72,7 @@ export class AuthenticationController {
     @Query('schoolId') schoolId: string,
     @Query('majorId', ParseIntPipe) majorId: number,
     @Req() { user }: Request,
-  ) {
+  ): Promise<void> {
     await this.authenticationService.verifySchoolId({
       user,
       schoolEmail,
@@ -84,14 +87,12 @@ export class AuthenticationController {
   @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
   async verifySchoolEmailByAuthenticationCode(
     @Query('code') code: string,
-  ): Promise<string> {
-    const updated =
+  ): Promise<void> {
+    const isUpdated =
       await this.authenticationService.verifySchoolEmailByAuthenticationCode(
         code,
       );
-    if (updated) {
-      return '인증이 완료되었습니다.';
-    }
+    if (!isUpdated) throw new InternalServerErrorException();
   }
 
   @Post('verify/identification')
@@ -107,13 +108,12 @@ export class AuthenticationController {
     @Req() { user }: Request,
     @Body() registerRequest: RegisterRequest,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.authenticationService.uploadRegisterImage(
       registerRequest,
       file.buffer,
       user,
     );
-    return '인증 이미지가 업로드 되었습니다.';
   }
 
   @Post('approve/identification/:userId')
@@ -122,8 +122,7 @@ export class AuthenticationController {
   @ApiOperation({ summary: '학생 인증 이미지(학생증, 합격증명서) 승인' })
   async approveRegisterImage(
     @Param('userId', ParseUUIDPipe) userId: string,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.authenticationService.approveRegisterImage(userId);
-    return '인증이 완료되었습니다.';
   }
 }

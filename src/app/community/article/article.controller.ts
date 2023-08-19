@@ -15,15 +15,16 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ArticleService } from '@app/community/article/article.service';
-import { ArticlePreviewResponse } from '@app/community/article/dtos/article-preview.response';
-import { ArticleProfileResponse } from '@app/community/article/dtos/article-profile.response';
-import { ArticleCreateRequest } from '@app/community/article/dtos/article-create.request';
+import { ArticlePreviewResponse } from '@app/community/article/dto/article-preview.response';
+import { ArticleProfileResponse } from '@app/community/article/dto/article-profile.response';
+import { ArticleCreateRequest } from '@app/community/article/dto/article-create.request';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
-import { ArticleUpdateRequest } from '@app/community/article/dtos/article-update.request';
+import { ArticleUpdateRequest } from '@app/community/article/dto/article-update.request';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -35,13 +36,14 @@ import {
 import { Pagination } from '@infrastructure/types/pagination.types';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { BoardService } from '@app/community/board/board.service';
-import { CouncilArticleCreateRequest } from '@app/community/article/dtos/council-article-create.request';
+import { CouncilArticleCreateRequest } from '@app/community/article/dto/council-article-create.request';
 import { BoardNotFoundException } from '@domain/error/board.error';
 import {
   ArticleNotFoundException,
   ArticlePermissionDeniedException,
   CanNotLikeOwnArticleException,
 } from '@domain/error/article.error';
+import { ArticleReportRequest } from '@app/community/article/dto/article-report.request';
 
 @Controller('boards/:boardId/articles')
 @UseGuards(JwtAuthGuard)
@@ -112,7 +114,10 @@ export class ArticleController {
   @ApiOperation({ summary: '게시글 상세 조회' })
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
-  @ApiOkResponse({ description: '게시글 조회 성공' })
+  @ApiOkResponse({
+    description: '게시글 조회 성공',
+    type: ArticleProfileResponse,
+  })
   @ApiNotFoundResponse({
     description: [
       '게시판을 찾을 수 없습니다.',
@@ -148,7 +153,14 @@ export class ArticleController {
   @Post()
   @ApiOperation({ summary: '게시글 생성' })
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
-  @ApiCreatedResponse({ description: '게시글 생성 성공' })
+  @ApiBody({
+    description: '게시글 생성 요청',
+    type: ArticleCreateRequest,
+  })
+  @ApiCreatedResponse({
+    description: '게시글 생성 성공',
+    type: ArticleProfileResponse,
+  })
   @ApiNotFoundResponse({
     description: [
       '게시판을 찾을 수 없습니다.',
@@ -196,7 +208,6 @@ export class ArticleController {
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
   @ApiCreatedResponse({
     description: '게시글 좋아요 성공',
-    type: String,
   })
   @ApiNotFoundResponse({
     description: '게시글을 찾을 수 없습니다.',
@@ -226,30 +237,23 @@ export class ArticleController {
   @ApiOperation({ summary: '게시글 신고' })
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
+  @ApiBody({ type: ArticleReportRequest })
   @ApiCreatedResponse({
     description: '게시글 신고 성공',
-    type: String,
   })
   async reportArticle(
     @Param('boardId', ParseIntPipe)
     _: number,
     @Param('articleId', ParseIntPipe)
     articleId: number,
-    @Req()
-    { user }: Request,
-    @Body()
-    {
-      reportReason,
-    }: {
-      reportReason: string;
-    },
-  ): Promise<string> {
-    const isReported = await this.articleService.reportArticle({
+    @Req() { user }: Request,
+    @Body() articleReportRequest: ArticleReportRequest,
+  ): Promise<void> {
+    await this.articleService.reportArticle({
       id: articleId,
       userId: user.id,
-      reportReason,
+      reportReason: articleReportRequest.reason,
     });
-    return isReported ? 'reported' : 'not reported';
   }
 
   @Post(':articleId/images')
@@ -282,9 +286,12 @@ export class ArticleController {
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
+  @ApiBody({
+    description: '게시글 수정 요청',
+    type: ArticleUpdateRequest,
+  })
   @ApiCreatedResponse({
     description: '게시글 수정 성공',
-    type: ArticleProfileResponse,
   })
   @ApiNotFoundResponse({
     description: [
@@ -321,7 +328,6 @@ export class ArticleController {
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
   @ApiCreatedResponse({
     description: '게시글 삭제 성공',
-    type: String,
   })
   @ApiNotFoundResponse({
     description: [
@@ -339,7 +345,7 @@ export class ArticleController {
     id: number,
     @Req()
     { user }: Request,
-  ): Promise<string> {
+  ): Promise<void> {
     const board = await this.boardService.findById(boardId, {
       select: { id: true, isAnonymous: true },
     });
@@ -352,11 +358,10 @@ export class ArticleController {
     if (article.authorId !== user.id)
       throw new ArticlePermissionDeniedException();
 
-    const isDeleted = await this.articleService.deleteArticle({
+    await this.articleService.deleteArticle({
       id,
       userId: user.id,
       boardId: boardId,
     });
-    return isDeleted ? 'deleted' : 'not deleted';
   }
 }

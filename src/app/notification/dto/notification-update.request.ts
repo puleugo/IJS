@@ -1,7 +1,13 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class NotificationUpdateRequest {
-  @IsNotEmpty()
+  @ApiProperty({
+    example: 'android',
+    description: '디바이스 타입',
+    required: false,
+  })
+  @IsOptional()
   @IsString()
-  deviceType: string;
+  deviceType?: string;
 }

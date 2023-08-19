@@ -21,6 +21,8 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -48,7 +50,10 @@ export class UserController {
     private readonly notificationService: NotificationService,
   ) {}
 
+  @Post('notifications/allow')
   @ApiOperation({ summary: '푸시 알림을 허용합니다.' })
+  @ApiBody({ type: NotificationCreateRequest })
+  @ApiCreatedResponse({ description: '허용되었습니다.' })
   async allowPushNotification(
     @Body() notificationCreateRequest: NotificationCreateRequest,
     @Req() { user }: Request,
@@ -59,8 +64,10 @@ export class UserController {
     );
   }
 
+  @Put('notifications/disallow')
   @ApiOperation({ summary: '푸시 알림을 거부합니다.' })
-  @Put('notifications')
+  @ApiBody({ type: NotificationUpdateRequest })
+  @ApiCreatedResponse({ description: '거부되었습니다.' })
   async disablePushNotification(
     @Body() notificationUpdateRequest: NotificationUpdateRequest,
     @Req() { user }: Request,
@@ -71,8 +78,13 @@ export class UserController {
     );
   }
 
-  @ApiOperation({ summary: '푸시 알림을 갱신합니다.' })
   @Get('notifications')
+  @ApiOperation({ summary: '푸시 알림을 갱신합니다.' })
+  @ApiOkResponse({
+    description: '푸시 알림 목록을 갱신합니다.',
+    type: NotificationProfileResponse,
+    isArray: true,
+  })
   async fetchPushNotification(
     @Req() { user }: Request,
   ): Promise<NotificationProfileResponse[]> {
@@ -108,6 +120,11 @@ export class UserController {
 
   @ApiOperation({ summary: '입장해있는 시간표 집합의 목록을 조회합니다.' })
   @Get('schedule-sets')
+  @ApiOkResponse({
+    description: '조회됐습니다.',
+    type: UserScheduleSetPreviewResponse,
+    isArray: true,
+  })
   async getScheduleSets(
     @Req() { user }: Request,
   ): Promise<UserScheduleSetPreviewResponse[]> {
@@ -119,6 +136,11 @@ export class UserController {
 
   @ApiOperation({ summary: '특정 시간표 집합의 정보를 조회합니다.' })
   @Get('schedule-sets/:scheduleSetId')
+  @ApiOkResponse({
+    description: '조회됐습니다.',
+    type: UserScheduleSetProfileResponse,
+    isArray: true,
+  })
   async getScheduleSetInfo(
     @Param('scheduleSetId', ParseUUIDPipe) scheduleSetId: string,
   ): Promise<UserScheduleSetProfileResponse[]> {
@@ -132,6 +154,10 @@ export class UserController {
 
   @ApiOperation({ summary: '시간표 집합을 생성합니다.' })
   @Post('schedule-sets')
+  @ApiCreatedResponse({
+    description: '생성됐습니다.',
+    type: ScheduleSetProfileResponse,
+  })
   async openScheduleSet(
     @Req() { user }: Request,
   ): Promise<ScheduleSetProfileResponse> {
@@ -180,6 +206,10 @@ export class UserController {
   @ApiBody({
     type: ImageUploadRequest,
   })
+  @ApiCreatedResponse({
+    description: '시간표가 집합에 입장했습니다.',
+    type: UserScheduleProfileResponse,
+  })
   async updateUniversitySchedule(
     @Req() { user }: Request,
     @Body() data?: { lectureIds: number[] },
@@ -224,6 +254,11 @@ export class UserController {
 
   @ApiOperation({ summary: '특정 유저를 팔로우하는 유저 목록을 조회합니다.' })
   @Get(':userId/followers')
+  @ApiOkResponse({
+    description: '조회됐습니다.',
+    type: UserPreviewResponse,
+    isArray: true,
+  })
   async getFollowersByUserId(
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<UserPreviewResponse[]> {
@@ -234,6 +269,11 @@ export class UserController {
 
   @ApiOperation({ summary: '특정 유저가 팔로우하는 유저 목록을 조회합니다.' })
   @Get(':userId/following')
+  @ApiOkResponse({
+    description: '조회됐습니다.',
+    type: UserPreviewResponse,
+    isArray: true,
+  })
   async getFollowingByUserId(
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<UserPreviewResponse[]> {

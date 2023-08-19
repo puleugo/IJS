@@ -9,14 +9,15 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CommentProfileResponse } from '@app/community/comment/dtos/comment-profile.response';
+import { CommentProfileResponse } from '@app/community/comment/dto/comment-profile.response';
 import { CommentService } from '@app/community/comment/comment.service';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { Request } from '@infrastructure/types/request.types';
-import { CreateCommentRequest } from '@app/community/comment/dtos/create-comment.request';
+import { CreateCommentRequest } from '@app/community/comment/dto/create-comment.request';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -38,7 +39,8 @@ export class CommentController {
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
   @ApiOkResponse({
     description: '댓글 목록 조회 성공',
-    type: [CommentProfileResponse],
+    type: CommentProfileResponse,
+    isArray: true,
   })
   @ApiNotFoundResponse({
     description: [
@@ -64,7 +66,6 @@ export class CommentController {
   @ApiParam({ name: 'commentId', description: '댓글 아이디', required: true })
   @ApiCreatedResponse({
     description: '댓글 좋아요 성공',
-    type: String,
   })
   @ApiNotFoundResponse({
     description: ['댓글을 찾을 수 없습니다.'].join('<br>'),
@@ -73,23 +74,26 @@ export class CommentController {
     description: '자신의 댓글에는 좋아요를 누를 수 없습니다.',
   })
   async likeComment(
-    @Param('boardId', ParseIntPipe) _,
+    @Param('boardId', ParseIntPipe) _: number,
     @Param('articleId', ParseIntPipe) articleId: number,
     @Param('commentId', ParseIntPipe) id: number,
     @Req() { user }: Request,
-  ): Promise<string> {
-    const isLiked = await this.commentService.hitCommentLike({
+  ): Promise<void> {
+    await this.commentService.hitCommentLike({
       articleId,
       id,
       userId: user.id,
     });
-    return isLiked ? 'liked' : 'already liked';
   }
 
   @Post()
   @ApiOperation({ summary: '댓글 작성' })
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
+  @ApiBody({
+    description: '댓글 생성 요청',
+    type: CreateCommentRequest,
+  })
   @ApiCreatedResponse({
     description: '댓글 작성 성공',
     type: CommentProfileResponse,
@@ -120,6 +124,10 @@ export class CommentController {
   @ApiParam({ name: 'boardId', description: '게시판 아이디', required: true })
   @ApiParam({ name: 'articleId', description: '게시글 아이디', required: true })
   @ApiParam({ name: 'commentId', description: '댓글 아이디', required: true })
+  @ApiBody({
+    description: '대댓글 생성 요청',
+    type: CreateCommentRequest,
+  })
   @ApiCreatedResponse({
     description: '대댓글 작성 성공',
     type: CommentProfileResponse,
@@ -155,7 +163,6 @@ export class CommentController {
   @ApiParam({ name: 'commentId', description: '댓글 아이디', required: true })
   @ApiCreatedResponse({
     description: '댓글 삭제 성공',
-    type: String,
   })
   @ApiNotFoundResponse({
     description: [
@@ -171,12 +178,11 @@ export class CommentController {
     @Param('articleId', ParseIntPipe) articleId: number,
     @Param('commentId', ParseIntPipe) id: number,
     @Req() { user }: Request,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.commentService.deleteComment({
       id,
       articleId,
       userId: user.id,
     });
-    return 'deleted';
   }
 }
