@@ -23,7 +23,7 @@ export class UniversityMealInfoProfileResponse
     ],
     description: '월요일 식단 정보, 혹은 오늘의 식단 정보',
   })
-  '0': UniversityMealInfo;
+  readonly '0': UniversityMealInfo;
   @ApiProperty({
     example: [
       {
@@ -38,9 +38,10 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '화요일 식단 정보',
-    nullable: true,
+    required: false,
   })
-  '1'?: UniversityMealInfo;
+  readonly '1'?: UniversityMealInfo;
+
   @ApiProperty({
     example: [
       {
@@ -55,9 +56,10 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '수요일 식단 정보',
-    nullable: true,
+    required: false,
   })
-  '2'?: UniversityMealInfo;
+  readonly '2'?: UniversityMealInfo;
+
   @ApiProperty({
     example: [
       {
@@ -72,9 +74,10 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '목요일 식단 정보',
-    nullable: true,
+    required: false,
   })
-  '3'?: UniversityMealInfo;
+  readonly '3'?: UniversityMealInfo;
+
   @ApiProperty({
     example: [
       {
@@ -89,15 +92,15 @@ export class UniversityMealInfoProfileResponse
       },
     ],
     description: '금요일 식단 정보',
-    nullable: true,
+    required: false,
   })
-  '4'?: UniversityMealInfo;
+  readonly '4'?: UniversityMealInfo;
 
   @ApiProperty({
     example: 'weekly',
     description: '시간 범위',
   })
-  time_range: 'weekly' | 'today';
+  readonly time_range: 'weekly' | 'today';
 
   constructor(meals: IUniversityMealInfo[]) {
     for (let i = 0; i < meals.length; i++) {

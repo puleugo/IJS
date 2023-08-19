@@ -9,5 +9,5 @@ export class NotificationUpdateRequest {
   })
   @IsOptional()
   @IsString()
-  deviceType?: string;
+  readonly deviceType?: string;
 }

@@ -8,13 +8,13 @@ export class ScheduleSetProfileResponse
     description: '시간표 집합의 ID를 가져옵니다.',
     example: '1234',
   })
-  scheduleSetId: string;
+  readonly scheduleSetId: string;
 
   @ApiProperty({
     description: '시간표 집합의 QR 코드를 가져옵니다.',
     example: 'https://example.com/qr/1234',
   })
-  qrUrl: string;
+  readonly qrUrl: string;
 
   constructor({ scheduleSetId, qrUrl }: ScheduleSetProfileResponseCommand) {
     this.scheduleSetId = scheduleSetId;

@@ -7,30 +7,31 @@ export class UserProfileResponse implements UserProfileResponseCommand {
     description: '유저 아이디',
     example: '4dfa1fcc-25c7-478a-ab72-36c9fa145890',
   })
-  id: string;
+  readonly id: string;
 
   @ApiProperty({
     description: '학생 인증 여부',
     example: true,
   })
-  isVerified: boolean;
+  readonly isVerified: boolean;
 
   @ApiProperty({
     description: '학과 아이디',
     example: 1,
   })
-  majorId: number | null;
+  readonly majorId: number | null;
 
   @ApiProperty({
     description: '학교 아이디',
     example: '20220000',
   })
-  schoolId: string | null;
+  readonly schoolId: string | null;
+
   @ApiProperty({
     description: '학교 이메일',
     example: 'example@oasis.inje.ac.kr',
   })
-  schoolEmail: string | null;
+  readonly schoolEmail: string | null;
 
   @ApiProperty({
     description: '유저 설정 정보',

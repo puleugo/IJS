@@ -12,7 +12,7 @@ export class UserUpdateSettingRequest
   })
   @IsOptional()
   @IsBoolean()
-  isIgnoredMealNotification?: boolean;
+  readonly isIgnoredMealNotification?: boolean;
 
   @ApiProperty({
     description: '학생회 게시글 알림을 차단합니다.',
@@ -21,7 +21,7 @@ export class UserUpdateSettingRequest
   })
   @IsOptional()
   @IsBoolean()
-  isIgnoredCouncilNotification?: boolean;
+  readonly isIgnoredCouncilNotification?: boolean;
 
   @ApiProperty({
     description: '학부 공지 알림을 차단합니다.',
@@ -30,5 +30,5 @@ export class UserUpdateSettingRequest
   })
   @IsOptional()
   @IsBoolean()
-  isIgnoredNoticeNotification?: boolean;
+  readonly isIgnoredNoticeNotification?: boolean;
 }

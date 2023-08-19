@@ -8,7 +8,7 @@ export class NotificationCreateRequest {
   })
   @IsNotEmpty()
   @IsString()
-  notificationToken!: string;
+  readonly notificationToken!: string;
 
   @ApiProperty({
     example: 'android',
@@ -16,5 +16,5 @@ export class NotificationCreateRequest {
   })
   @IsNotEmpty()
   @IsString()
-  deviceType!: string;
+  readonly deviceType!: string;
 }

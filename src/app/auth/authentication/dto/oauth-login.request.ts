@@ -6,12 +6,12 @@ import { IsEnum, IsString } from 'class-validator';
 export class OauthLoginRequest implements OauthLoginRequestCommand {
   @IsString()
   @ApiProperty({ default: 'aaa.bbb.ccc' })
-  accessToken: string;
+  readonly accessToken: string;
 
   @IsEnum(OauthLoginProviderEnum)
   @ApiProperty({
     enum: OauthLoginProviderEnum,
     default: OauthLoginProviderEnum.GOOGLE,
   })
-  provider: OauthLoginProviderEnum;
+  readonly provider: OauthLoginProviderEnum;
 }

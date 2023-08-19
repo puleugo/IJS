@@ -5,7 +5,7 @@ import { IUniversityLecture } from '@domain/university/university-lecture.interf
 export class UserScheduleProfileResponse
   implements UserScheduleProfileResponseCommand
 {
-  lectures: { [day: string]: UniversityLectureProfileResponse[] } = {
+  readonly lectures: { [day: string]: UniversityLectureProfileResponse[] } = {
     0: [],
     1: [],
     2: [],

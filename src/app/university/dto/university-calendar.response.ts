@@ -9,29 +9,40 @@ export class UniversityCalendarResponse
   implements UniversityCalendarResponseCommand
 {
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Apr: MonthlyEventDTO['Apr'];
+  readonly Apr: MonthlyEventDTO['Apr'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Mar: MonthlyEventDTO['Mar'];
+  readonly Mar: MonthlyEventDTO['Mar'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  May: MonthlyEventDTO['May'];
+  readonly May: MonthlyEventDTO['May'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Jun: MonthlyEventDTO['Jun'];
+  readonly Jun: MonthlyEventDTO['Jun'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Jul: MonthlyEventDTO['Jul'];
+  readonly Jul: MonthlyEventDTO['Jul'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Aug: MonthlyEventDTO['Aug'];
+  readonly Aug: MonthlyEventDTO['Aug'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Sep: MonthlyEventDTO['Sep'];
+  readonly Sep: MonthlyEventDTO['Sep'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Oct: MonthlyEventDTO['Oct'];
+  readonly Oct: MonthlyEventDTO['Oct'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Nov: MonthlyEventDTO['Nov'];
+  readonly Nov: MonthlyEventDTO['Nov'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Dec: MonthlyEventDTO['Dec'];
+  readonly Dec: MonthlyEventDTO['Dec'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Jan: MonthlyEventDTO['Jan'];
+  readonly Jan: MonthlyEventDTO['Jan'];
+
   @ApiProperty({ type: [UniversityCalendarProfileResponse] })
-  Feb: MonthlyEventDTO['Feb'];
+  readonly Feb: MonthlyEventDTO['Feb'];
 
   constructor({
     Mar,

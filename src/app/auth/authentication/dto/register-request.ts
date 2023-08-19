@@ -10,17 +10,17 @@ export type UserVerificationRequestCommand = Pick<
 export class RegisterRequest implements UserVerificationRequestCommand {
   @IsOptional()
   @ApiProperty({ type: 'string', format: 'binary', description: '이미지' })
-  file!: Buffer;
+  readonly file!: Buffer;
 
   @IsNotEmpty()
   @ApiProperty({ type: 'string', description: '이름' })
-  name!: string;
+  readonly name!: string;
 
   @IsNotEmpty()
   @ApiProperty({ type: 'string', description: '학번' })
-  schoolId!: string;
+  readonly schoolId!: string;
 
   @IsNotEmpty()
   @ApiProperty({ type: 'int', description: '학과 ID' })
-  majorId!: number;
+  readonly majorId!: number;
 }

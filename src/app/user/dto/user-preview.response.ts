@@ -6,7 +6,7 @@ export class UserPreviewResponse implements UserPreviewResponseCommand {
     description: '사용자 ID',
     example: '41c7ffb8-399c-440f-925d-1869ee77d3c0',
   })
-  id: string;
+  readonly id: string;
 
   constructor({ id }: UserPreviewResponseCommand) {
     this.id = id;

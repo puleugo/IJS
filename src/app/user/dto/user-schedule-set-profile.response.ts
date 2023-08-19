@@ -2,13 +2,28 @@ import { UniversityLectureProfileResponse } from '@app/university/dto/university
 import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum';
 import { UserScheduleSetProfileResponseCommand } from '@app/user/command/user-schedule-set-profile-response.command';
 import { IUniversityLecture } from '@domain/university/university-lecture.interface';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UserScheduleSetProfileResponse
   implements UserScheduleSetProfileResponseCommand
 {
-  userId: string;
-  role: UserScheduleRoleEnum;
-  lectures: { [day: string]: UniversityLectureProfileResponse[] } = {
+  @ApiProperty({
+    description: '사용자 ID',
+    example: '41c7ffb8-399c-440f-925d-1869ee77d3c0',
+  })
+  readonly userId: string;
+
+  @ApiProperty({
+    description: '사용자 역할',
+    example: UserScheduleRoleEnum.USER,
+  })
+  readonly role: UserScheduleRoleEnum;
+
+  @ApiProperty({
+    description: '시간표 집합의 ID를 가져옵니다.',
+    example: '1234',
+  })
+  readonly lectures: { [day: string]: UniversityLectureProfileResponse[] } = {
     0: [],
     1: [],
     2: [],

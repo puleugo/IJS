@@ -20,7 +20,7 @@ export class CouncilArticleCreateRequest
   @ApiProperty({
     description: '이미지 url',
     default: ['https://example.com/1.png'],
-    nullable: true,
+    required: false,
   })
   readonly images?: string[];
 }

@@ -8,13 +8,13 @@ export class UniversityMajorProfileResponse
     example: 1,
     description: '학과 식별자',
   })
-  id: number;
+  readonly id: number;
 
   @ApiProperty({
     example: '컴퓨터공학과',
     description: '학과명',
   })
-  name: string;
+  readonly name: string;
 
   constructor({ id, name }: UniversityMajorProfileResponseCommand) {
     this.id = id;

@@ -10,12 +10,12 @@ export class UniversityBusResponse implements UniversityBusResponseCommand {
     type: [UniversityBusProfileResponse],
     description: '학교에 도착하는 버스',
   })
-  toSchool: UniversityBusProfileCommand[];
+  readonly toSchool: UniversityBusProfileCommand[];
   @ApiProperty({
     type: [UniversityBusProfileResponse],
     description: '학교에서 출발하는 버스',
   })
-  fromSchool: UniversityBusProfileCommand[];
+  readonly fromSchool: UniversityBusProfileCommand[];
 
   constructor({ toSchool, fromSchool }: UniversityBusResponseCommand) {
     this.toSchool = toSchool.map(

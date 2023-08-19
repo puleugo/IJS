@@ -8,26 +8,29 @@ export class UniversityLectureProfileResponse
     example: 1,
     description: '강의 식별자',
   })
-  id: number;
+  readonly id: number;
+
   @ApiProperty({
     example: 'C++프로그래밍',
     description: '강의명',
   })
-  title: string;
+  readonly title: string;
+
   @ApiProperty({
     example: 4,
     description: '강의 시작 교시',
     minimum: 0,
     maximum: 9,
   })
-  startAt: number;
+  readonly startAt: number;
+
   @ApiProperty({
     example: 9,
     description: '강의 종료 교시',
     minimum: 0,
     maximum: 9,
   })
-  endAt: number;
+  readonly endAt: number;
 
   constructor({
     id,
