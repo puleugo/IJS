@@ -68,6 +68,7 @@
     "fastify-multer": "^2.0.3",
     "fastify-multipart": "^5.4.0",
     "find-my-way": "^7.0.1",
+    "firebase-admin": "^11.10.1",
     "form-data": "^4.0.0",
     "ioredis": "^5.3.2",
     "multer-s3": "2",
