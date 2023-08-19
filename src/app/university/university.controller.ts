@@ -69,15 +69,16 @@ export class UniversityController {
 
   @Get('notices')
   @ApiOperation({ summary: '공지사항 게시글 목록을 조회합니다.' })
-  async getUniversityNoticesSlug(): Promise<UniversityNoticePreviewResponse[]> {
-    const slugs = await this.universityService.getUniversityNotices();
-    return slugs.map((slug) => new UniversityNoticePreviewResponse(slug));
+  @ApiResponse({ type: [UniversityNoticePreviewResponse] })
+  async getUniversityNotices(): Promise<UniversityNoticePreviewResponse[]> {
+    const notices = await this.universityService.getUniversityNotices();
+    return notices.map((notice) => new UniversityNoticePreviewResponse(notice));
   }
 
   @Get('notices/:id')
-  @ApiOperation({ summary: '특정 공지사항을 가져옵니다.' })
+  @ApiOperation({ summary: '특정 공지사항 상세를 가져옵니다.' })
   @ApiResponse({ type: [UniversityNoticeProfileResponse] })
-  async getUniversityNotices(
+  async getUniversityNotice(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UniversityNoticeProfileResponse[]> {
     const notices = await this.universityService.getUniversityNoticeProfileById(

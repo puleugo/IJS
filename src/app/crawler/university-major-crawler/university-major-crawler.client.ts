@@ -27,7 +27,6 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
       const departments: {
         name: string;
         url: string;
-        slug: string;
         departmentName: string;
         departmentUrl: string | null;
       }[][] = await page.$$eval('#organization > div > div', (departments) => {
@@ -39,13 +38,9 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
           return majors.map((major) => {
             const name = major.textContent;
             const url = major.querySelector('a').href;
-            const slug = url
-              .replace(/^(https?:\/\/)?/, '')
-              .replace(/\.inje\.ac\.kr\//, '');
             return {
               name,
               url,
-              slug,
               departmentName,
               departmentUrl,
             };
