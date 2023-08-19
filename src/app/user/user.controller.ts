@@ -33,13 +33,56 @@ import { LogResponseTypes } from '@infrastructure/types/log-respone.types';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageUploadRequest } from '@app/auth/authentication/dto/image-upload.request';
 import { UserUpdateSettingRequest } from '@app/user/dto/user-update-setting.request';
+import { NotificationService } from '@app/notification/notification.service';
+import { NotificationCreateRequest } from '@app/notification/dto/notification-create.request';
+import { NotificationUpdateRequest } from '@app/notification/dto/notification-update.request';
+import { NotificationProfileResponse } from '@app/notification/dto/notification-profile-response';
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly notificationService: NotificationService,
+  ) {}
+
+  @ApiOperation({ summary: '푸시 알림을 허용합니다.' })
+  async allowPushNotification(
+    @Body() notificationCreateRequest: NotificationCreateRequest,
+    @Req() { user }: Request,
+  ): Promise<void> {
+    await this.notificationService.acceptPushNotification(
+      user.id,
+      notificationCreateRequest,
+    );
+  }
+
+  @ApiOperation({ summary: '푸시 알림을 거부합니다.' })
+  @Put('notifications')
+  async disablePushNotification(
+    @Body() notificationUpdateRequest: NotificationUpdateRequest,
+    @Req() { user }: Request,
+  ): Promise<void> {
+    await this.notificationService.disablePushNotification(
+      user.id,
+      notificationUpdateRequest,
+    );
+  }
+
+  @ApiOperation({ summary: '푸시 알림을 갱신합니다.' })
+  @Get('notifications')
+  async fetchPushNotification(
+    @Req() { user }: Request,
+  ): Promise<NotificationProfileResponse[]> {
+    const notifications = await this.notificationService.getNotifications(
+      user.id,
+    );
+    return notifications.map(
+      (notification) => new NotificationProfileResponse(notification),
+    );
+  }
 
   @ApiOperation({ summary: '유저 설정 정보를 수정합니다.' })
   @Put('profile')

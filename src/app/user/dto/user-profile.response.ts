@@ -43,7 +43,6 @@ export class UserProfileResponse implements UserProfileResponseCommand {
   })
   settings: Pick<
     IUserSetting,
-    | 'isIgnoredGeneralNotification'
     | 'isIgnoredMealNotification'
     | 'isIgnoredCouncilNotification'
     | 'isIgnoredNoticeNotification'

@@ -7,7 +7,6 @@ export type UserProfileResponseCommand = Pick<
 > & {
   settings: Pick<
     IUserSetting,
-    | 'isIgnoredGeneralNotification'
     | 'isIgnoredMealNotification'
     | 'isIgnoredCouncilNotification'
     | 'isIgnoredNoticeNotification'

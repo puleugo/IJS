@@ -7,5 +7,6 @@ import { NotificationToken } from '@domain/user/notification/notification-token.
 @Module({
   imports: [TypeOrmModule.forFeature([Notification, NotificationToken])],
   providers: [NotificationService],
+  exports: [NotificationService],
 })
 export class NotificationModule {}

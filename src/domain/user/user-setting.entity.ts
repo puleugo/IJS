@@ -10,9 +10,6 @@ export class UserSetting implements IUserSetting {
   isIgnoredCouncilNotification: boolean;
 
   @Column('boolean', { default: false })
-  isIgnoredGeneralNotification: boolean;
-
-  @Column('boolean', { default: false })
   isIgnoredMealNotification: boolean;
 
   @Column('boolean', { default: false })

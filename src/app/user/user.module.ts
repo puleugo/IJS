@@ -16,6 +16,7 @@ import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserSetting } from '@domain/user/user-setting.entity';
+import { NotificationModule } from '@app/notification/notification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UserSetting } from '@domain/user/user-setting.entity';
       UniversityLecture,
     ]),
     HttpModule,
+    NotificationModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
