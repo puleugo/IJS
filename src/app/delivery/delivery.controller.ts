@@ -9,13 +9,14 @@ import {
   Post,
 } from '@nestjs/common';
 import { DeliveryService } from '@app/delivery/delivery.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import {
-  DeliveryPreviewResponse,
   DeliveryData,
+  DeliveryPreviewResponse,
 } from '@app/delivery/dto/delivery-profile.response';
 
 @ApiTags('Delivery')
+@ApiExcludeController()
 @Controller('deliveries')
 export class DeliveryController {
   constructor(private readonly deliveryService: DeliveryService) {}
