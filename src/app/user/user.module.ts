@@ -15,11 +15,13 @@ import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserSetting } from '@domain/user/user-setting.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       User,
+      UserSetting,
       UserAuth,
       UserAuthProvider,
       UserLecture,

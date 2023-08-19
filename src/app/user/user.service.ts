@@ -20,16 +20,21 @@ import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
-import { IUser } from '@domain/user/user.interface';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
 import { JwtService } from '@nestjs/jwt';
 import { USER_QR_CODE_EXPIRE } from '../../contants';
+import { UserSetting } from '@domain/user/user-setting.entity';
+import { UserNotFoundException } from '@domain/error/user.error';
+import { UserUpdateSettingRequestCommand } from '@app/user/command/user-update-setting-request.command';
+import { IUser } from '@domain/user/user.interface';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(UserSetting)
+    private readonly userSettingRepository: Repository<UserSetting>,
     @InjectRepository(UserAuth)
     private readonly userAuthRepository: Repository<UserAuth>,
     @InjectRepository(UserLecture)
@@ -64,7 +69,7 @@ export class UserService {
 
     const user = await this.userRepository.save({});
 
-    const userAuth = await this.userAuthRepository.create({
+    const userAuth = this.userAuthRepository.create({
       provider: userAuthProvider,
       providerId: userAuthProvider.id,
       username: data.providerUsername,
@@ -196,13 +201,10 @@ export class UserService {
   > {
     const userScheduleSets = await this.userScheduleSetRepository.find({
       where: { scheduleSetId: id },
-      relations: [
-        'user',
-        'user.lectures',
-        'user.lectures.lecture',
-        'scheduleSet',
-        'scheduleSet.owner',
-      ],
+      relations: {
+        user: { lectures: { lecture: true } },
+        scheduleSet: { owner: true },
+      },
     });
     const scheduleSet: {
       userId: string;
@@ -247,16 +249,22 @@ export class UserService {
       );
   }
 
-  async updateUserProfile(
+  async updateUserSettingsById(
     userId: string,
-    data: Partial<IUser>,
-  ): Promise<boolean> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-    if (!user) throw new NotFoundException('user not found');
+    data: UserUpdateSettingRequestCommand,
+  ): Promise<void> {
+    const { affected } = await this.userSettingRepository.update(
+      { userId },
+      data,
+    );
+    if (affected <= 0) throw new UserNotFoundException();
+    return;
+  }
+
+  async updateUserById(userId: string, data: Partial<IUser>): Promise<void> {
     const { affected } = await this.userRepository.update({ id: userId }, data);
-    return affected > 0;
+    if (affected <= 0) throw new UserNotFoundException();
+    return;
   }
 
   async getFollowersByUserId(myId: string): Promise<User[]> {

@@ -32,14 +32,27 @@ import { ScheduleSetProfileResponse } from '@app/user/dto/schedule-set-profile.r
 import { LogResponseTypes } from '@infrastructure/types/log-respone.types';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageUploadRequest } from '@app/auth/authentication/dto/image-upload.request';
+import { UserUpdateSettingRequest } from '@app/user/dto/user-update-setting.request';
 
-// TODO 구현
 @ApiTags('User')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @ApiOperation({ summary: '유저 설정 정보를 수정합니다.' })
+  @Put('profile')
+  async updateUserProfile(
+    @Body() userUpdateSettingRequest: UserUpdateSettingRequest,
+    @Req() { user }: Request,
+  ): Promise<void> {
+    const foundUser = await this.userService.findById(user.id);
+    await this.userService.updateUserSettingsById(
+      foundUser.id,
+      userUpdateSettingRequest,
+    );
+  }
 
   @ApiOperation({ summary: '모바일 학생증을 발급합니다.' })
   @Get('my-student-qr')

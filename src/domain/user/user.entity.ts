@@ -3,8 +3,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -21,6 +23,8 @@ import { ArticleLike } from '@domain/communities/articles/article-like.entity';
 import { Comment } from '@domain/communities/comments/comment.entity';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 import { RoleEnum } from '@app/auth/authorization/types';
+import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
+import { UserSetting } from '@domain/user/user-setting.entity';
 
 @Entity('users')
 export class User implements IUser {
@@ -39,7 +43,7 @@ export class User implements IUser {
   @Column('varchar', { unique: true, nullable: true, length: 20 })
   schoolId: string | null;
 
-  @Column('varchar', { array: true, length: 20, default: RoleEnum.USER })
+  @Column('varchar', { array: true, length: 20, default: [RoleEnum.USER] })
   role: RoleEnum[];
 
   @ManyToOne(() => UniversityMajor, (major) => major.notices)
@@ -61,6 +65,9 @@ export class User implements IUser {
   @OneToMany(() => UserLecture, (lecture) => lecture.user)
   lectures: UserLecture[];
 
+  @OneToMany(() => CouncilArticle, ({ author }) => author)
+  councilArticles: CouncilArticle[];
+
   @OneToMany(() => Article, ({ author }) => author)
   articles: Article[];
 
@@ -72,6 +79,10 @@ export class User implements IUser {
 
   @OneToMany(() => CommentLike, ({ author }) => author)
   commentLikes: CommentLike[];
+
+  @OneToOne(() => UserSetting, { cascade: true })
+  @JoinColumn()
+  settings: UserSetting;
 
   @CreateDateColumn()
   createdAt: Date;

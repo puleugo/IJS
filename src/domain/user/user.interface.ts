@@ -8,6 +8,7 @@ import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 import { IComment } from '@domain/communities/comments/comment.interface';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
 import { RoleEnum } from '@app/auth/authorization/types';
+import { IUserSetting } from '@domain/user/user-setting.interface';
 
 export interface IUser {
   id: string;
@@ -25,6 +26,7 @@ export interface IUser {
   articles: IArticle[];
   articleLikes: ArticleLike[];
   comments: IComment[];
+  settings: IUserSetting;
   commentLikes: CommentLike[];
   createdAt: Date;
   updatedAt: Date;

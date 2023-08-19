@@ -1,12 +1,3 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import { ScheduleSet } from '@domain/user/schedule-set.entity';
 

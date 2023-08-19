@@ -32,6 +32,7 @@ import { PhotoClient } from '@infrastructure/utils/photo.client';
 import { UserVerificationRequestCommand } from '@app/auth/authentication/dto/register-request';
 import { UniversityService } from '@app/university/university.service';
 import { ConfigService } from '@nestjs/config';
+import { UserProfileResponseCommand } from '@app/user/command/user-profile-response.command';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const TelegramBot = require('node-telegram-bot-api');
@@ -203,13 +204,12 @@ export class AuthenticationService {
     }
     await this.redis.del(`code_${code}`);
 
-    const affected = await this.userService.updateUserById(userId, {
+    await this.userService.updateUserById(userId, {
       schoolEmail,
       schoolId,
       majorId,
       isVerified: true,
     });
-    if (!affected) throw new UserNotFoundException();
     return true;
   }
 
@@ -244,8 +244,10 @@ export class AuthenticationService {
       });
   }
 
-  async getProfile(userId: string): Promise<User> {
-    return await this.userService.findById(userId);
+  async getProfile(userId: string): Promise<UserProfileResponseCommand> {
+    return await this.userService.findById(userId, {
+      relations: { settings: true },
+    });
   }
 
   async uploadRegisterImage(
@@ -268,18 +270,16 @@ export class AuthenticationService {
     majorId?: number,
     schoolId?: string,
     schoolEmail?: string,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const user = await this.userService.findById(userId);
     if (!user) throw new UserNotFoundException();
 
-    const affected = await this.userService.updateUserById(user.id, {
+    await this.userService.updateUserById(user.id, {
       isVerified: true,
       majorId,
       schoolId,
       schoolEmail,
     });
-    if (!affected) throw new UserNotFoundException();
-    return;
   }
 
   async initializeAuthProvider() {
