@@ -36,7 +36,6 @@ export class UserProfileResponse implements UserProfileResponseCommand {
   @ApiProperty({
     description: '유저 설정 정보',
     example: {
-      isIgnoredGeneralNotification: false,
       isIgnoredMealNotification: false,
       isIgnoredCouncilNotification: false,
       isIgnoredNoticeNotification: false,
