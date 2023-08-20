@@ -5,15 +5,20 @@ import { Notification } from '@domain/user/notification/notification.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotificationUpdateRequest } from '@app/notification/dto/notification-update.request';
-import * as firebase from 'firebase-admin';
-import * as path from 'path';
 import { NotificationProfileResponse } from '@app/notification/dto/notification-profile-response';
 import { NotificationCategoryEnum } from '@app/notification/notification-category.enum';
+import * as firebaseAdmin from 'firebase-admin';
+import * as dotenv from 'dotenv';
 
-firebase.initializeApp({
-  credential: firebase.credential.cert(
-    path.join(__dirname, '..', '..', '..', 'firebase-admin-sdk.json'),
-  ),
+dotenv.config();
+const serviceAccount: firebaseAdmin.ServiceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+};
+
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccount),
 });
 
 @Injectable()
@@ -73,7 +78,7 @@ export class NotificationService {
           body,
           category,
         });
-        await firebase
+        await firebaseAdmin
           .messaging()
           .send({
             notification: new NotificationProfileResponse({
