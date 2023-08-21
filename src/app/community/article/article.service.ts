@@ -165,7 +165,7 @@ export class ArticleService {
   }
 
   async deleteArticle(params: ArticleDeleteRequestType): Promise<boolean> {
-    const { id, userId, boardId } = params;
+    const { id, boardId } = params;
 
     const [softDeleteResult, decrementResult] = await Promise.all([
       this.articleRepository.softDelete({ id }),

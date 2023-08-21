@@ -190,10 +190,9 @@ export class UniversityService {
   }
 
   async getUniversityNotices(): Promise<UniversityNoticePreviewResponseType[]> {
-    const notices = await this.universityNoticeRepository.find({
+    return await this.universityNoticeRepository.find({
       select: { id: true },
     });
-    return notices;
   }
 
   private async getUniversitySemesterByDate(

@@ -62,7 +62,7 @@ export class CommentService {
     // LEFT JOIN comments r ON c.id = r.reply_to_id
     // WHERE r.deleted_at IS NULL AND c.deleted_at IS NULL AND ((c.reply_to_id IS NULL) OR NOT( r.reply_to_id IS NULL))
     // ORDER BY c.created_at, r.created_at;
-    const comments: CommentProfileResponseType[] = await this.commentRepository
+    return await this.commentRepository
       .find({
         relations: {
           replies: true,
@@ -106,7 +106,6 @@ export class CommentService {
           };
         });
       });
-    return comments;
   }
 
   async createComment(

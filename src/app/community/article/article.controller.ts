@@ -44,6 +44,7 @@ import {
   CanNotLikeOwnArticleException,
 } from '@domain/error/article.error';
 import { ArticleReportRequest } from '@app/community/article/dto/article-report.request';
+import { UserService } from '@app/user/user.service';
 
 @Controller('boards/:boardId/articles')
 @UseGuards(JwtAuthGuard)
@@ -53,6 +54,7 @@ export class ArticleController {
   constructor(
     private readonly boardService: BoardService,
     private readonly articleService: ArticleService,
+    private readonly userService: UserService,
   ) {}
 
   @Get()
@@ -360,7 +362,6 @@ export class ArticleController {
 
     await this.articleService.deleteArticle({
       id,
-      userId: user.id,
       boardId: boardId,
     });
   }

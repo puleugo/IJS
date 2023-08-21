@@ -18,9 +18,7 @@ export type ArticleHitLikeRequestType = Pick<IArticle, 'id'> & {
   userId: string;
 };
 
-export type ArticleDeleteRequestType = Pick<IArticle, 'id' | 'boardId'> & {
-  userId: string;
-};
+export type ArticleDeleteRequestType = Pick<IArticle, 'id' | 'boardId'>;
 export type ArticleImageUploadRequestType = {
   images: Buffer[];
 };

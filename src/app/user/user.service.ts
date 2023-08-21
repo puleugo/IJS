@@ -155,11 +155,10 @@ export class UserService {
   }
 
   async findById(id: string, options?: FindOneOptions<User>): Promise<User> {
-    const user = await this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { id },
       ...options,
     });
-    return user;
   }
 
   async findScheduleSetById(id: string): Promise<ScheduleSet> {
