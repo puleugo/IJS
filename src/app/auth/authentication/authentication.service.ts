@@ -31,6 +31,7 @@ import {
 
 import * as TelegramBot from 'node-telegram-bot-api';
 import { UserAuthenticationType } from '@app/auth/authentication/authentication.type';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class AuthenticationService {
@@ -96,7 +97,7 @@ export class AuthenticationService {
   }
 
   async kakaoOauthLogin(accessToken: string): Promise<User> {
-    let kakaoUserInfo;
+    let kakaoUserInfo: AxiosResponse<any, any>;
     try {
       kakaoUserInfo = await this.httpService.axiosRef.request({
         method: 'GET',
@@ -246,7 +247,7 @@ export class AuthenticationService {
     const { name, schoolId, majorId } = userVerificationRequest;
     const majorName =
       await this.universityService.getUniversityMajorNameByMajorId(majorId);
-    this.bot.sendPhoto(
+    await this.bot.sendPhoto(
       this.chatId,
       `https://duscltkrckrf7.cloudfront.net/${photoUrl}`,
       {
