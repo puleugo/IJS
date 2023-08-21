@@ -6,19 +6,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 import { IUniversityBusSchedule } from '@domain/university/university-bus-schedule.interface';
 import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
-import { generateChromeBrowser } from '@infrastructure/utils/generate-chrome-browser';
+import { UtilService } from '@infrastructure/utils/util.service';
 
 @Injectable()
 export class UniversityBusScheduleCrawlerClient implements CrawlerClient {
   constructor(
     @InjectRepository(UniversityBusSchedule)
     private readonly universityBusScheduleRepository: Repository<UniversityBusSchedule>,
+    private readonly utilService: UtilService,
   ) {}
 
   async crawl(): Promise<any> {
     await this.universityBusScheduleRepository.delete({});
     const url = 'https://www.inje.ac.kr/kor/campus-life/welfare-0102-1.asp';
-    const browser = await generateChromeBrowser();
+    const browser = await this.utilService.generateChromeBrowser();
     const page = await getPuppeteerPage(browser, url);
     try {
       // 학교→인제대역

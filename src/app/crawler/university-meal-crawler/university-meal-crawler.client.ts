@@ -7,7 +7,7 @@ import { MealCourseEnum } from '@domain/university/university-meal.interface';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
 import { Crawler } from '@domain/crawler/crawler.entity';
 import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
-import { generateChromeBrowser } from '@infrastructure/utils/generate-chrome-browser';
+import { UtilService } from '@infrastructure/utils/util.service';
 
 @Injectable()
 export class UniversityMealCrawlerClient implements CrawlerClient {
@@ -16,13 +16,14 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
     private readonly universityMealRepository: Repository<UniversityMeal>,
     @InjectRepository(Crawler)
     private readonly crawlerRepository: Repository<Crawler>,
+    private readonly utilService: UtilService,
   ) {}
 
   async crawl(): Promise<any> {
     const url =
       'https://www.inje.ac.kr/kor/Template/Bsub_page.asp?Ltype=5&Ltype2=3&Ltype3=3&Tname=S_Food&Ldir=board/S_Food&Lpage=s_food_view&d1n=5&d2n=4&d3n=4&d4n=0';
     const meals: UniversityMeal[] = [];
-    const browser = await generateChromeBrowser();
+    const browser = await this.utilService.generateChromeBrowser();
     const page = await getPuppeteerPage(browser, url);
     try {
       const weekDay = getLastMondayByDate(new Date());

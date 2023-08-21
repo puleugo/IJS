@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UniversityDepartment } from '@domain/university/university-department.entity';
 import { Crawler } from '@domain/crawler/crawler.entity';
 import { getPuppeteerPage } from '@infrastructure/utils/get-puppeteer-page';
-import { generateChromeBrowser } from '@infrastructure/utils/generate-chrome-browser';
+import { UtilService } from '@infrastructure/utils/util.service';
 
 @Injectable()
 export class UniversityMajorCrawlerClient implements CrawlerClient {
@@ -17,11 +17,12 @@ export class UniversityMajorCrawlerClient implements CrawlerClient {
     private readonly universityDepartmentRepository: Repository<UniversityDepartment>,
     @InjectRepository(Crawler)
     private readonly crawlerRepository: Repository<Crawler>,
+    private readonly utilService: UtilService,
   ) {}
 
   async crawl(): Promise<any> {
     const url = 'https://www.inje.ac.kr/kor/academics/academics.asp';
-    const browser = await generateChromeBrowser();
+    const browser = await this.utilService.generateChromeBrowser();
     const page = await getPuppeteerPage(browser, url);
     try {
       const departments: {
