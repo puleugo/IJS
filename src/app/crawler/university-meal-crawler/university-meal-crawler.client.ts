@@ -37,6 +37,8 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
               .replace(/&amp;/g, '&')
               .replace(/&amp;/g, '&')
               .replace(/\((.*?)\)<br>/g, '')
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
               .split('<br>'),
         );
         const mealA = this.universityMealRepository.create({
@@ -80,13 +82,6 @@ export class UniversityMealCrawlerClient implements CrawlerClient {
         meals.push(mealC);
         weekDay.setDate(weekDay.getDate() + 1);
       }
-      const a = [];
-      meals.map((meal) => {
-        const test = {
-          course: meal.course,
-          publishedAt: meal.publishedAt,
-        };
-      });
       await Promise.all(
         meals.map(async (meal) => {
           this.universityMealRepository.create(meal);
