@@ -6,19 +6,21 @@ import {
 import { Article } from '@domain/communities/articles/article.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleCreateCommand } from '@app/community/article/commands/article-create.command';
-import { ArticleUpdateCommand } from '@app/community/article/commands/article-update.command';
-import { ArticleLikeCommand } from '@app/community/article/commands/article-like.command';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
-import { ArticleDeleteCommand } from '@app/community/article/commands/article-delete.command';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { BoardService } from '@app/community/board/board.service';
-import { ArticleImageUploadCommand } from '@app/community/article/commands/article-image-upload.command';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
 import { Pagination } from '@infrastructure/types/pagination.types';
 import { paginate } from 'nestjs-typeorm-paginate';
-import { ArticleCreateRequestCommand } from '@app/community/article/commands/council-article-create-request.command';
 import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
+import {
+  ArticleCreateRequestType,
+  ArticleDeleteRequestType,
+  ArticleHitLikeRequestType,
+  ArticleImageUploadRequestType,
+  ArticleUpdateRequestType,
+  CouncilArticleCreateRequestType,
+} from '@app/community/article/article.type';
 
 @Injectable()
 export class ArticleService {
@@ -101,9 +103,9 @@ export class ArticleService {
   }
 
   async createArticle(
-    articleCreateCommand: ArticleCreateCommand,
+    articleCreateRequest: ArticleCreateRequestType,
   ): Promise<Article> {
-    const { authorId, boardId, ...articleData } = articleCreateCommand;
+    const { authorId, boardId, ...articleData } = articleCreateRequest;
 
     const createdArticle = this.articleRepository.create({
       ...articleData,
@@ -123,18 +125,18 @@ export class ArticleService {
 
   async updateArticle(
     id: number,
-    articleUpdateCommand: ArticleUpdateCommand,
+    articleUpdateRequest: ArticleUpdateRequestType,
   ): Promise<void> {
     const updateResult = await this.articleRepository.update(
       { id },
       {
-        ...articleUpdateCommand,
+        ...articleUpdateRequest,
       },
     );
     if (!updateResult.affected) throw new InternalServerErrorException();
   }
 
-  async hitArticleLike(params: ArticleLikeCommand): Promise<boolean> {
+  async hitArticleLike(params: ArticleHitLikeRequestType): Promise<boolean> {
     const { id, userId } = params;
     const articleLike = await this.articleLikeRepository.findOne({
       where: { articleId: id, authorId: userId },
@@ -162,7 +164,7 @@ export class ArticleService {
     return updateResult.affected > 0 && deleteResult.affected > 0;
   }
 
-  async deleteArticle(params: ArticleDeleteCommand): Promise<boolean> {
+  async deleteArticle(params: ArticleDeleteRequestType): Promise<boolean> {
     const { id, userId, boardId } = params;
 
     const [softDeleteResult, decrementResult] = await Promise.all([
@@ -192,9 +194,9 @@ export class ArticleService {
   }
 
   async uploadArticleImage(
-    articleImageUploadCommand: ArticleImageUploadCommand,
+    articleImageUploadRequest: ArticleImageUploadRequestType,
   ): Promise<string[]> {
-    const { images } = articleImageUploadCommand;
+    const { images } = articleImageUploadRequest;
     const resizedImages = await Promise.all(
       images.map((image) => this.articlePhotoClient.resizePhoto(image)),
     );
@@ -220,13 +222,13 @@ export class ArticleService {
   }
 
   async createCouncilArticle(
-    councilArticleCreateRequestCommand: ArticleCreateRequestCommand,
+    councilArticleCreateRequestRequest: CouncilArticleCreateRequestType,
   ): Promise<CouncilArticle> {
-    const { authorId, boardId, ...articleCommand } =
-      councilArticleCreateRequestCommand;
+    const { authorId, boardId, ...articleContents } =
+      councilArticleCreateRequestRequest;
 
     const createdArticle = this.articleRepository.create({
-      ...articleCommand,
+      ...articleContents,
       authorId,
     });
     const [article, incrementResult] = await Promise.all([

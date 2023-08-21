@@ -1,8 +1,8 @@
-import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { ScheduleSetProfileResponseType } from '@app/user/user.type';
 
 export class ScheduleSetProfileResponse
-  implements ScheduleSetProfileResponseCommand
+  implements ScheduleSetProfileResponseType
 {
   @ApiProperty({
     description: '시간표 집합의 ID를 가져옵니다.',
@@ -16,7 +16,7 @@ export class ScheduleSetProfileResponse
   })
   readonly qrUrl: string;
 
-  constructor({ scheduleSetId, qrUrl }: ScheduleSetProfileResponseCommand) {
+  constructor({ scheduleSetId, qrUrl }: ScheduleSetProfileResponseType) {
     this.scheduleSetId = scheduleSetId;
     this.qrUrl = qrUrl;
   }

@@ -1,7 +1,7 @@
-import { BoardProfileCommand } from '@app/community/board/commands/board-profile.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { BoardProfileResponseType } from '@app/community/board/board.type';
 
-export class BoardProfileResponse implements BoardProfileCommand {
+export class BoardProfileResponse implements BoardProfileResponseType {
   @ApiProperty({
     description: '게시판 ID',
     example: 1,

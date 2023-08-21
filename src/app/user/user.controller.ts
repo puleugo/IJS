@@ -38,7 +38,7 @@ import { UserUpdateSettingRequest } from '@app/user/dto/user-update-setting.requ
 import { NotificationService } from '@app/notification/notification.service';
 import { NotificationCreateRequest } from '@app/notification/dto/notification-create.request';
 import { NotificationUpdateRequest } from '@app/notification/dto/notification-update.request';
-import { NotificationProfileResponse } from '@app/notification/dto/notification-profile-response';
+import { NotificationProfileResponse } from '@app/notification/dto/notification-profile.response';
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard)

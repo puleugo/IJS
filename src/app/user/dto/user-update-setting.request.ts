@@ -1,10 +1,8 @@
 import { IsBoolean, IsOptional } from 'class-validator';
-import { UserUpdateSettingRequestCommand } from '@app/user/command/user-update-setting-request.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserUpdateSettingRequestType } from '@app/user/user.type';
 
-export class UserUpdateSettingRequest
-  implements UserUpdateSettingRequestCommand
-{
+export class UserUpdateSettingRequest implements UserUpdateSettingRequestType {
   @ApiProperty({
     description: '학식 알림을 차단합니다.',
     example: true,

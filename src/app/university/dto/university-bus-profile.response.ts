@@ -1,8 +1,8 @@
-import { UniversityBusProfileCommand } from '@app/university/command/university-bus-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UniversityBusProfileResponseType } from '@app/university/university.type';
 
 export class UniversityBusProfileResponse
-  implements UniversityBusProfileCommand
+  implements UniversityBusProfileResponseType
 {
   @ApiProperty({ example: 1, description: '버스 식별자' })
   readonly id: number;
@@ -25,7 +25,12 @@ export class UniversityBusProfileResponse
   })
   readonly departedOn: Date;
 
-  constructor({ id, departedOn, price, title }: UniversityBusProfileCommand) {
+  constructor({
+    id,
+    departedOn,
+    price,
+    title,
+  }: UniversityBusProfileResponseType) {
     this.id = id;
     this.departedOn = departedOn;
     this.price = price;

@@ -35,28 +35,33 @@ import { UniversityModule } from '@app/university/university.module';
       },
     }),
     MailerModule.forRootAsync({
-      useFactory: () => ({
-        transport: {
-          service: 'gmail',
-          host: process.env.EMAIL_HOST,
-          port: process.env.EMAIL_PORT,
-          secure: false,
-          auth: {
-            user: process.env.EMAIL_ID, // generated ethereal user
-            pass: process.env.EMAIL_PASS, // generated ethereal password
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const host = configService.get<string>('EMAIL_HOST', '');
+        const port = configService.get<string>('EMAIL_PORT', '');
+        const user = configService.get<string>('EMAIL_ID', '');
+        const pass = configService.get<string>('EMAIL_PASS', '');
+        return {
+          transport: {
+            service: 'gmail',
+            host,
+            port,
+            secure: false,
+            auth: { user, pass },
           },
-        },
-        defaults: {
-          from: '"인제생 개발팀" <modules@gmail.com>',
-        },
-        template: {
-          dir: __dirname + '/templates',
-          adapter: new PugAdapter(),
-          options: {
-            strict: true,
+          defaults: {
+            from: '"인제생 개발팀" <modules@gmail.com>',
           },
-        },
-      }),
+          template: {
+            dir: __dirname + '/templates',
+            adapter: new PugAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthenticationController],

@@ -25,13 +25,19 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { BoardService } from '@app/community/board/board.service';
+import { ArticleService } from '@app/community/article/article.service';
 
 @Controller('boards/:boardId/articles/:articleId/comments')
 @ApiTags('[커뮤니티] 댓글')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(
+    private readonly boardService: BoardService,
+    private readonly articlesService: ArticleService,
+    private readonly commentService: CommentService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: '댓글 목록 조회' })

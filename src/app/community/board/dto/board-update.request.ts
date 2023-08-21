@@ -1,8 +1,8 @@
-import { BoardUpdateCommand } from '@app/community/board/commands/board-update.command';
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { BoardUpdateRequestType } from '@app/community/board/board.type';
 
-export class BoardUpdateRequest implements Partial<BoardUpdateCommand> {
+export class BoardUpdateRequest implements Partial<BoardUpdateRequestType> {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({

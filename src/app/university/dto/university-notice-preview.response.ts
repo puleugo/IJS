@@ -1,8 +1,8 @@
-import { UniversityNoticePreviewResponseCommand } from '@app/university/command/university-notice-preview-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UniversityNoticePreviewResponseType } from '@app/university/university.type';
 
 export class UniversityNoticePreviewResponse
-  implements UniversityNoticePreviewResponseCommand
+  implements UniversityNoticePreviewResponseType
 {
   @ApiProperty({ description: '공지 게시글 ID', example: 1 })
   readonly id: number;
@@ -19,7 +19,7 @@ export class UniversityNoticePreviewResponse
   })
   readonly wroteAt: Date;
 
-  constructor(data: UniversityNoticePreviewResponseCommand) {
+  constructor(data: UniversityNoticePreviewResponseType) {
     this.id = data.id;
     this.title = data.title;
     this.wroteAt = data.wroteAt;

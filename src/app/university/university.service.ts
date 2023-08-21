@@ -3,15 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UniversityMealSearchQuery } from '@app/university/command/university-meal-info-profile-response.command';
-import { UniversityProgramProfileResponseCommand } from '@app/university/command/university-program-profile-response.command';
-import { UniversityNearBusResponseCommand } from '@app/university/command/university-near-bus-response.command';
-import { UniversityFinishDateProfileResponseCommand } from '@app/university/command/university-finished-date-profile-response.command';
-import { UniversityCalendarResponseCommand } from '@app/university/command/university-calendar-response.command';
-import {
-  UniversityBusProfileCommand,
-  UniversityBusResponseCommand,
-} from '@app/university/command/university-bus-response.command';
 import {
   Between,
   LessThanOrEqual,
@@ -33,8 +24,17 @@ import {
 } from '@domain/university/university-meal.interface';
 import { getDateByTime } from '@infrastructure/utils/get-date-by-time';
 import { getLastMondayByDate } from '@infrastructure/utils/get-last-monday-by-date';
-import { UniversityNoticePreviewResponseCommand } from '@app/university/command/university-notice-preview-response.command';
-import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
+import {
+  UniversityBusProfileResponseType,
+  UniversityBusResponseType,
+  UniversityCalendarResponseType,
+  UniversityFinishDateProfileResponseType,
+  UniversityMealSearchQuery,
+  UniversityNearBusResponseType,
+  UniversityNoticePreviewResponseType,
+  UniversityNoticeProfileResponseType,
+  UniversityProgramProfileResponseType,
+} from '@app/university/university.type';
 
 @Injectable()
 export class UniversityService {
@@ -72,7 +72,7 @@ export class UniversityService {
 
   async getUniversityProgramsByDate(
     date: Date,
-  ): Promise<UniversityProgramProfileResponseCommand[]> {
+  ): Promise<UniversityProgramProfileResponseType[]> {
     return await this.universityProgramRepository.find({
       where: {
         endAt: MoreThan(date),
@@ -82,27 +82,25 @@ export class UniversityService {
 
   async getUniversityNoticeProfileById(
     id: number,
-  ): Promise<UniversityNoticeProfileResponseCommand[]> {
+  ): Promise<UniversityNoticeProfileResponseType[]> {
     const notices = await this.universityNoticeRepository.find({
       where: { id },
       relations: {
         major: true,
       },
     });
-    return notices.map((notice): UniversityNoticeProfileResponseCommand => {
+    return notices.map((notice): UniversityNoticeProfileResponseType => {
       return { ...notice, majorName: notice.major.name };
     });
   }
 
-  async getUniversityNearBusInfo(): Promise<
-    UniversityNearBusResponseCommand[]
-  > {
+  async getUniversityNearBusInfo(): Promise<UniversityNearBusResponseType[]> {
     return;
   }
 
   async getUniversityFinishDate(
     date: Date,
-  ): Promise<UniversityFinishDateProfileResponseCommand> {
+  ): Promise<UniversityFinishDateProfileResponseType> {
     const semester = await this.getUniversitySemesterByDate(date);
 
     if (!semester) {
@@ -131,7 +129,7 @@ export class UniversityService {
 
   async getUniversityCalendarInfo(
     date: Date,
-  ): Promise<UniversityCalendarResponseCommand> {
+  ): Promise<UniversityCalendarResponseType> {
     const events = await this.universityEventRepository.find({
       where: {
         startAt: MoreThanOrEqual(new Date(date.getFullYear(), 2, 1)),
@@ -141,7 +139,7 @@ export class UniversityService {
     return await this.groupEventByMonth(events);
   }
 
-  async getUniversityBusInfo(): Promise<UniversityBusResponseCommand> {
+  async getUniversityBusInfo(): Promise<UniversityBusResponseType> {
     const toSchoolBus = await this.universityBusScheduleRepository.find({
       where: { toSchool: true },
     });
@@ -162,7 +160,7 @@ export class UniversityService {
   async getUniversityNextBusInfo(
     currentTime: Date,
     stationName?: string,
-  ): Promise<UniversityBusProfileCommand[]> {
+  ): Promise<UniversityBusProfileResponseType[]> {
     const busInfo = await this.universityBusScheduleRepository.find({
       where: {
         title: stationName,
@@ -191,9 +189,7 @@ export class UniversityService {
     return major.name;
   }
 
-  async getUniversityNotices(): Promise<
-    UniversityNoticePreviewResponseCommand[]
-  > {
+  async getUniversityNotices(): Promise<UniversityNoticePreviewResponseType[]> {
     const notices = await this.universityNoticeRepository.find({
       select: { id: true },
     });
@@ -227,8 +223,8 @@ export class UniversityService {
 
   private async groupEventByMonth(
     events: UniversityEvent[],
-  ): Promise<UniversityCalendarResponseCommand> {
-    const result: UniversityCalendarResponseCommand = {
+  ): Promise<UniversityCalendarResponseType> {
+    const result: UniversityCalendarResponseType = {
       Mar: [],
       Apr: [],
       May: [],

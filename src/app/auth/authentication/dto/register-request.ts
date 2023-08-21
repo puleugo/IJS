@@ -1,13 +1,8 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IUser } from '@domain/user/user.interface';
+import { UserVerificationRequestType } from '@app/user/user.type';
 
-export type UserVerificationRequestCommand = Pick<
-  IUser,
-  'name' | 'schoolId' | 'majorId'
->;
-
-export class RegisterRequest implements UserVerificationRequestCommand {
+export class RegisterRequest implements UserVerificationRequestType {
   @IsOptional()
   @ApiProperty({ type: 'string', format: 'binary', description: '이미지' })
   readonly file!: Buffer;

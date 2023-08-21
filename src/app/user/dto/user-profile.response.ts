@@ -1,8 +1,8 @@
-import { UserProfileResponseCommand } from '@app/user/command/user-profile-response.command';
 import { IUserSetting } from '@domain/user/user-setting.interface';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserProfileResponseType } from '@app/user/user.type';
 
-export class UserProfileResponse implements UserProfileResponseCommand {
+export class UserProfileResponse implements UserProfileResponseType {
   @ApiProperty({
     description: '유저 아이디',
     example: '4dfa1fcc-25c7-478a-ab72-36c9fa145890',
@@ -55,7 +55,7 @@ export class UserProfileResponse implements UserProfileResponseCommand {
     schoolId,
     schoolEmail,
     settings,
-  }: UserProfileResponseCommand) {
+  }: UserProfileResponseType) {
     this.id = id;
     this.isVerified = isVerified;
     this.majorId = majorId;

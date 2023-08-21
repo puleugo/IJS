@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
+import { UniversityNoticeProfileResponseType } from '@app/university/university.type';
 
 export class UniversityNoticeProfileResponse
-  implements UniversityNoticeProfileResponseCommand
+  implements UniversityNoticeProfileResponseType
 {
   @ApiProperty({ description: '공지 게시글 ID', example: 1 })
   readonly id: number;
@@ -55,7 +55,7 @@ export class UniversityNoticeProfileResponse
   })
   readonly wroteAt: Date;
 
-  constructor(data: UniversityNoticeProfileResponseCommand) {
+  constructor(data: UniversityNoticeProfileResponseType) {
     this.id = data.id;
     this.title = data.title;
     this.content = data.content;

@@ -4,10 +4,12 @@ import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { Board } from '@domain/communities/boards/board.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BoardProfileCommand } from '@app/community/board/commands/board-profile.command';
-import { BoardUpdateCommand } from '@app/community/board/commands/board-update.command';
-import { BoardDeleteCommand } from '@app/community/board/commands/board-delete.command';
 import { BoardNotFoundException } from '@domain/error/board.error';
+import {
+  BoardDeleteRequestType,
+  BoardProfileResponseType,
+  BoardUpdateRequestType,
+} from '@app/community/board/board.type';
 
 @Injectable()
 export class BoardService {
@@ -16,37 +18,36 @@ export class BoardService {
     private readonly boardRepository: Repository<Board>,
   ) {}
 
-  async getBoards(): Promise<BoardProfileCommand[]> {
-    const boards = await this.boardRepository.find();
-    return boards;
+  async getBoards(): Promise<BoardProfileResponseType[]> {
+    return await this.boardRepository.find();
   }
 
   async createBoard(
     boardCreateRequest: BoardCreateRequest,
-  ): Promise<BoardProfileCommand> {
+  ): Promise<BoardProfileResponseType> {
     const createdBoard = this.boardRepository.create(boardCreateRequest);
 
-    const board = await this.boardRepository.save(createdBoard);
-    return board;
+    return await this.boardRepository.save(createdBoard);
   }
 
   async updateBoard(
-    boardUpdateRequest: BoardUpdateCommand,
-  ): Promise<BoardProfileCommand> {
+    boardUpdateRequest: BoardUpdateRequestType,
+  ): Promise<BoardProfileResponseType> {
     const { id, ...BoardUpdateData } = boardUpdateRequest;
     const board = await this.boardRepository.findOne({
       where: { id },
     });
     if (!board) throw new BoardNotFoundException();
-    const updatedBoard = await this.boardRepository.save({
+    return await this.boardRepository.save({
       ...board,
       ...BoardUpdateData,
     });
-    return updatedBoard;
   }
 
-  async deleteBoard(boardDeleteCommand: BoardDeleteCommand): Promise<boolean> {
-    const { id } = boardDeleteCommand;
+  async deleteBoard(
+    deleteRequestType: BoardDeleteRequestType,
+  ): Promise<boolean> {
+    const { id } = deleteRequestType;
     const isBoardExist = await this.boardRepository.exist({ where: { id } });
     if (!isBoardExist) throw new BoardNotFoundException();
 

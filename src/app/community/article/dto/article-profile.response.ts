@@ -1,8 +1,8 @@
-import { ArticleProfileCommand } from '@app/community/article/commands/article-profile.command';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
+import { ArticleProfileResponseType } from '@app/community/article/article.type';
 
-export class ArticleProfileResponse implements ArticleProfileCommand {
+export class ArticleProfileResponse implements ArticleProfileResponseType {
   @ApiProperty({ description: '글 id', example: 1 })
   readonly id: number;
 
@@ -65,7 +65,7 @@ export class ArticleProfileResponse implements ArticleProfileCommand {
   })
   majorId: number | null;
 
-  constructor(article: ArticleProfileCommand) {
+  constructor(article: ArticleProfileResponseType) {
     this.id = article.id;
     this.title = article.title;
     this.content = article.content;

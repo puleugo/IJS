@@ -2,18 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { IsNull, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from '@domain/communities/comments/comment.entity';
-import { CommentListQuery } from '@app/community/comment/commands/comment-list-query';
 import { BoardService } from '@app/community/board/board.service';
 
-import { CommentCreateCommand } from '@app/community/comment/commands/comment-create.command';
-import {
-  CommentProfileCommand,
-  ReplyCommentProfileCommand,
-} from '@app/community/comment/commands/comment-profile.command';
-import { CommentLikeCommand } from '@app/community/comment/commands/comment-like.command';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 import { ArticleService } from '@app/community/article/article.service';
-import { CommentDeleteCommand } from '@app/community/comment/commands/comment-delete.command';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { BoardNotFoundException } from '@domain/error/board.error';
 import { ArticleNotFoundException } from '@domain/error/article.error';
@@ -24,6 +16,14 @@ import {
   CommentPermissionDeniedException,
   FailedToLikeCommentException,
 } from '@domain/error/comment.error';
+import {
+  CommentCreateRequestType,
+  CommentDeleteRequestType,
+  CommentHitLikeRequestType,
+  CommentListQuery,
+  CommentProfileResponseType,
+  ReplyCommentProfileResponseType,
+} from '@app/community/comment/comment.type';
 
 @Injectable()
 export class CommentService {
@@ -38,7 +38,7 @@ export class CommentService {
 
   async getComments(
     commentListQuery: CommentListQuery,
-  ): Promise<CommentProfileCommand[]> {
+  ): Promise<CommentProfileResponseType[]> {
     const board = await this.boardService.findById(commentListQuery.boardId, {
       select: { isAnonymous: true },
     });
@@ -62,7 +62,7 @@ export class CommentService {
     // LEFT JOIN comments r ON c.id = r.reply_to_id
     // WHERE r.deleted_at IS NULL AND c.deleted_at IS NULL AND ((c.reply_to_id IS NULL) OR NOT( r.reply_to_id IS NULL))
     // ORDER BY c.created_at, r.created_at;
-    const comments: CommentProfileCommand[] = await this.commentRepository
+    const comments: CommentProfileResponseType[] = await this.commentRepository
       .find({
         relations: {
           replies: true,
@@ -80,10 +80,10 @@ export class CommentService {
         ],
         order: { createdAt: 'ASC', replies: { createdAt: 'ASC' } },
       })
-      .then((comments): CommentProfileCommand[] => {
-        return comments.map((comment): CommentProfileCommand => {
+      .then((comments): CommentProfileResponseType[] => {
+        return comments.map((comment): CommentProfileResponseType => {
           const replies = comment.replies.map(
-            (reply): ReplyCommentProfileCommand => {
+            (reply): ReplyCommentProfileResponseType => {
               return {
                 ...reply,
                 author: {
@@ -110,9 +110,9 @@ export class CommentService {
   }
 
   async createComment(
-    createCommentCommand: CommentCreateCommand,
-  ): Promise<CommentProfileCommand> {
-    const { boardId, ...createCommentData } = createCommentCommand;
+    commentCreateRequest: CommentCreateRequestType,
+  ): Promise<CommentProfileResponseType> {
+    const { boardId, ...createCommentData } = commentCreateRequest;
     const board = await this.boardService.findById(boardId, {
       select: {
         isAnonymous: true,
@@ -121,18 +121,18 @@ export class CommentService {
     if (!board) throw new BoardNotFoundException();
 
     const article = await this.articlesService.findById(
-      createCommentCommand.articleId,
+      commentCreateRequest.articleId,
       {
         select: { id: true, authorId: true },
       },
     );
     if (!article) throw new ArticleNotFoundException();
 
-    if (createCommentCommand.replyToId) {
-      createCommentCommand.replyToId = await this.getRootCommentIdByReplyId(
-        createCommentCommand.replyToId,
+    if (commentCreateRequest.replyToId) {
+      commentCreateRequest.replyToId = await this.getRootCommentIdByReplyId(
+        commentCreateRequest.replyToId,
       );
-      if (!createCommentCommand.replyToId) {
+      if (!commentCreateRequest.replyToId) {
         throw new CommentNotFoundException();
       }
     }
@@ -161,7 +161,7 @@ export class CommentService {
     };
   }
 
-  async hitCommentLike(params: CommentLikeCommand): Promise<void> {
+  async hitCommentLike(params: CommentHitLikeRequestType): Promise<void> {
     const { articleId, id, userId } = params;
 
     const comment = await this.commentRepository.findOne({
@@ -189,24 +189,24 @@ export class CommentService {
   }
 
   async deleteComment(
-    commentDeleteCommand: CommentDeleteCommand,
+    commentDeleteRequest: CommentDeleteRequestType,
   ): Promise<boolean> {
     const article = await this.articlesService.findById(
-      commentDeleteCommand.articleId,
+      commentDeleteRequest.articleId,
       {
         select: { id: true },
       },
     );
     if (!article) throw new ArticleNotFoundException();
 
-    const comment = await this.findById(commentDeleteCommand.id, {
+    const comment = await this.findById(commentDeleteRequest.id, {
       select: {
         id: true,
         authorId: true,
       },
     });
     if (!comment) throw new CommentNotFoundException();
-    if (comment.authorId !== commentDeleteCommand.userId)
+    if (comment.authorId !== commentDeleteRequest.userId)
       throw new CommentPermissionDeniedException();
 
     const [deletedResult, decrementResult] = await Promise.all([

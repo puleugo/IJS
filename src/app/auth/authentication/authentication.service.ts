@@ -4,11 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { OauthLoginRequestCommand } from '@app/auth/authentication/command/oauth-login-request.command';
 import { User } from '@domain/user/user.entity';
 import { TokenResponse } from '@app/auth/authentication/dto/token.response';
 import { UserService } from '@app/user/user.service';
-import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
+import { OauthLoginProviderEnum } from '@app/auth/authentication/oauth-login-provider.enum';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -29,13 +28,15 @@ import { UserAuthProvider } from '@domain/user/user-auth-provider.entity';
 import { Repository } from 'typeorm';
 import { Request } from '@infrastructure/types/request.types';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
-import { UserVerificationRequestCommand } from '@app/auth/authentication/dto/register-request';
 import { UniversityService } from '@app/university/university.service';
 import { ConfigService } from '@nestjs/config';
-import { UserProfileResponseCommand } from '@app/user/command/user-profile-response.command';
+import { OauthLoginRequestType } from '@app/auth/authentication/authentication.type';
+import {
+  UserProfileResponseType,
+  UserVerificationRequestType,
+} from '@app/user/user.type';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const TelegramBot = require('node-telegram-bot-api');
+import * as TelegramBot from 'node-telegram-bot-api';
 
 @Injectable()
 export class AuthenticationService {
@@ -56,16 +57,17 @@ export class AuthenticationService {
     @InjectRepository(UserAuthProvider)
     private readonly userAuthProviderRepository: Repository<UserAuthProvider>,
   ) {
-    this.bot = new TelegramBot(process.env.TELEGRAM_BOT_KEY, { polling: true });
+    const telegramBotKey = this.configService.get('TELEGRAM_BOT_KEY', '');
+    this.chatId = this.configService.get('TELEGRAM_CHAT_ID', '6279443618');
+    this.bot = new TelegramBot(telegramBotKey, { polling: true });
     this.bot.on('callback_query', (msg) => {
       this.answerVerification(msg);
     });
     this.bot.on('polling_error', console.log);
-    this.chatId = this.configService.get('TELEGRAM_CHAT_ID', '6279443618');
   }
 
   async oauthLogin(
-    oauthLoginRequest: OauthLoginRequestCommand,
+    oauthLoginRequest: OauthLoginRequestType,
   ): Promise<TokenResponse> {
     let user: User;
     switch (oauthLoginRequest.provider) {
@@ -244,24 +246,20 @@ export class AuthenticationService {
       });
   }
 
-  async getProfile(userId: string): Promise<UserProfileResponseCommand> {
+  async getProfile(userId: string): Promise<UserProfileResponseType> {
     return await this.userService.findById(userId, {
       relations: { settings: true },
     });
   }
 
   async uploadRegisterImage(
-    userVerificationRequestCommand: UserVerificationRequestCommand,
+    userVerificationRequest: UserVerificationRequestType,
     photo: Buffer,
     user: User,
   ) {
     const resizedPhoto = await this.authPhotoClient.resizePhoto(photo);
     const photoUrl = await this.authPhotoClient.uploadPhoto(resizedPhoto);
-    await this.requestVerification(
-      userVerificationRequestCommand,
-      user.id,
-      photoUrl,
-    );
+    await this.requestVerification(userVerificationRequest, user.id, photoUrl);
     return;
   }
 
@@ -343,11 +341,11 @@ export class AuthenticationService {
   }
 
   private async requestVerification(
-    userVerificationRequestCommand: UserVerificationRequestCommand,
+    userVerificationRequest: UserVerificationRequestType,
     userId: string,
     photoUrl: string,
   ) {
-    const { name, schoolId, majorId } = userVerificationRequestCommand;
+    const { name, schoolId, majorId } = userVerificationRequest;
     const majorName =
       await this.universityService.getUniversityMajorNameByMajorId(majorId);
     this.bot.sendPhoto(

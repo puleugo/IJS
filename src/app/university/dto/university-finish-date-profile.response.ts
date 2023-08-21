@@ -1,8 +1,8 @@
-import { UniversityFinishDateProfileResponseCommand } from '@app/university/command/university-finished-date-profile-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UniversityFinishDateProfileResponseType } from '@app/university/university.type';
 
 export class UniversityFinishDateProfileResponse
-  implements UniversityFinishDateProfileResponseCommand
+  implements UniversityFinishDateProfileResponseType
 {
   @ApiProperty({
     description: '학기가 끝났는지 여부',
@@ -49,7 +49,7 @@ export class UniversityFinishDateProfileResponse
     semester,
     middleExamAt,
     finalExamAt,
-  }: UniversityFinishDateProfileResponseCommand) {
+  }: UniversityFinishDateProfileResponseType) {
     this.isFinished = isFinished;
     this.comingFinishDate = comingFinishDate;
     this.apiCalled = apiCalled;

@@ -1,8 +1,8 @@
-import { UniversityMajorProfileResponseCommand } from '@app/university/command/university-major-profile-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UniversityMajorProfileResponseType } from '@app/university/university.type';
 
 export class UniversityMajorProfileResponse
-  implements UniversityMajorProfileResponseCommand
+  implements UniversityMajorProfileResponseType
 {
   @ApiProperty({
     example: 1,
@@ -16,7 +16,7 @@ export class UniversityMajorProfileResponse
   })
   readonly name: string;
 
-  constructor({ id, name }: UniversityMajorProfileResponseCommand) {
+  constructor({ id, name }: UniversityMajorProfileResponseType) {
     this.id = id;
     this.name = name;
   }

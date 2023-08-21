@@ -1,8 +1,8 @@
-import { BoardCreateCommand } from '@app/community/board/commands/board-create.command';
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { BoardCreateRequestType } from '@app/community/board/board.type';
 
-export class BoardCreateRequest implements BoardCreateCommand {
+export class BoardCreateRequest implements BoardCreateRequestType {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({

@@ -1,9 +1,9 @@
-import { ArticlePreviewCommand } from '@app/community/article/commands/article-preview.command';
-import { UserPreviewResponseCommand } from '@app/user/command/user-preview-response.command';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { ApiProperty } from '@nestjs/swagger';
+import { ArticlePreviewRequestType } from '@app/community/article/article.type';
+import { UserPreviewResponseType } from '@app/user/user.type';
 
-export class ArticlePreviewResponse implements ArticlePreviewCommand {
+export class ArticlePreviewResponse implements ArticlePreviewRequestType {
   @ApiProperty({ description: '글 id', example: 1 })
   readonly id: number;
 
@@ -33,7 +33,7 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
     type: UserPreviewResponse,
     nullable: true,
   })
-  readonly author: UserPreviewResponseCommand | null;
+  readonly author: UserPreviewResponseType | null;
 
   @ApiProperty({
     description: '작성자 id',
@@ -66,7 +66,7 @@ export class ArticlePreviewResponse implements ArticlePreviewCommand {
     isAnonymous,
     isCouncil,
     majorId,
-  }: ArticlePreviewCommand) {
+  }: ArticlePreviewRequestType) {
     this.id = id;
     this.title = title;
     this.content = content;

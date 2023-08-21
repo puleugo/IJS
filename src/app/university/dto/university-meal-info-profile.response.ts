@@ -1,12 +1,12 @@
-import {
-  UniversityMealInfo,
-  UniversityMealInfoProfileResponseCommand,
-} from '@app/university/command/university-meal-info-profile-response.command';
 import { ApiProperty } from '@nestjs/swagger';
 import { IUniversityMealInfo } from '@domain/university/university-meal.interface';
+import {
+  UniversityMealInfo,
+  UniversityMealInfoProfileResponseType,
+} from '@app/university/university.type';
 
 export class UniversityMealInfoProfileResponse
-  implements UniversityMealInfoProfileResponseCommand
+  implements UniversityMealInfoProfileResponseType
 {
   @ApiProperty({
     example: [

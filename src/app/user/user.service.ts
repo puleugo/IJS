@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
+import { OauthLoginProviderEnum } from '@app/auth/authentication/oauth-login-provider.enum';
 import { Repository } from 'typeorm';
 import { User } from '@domain/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,18 +15,20 @@ import { UserScheduleSet } from '@domain/user/user-schedule-set.entity';
 import { UniversityLecture } from '@domain/university/university-lecture.entity';
 import { UserLecture } from '@domain/user/user-lecture.entity';
 import * as QRCode from 'qrcode';
-import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum';
+import { UserScheduleRoleEnum } from '@app/user/user-schedule-role.enum';
 import { UserFollow } from '@domain/user/user-follow.entity';
 import { UserOcrClient } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { ScheduleSetProfileResponseCommand } from '@app/user/command/schedule-set-profile-response.command';
 import { PhotoClient } from '@infrastructure/utils/photo.client';
 import { JwtService } from '@nestjs/jwt';
 import { USER_QR_CODE_EXPIRE } from '../../contants';
 import { UserSetting } from '@domain/user/user-setting.entity';
 import { UserNotFoundException } from '@domain/error/user.error';
-import { UserUpdateSettingRequestCommand } from '@app/user/command/user-update-setting-request.command';
 import { IUser } from '@domain/user/user.interface';
+import {
+  ScheduleSetProfileResponseType,
+  UserUpdateSettingRequestType,
+} from '@app/user/user.type';
 
 @Injectable()
 export class UserService {
@@ -103,7 +105,7 @@ export class UserService {
 
   async openScheduleSet(
     userId: string,
-  ): Promise<ScheduleSetProfileResponseCommand> {
+  ): Promise<ScheduleSetProfileResponseType> {
     const owner = await this.findById(userId);
     const userScheduleSet = new UserScheduleSet();
     userScheduleSet.user = owner;
@@ -251,7 +253,7 @@ export class UserService {
 
   async updateUserSettingsById(
     userId: string,
-    data: UserUpdateSettingRequestCommand,
+    data: UserUpdateSettingRequestType,
   ): Promise<void> {
     const { affected } = await this.userSettingRepository.update(
       { userId },

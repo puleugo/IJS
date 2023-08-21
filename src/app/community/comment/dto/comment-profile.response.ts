@@ -1,9 +1,9 @@
-import { CommentProfileCommand } from '@app/community/comment/commands/comment-profile.command';
 import { UserPreviewResponse } from '@app/user/dto/user-preview.response';
 import { ApiProperty } from '@nestjs/swagger';
 import { ReplyCommentProfileResponse } from '@app/community/comment/dto/reply-comment-profile.response';
+import { CommentProfileResponseType } from '@app/community/comment/comment.type';
 
-export class CommentProfileResponse implements CommentProfileCommand {
+export class CommentProfileResponse implements CommentProfileResponseType {
   @ApiProperty({ example: 1, description: '댓글 아이디' })
   readonly id: number;
   @ApiProperty({
@@ -76,7 +76,7 @@ export class CommentProfileResponse implements CommentProfileCommand {
   })
   readonly isDeleted: boolean;
 
-  constructor(comment: CommentProfileCommand) {
+  constructor(comment: CommentProfileResponseType) {
     this.id = comment.id;
     this.author = comment.isAnonymous
       ? null

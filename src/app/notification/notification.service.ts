@@ -5,7 +5,7 @@ import { Notification } from '@domain/user/notification/notification.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotificationUpdateRequest } from '@app/notification/dto/notification-update.request';
-import { NotificationProfileResponse } from '@app/notification/dto/notification-profile-response';
+import { NotificationProfileResponse } from '@app/notification/dto/notification-profile.response';
 import { NotificationCategoryEnum } from '@app/notification/notification-category.enum';
 import * as firebaseAdmin from 'firebase-admin';
 import * as dotenv from 'dotenv';

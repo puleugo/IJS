@@ -1,8 +1,8 @@
-import { UniversityProgramProfileResponseCommand } from '@app/university/command/university-program-profile-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UniversityProgramProfileResponseType } from '@app/university/university.type';
 
 export class UniversityProgramProfileResponse
-  implements UniversityProgramProfileResponseCommand
+  implements UniversityProgramProfileResponseType
 {
   @ApiProperty({ example: 1, description: '비교과 프로그램 식별자' })
   readonly id: number;
@@ -38,7 +38,7 @@ export class UniversityProgramProfileResponse
     url,
     author,
     endAt,
-  }: UniversityProgramProfileResponseCommand) {
+  }: UniversityProgramProfileResponseType) {
     this.id = id;
     this.title = title;
     this.url = url;

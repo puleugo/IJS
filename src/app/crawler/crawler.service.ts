@@ -15,7 +15,7 @@ import { UniversityMealCrawlerClient } from '@app/crawler/university-meal-crawle
 import { UniversityMajorNoticeCrawlerClient } from '@app/crawler/university-major-notice-crawler/university-major-notice-crawler.client';
 import { UniversityLectureCrawlerClient } from '@app/crawler/university-lecture-crawler/university-lecture-crawler.client';
 import { UniversityMajorCrawlerClient } from '@app/crawler/university-major-crawler/university-major-crawler.client';
-import { CrawlerEnum } from '@app/crawler/utils/crawler.types';
+import { CrawlerEnum } from '@app/crawler/utils/crawler.type';
 
 @Injectable()
 export class CrawlerService implements OnApplicationBootstrap {

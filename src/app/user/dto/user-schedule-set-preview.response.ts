@@ -1,9 +1,9 @@
-import { UserScheduleSetPreviewResponseCommand } from '@app/user/command/user-schedule-set-preview-response.command';
 import { IUserScheduleSet } from '@domain/user/user-schedule-set.interface';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserScheduleSetPreviewResponseType } from '@app/user/user.type';
 
 export class UserScheduleSetPreviewResponse
-  implements UserScheduleSetPreviewResponseCommand
+  implements UserScheduleSetPreviewResponseType
 {
   @ApiProperty({
     description: '시간표 집합의 ID를 가져옵니다.',

@@ -1,8 +1,8 @@
-import { UniversityCalendarProfileResponseCommand } from '@app/university/command/university-calendar-profile-response.command';
 import { ApiProperty } from '@nestjs/swagger';
+import { UniversityCalendarProfileResponseType } from '@app/university/university.type';
 
 export class UniversityCalendarProfileResponse
-  implements UniversityCalendarProfileResponseCommand
+  implements UniversityCalendarProfileResponseType
 {
   @ApiProperty({
     example: 1,
@@ -33,7 +33,7 @@ export class UniversityCalendarProfileResponse
     title,
     startAt,
     endAt,
-  }: UniversityCalendarProfileResponseCommand) {
+  }: UniversityCalendarProfileResponseType) {
     this.id = id;
     this.title = title;
     this.startAt = startAt;

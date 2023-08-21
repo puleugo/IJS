@@ -1,7 +1,10 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { NotificationCreateRequestType } from '@app/notification/notification.type';
 
-export class NotificationCreateRequest {
+export class NotificationCreateRequest
+  implements NotificationCreateRequestType
+{
   @ApiProperty({
     example: 'fcmToken',
     description: '푸시 알림을 위한 토큰',

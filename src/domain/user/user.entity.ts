@@ -22,7 +22,7 @@ import { Article } from '@domain/communities/articles/article.entity';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
 import { Comment } from '@domain/communities/comments/comment.entity';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
-import { RoleEnum } from '@app/auth/authorization/types';
+import { RoleEnum } from '@app/auth/authorization/type';
 import { CouncilArticle } from '@domain/communities/articles/council-article.entity';
 import { UserSetting } from '@domain/user/user-setting.entity';
 

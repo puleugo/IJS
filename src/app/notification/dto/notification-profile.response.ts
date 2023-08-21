@@ -1,9 +1,6 @@
-import { Notification } from '@domain/user/notification/notification.entity';
 import { NotificationCategoryEnum } from '@app/notification/notification-category.enum';
 import { ApiProperty } from '@nestjs/swagger';
-
-type NotificationProfileResponseCommand = Pick<Notification, 'title' | 'body'> &
-  Partial<Pick<Notification, 'category'>> & { categoryName?: string };
+import { NotificationProfileResponseType } from '@app/notification/notification.type';
 
 const NotificationCategoryName = new Map<number, string>([
   [NotificationCategoryEnum.Unknown, '확인되지 않음'],
@@ -13,7 +10,7 @@ const NotificationCategoryName = new Map<number, string>([
 ]);
 
 export class NotificationProfileResponse
-  implements NotificationProfileResponseCommand
+  implements NotificationProfileResponseType
 {
   @ApiProperty({
     description: '푸시 알림의 제목',
@@ -35,9 +32,9 @@ export class NotificationProfileResponse
   })
   readonly categoryName: string;
 
-  constructor(command: NotificationProfileResponseCommand) {
-    this.body = command.body;
-    this.title = command.title;
-    this.categoryName = NotificationCategoryName.get(command.category);
+  constructor(data: NotificationProfileResponseType) {
+    this.body = data.body;
+    this.title = data.title;
+    this.categoryName = NotificationCategoryName.get(data.category);
   }
 }

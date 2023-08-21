@@ -1,9 +1,9 @@
 import { UniversityLectureProfileResponse } from '@app/university/dto/university-lecture-profile.response';
-import { UserScheduleProfileResponseCommand } from '@app/user/command/user-schedule-profile-response.command';
 import { IUniversityLecture } from '@domain/university/university-lecture.interface';
+import { UserScheduleProfileResponseType } from '../user.type';
 
 export class UserScheduleProfileResponse
-  implements UserScheduleProfileResponseCommand
+  implements UserScheduleProfileResponseType
 {
   readonly lectures: { [day: string]: UniversityLectureProfileResponse[] } = {
     0: [],

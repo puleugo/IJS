@@ -7,7 +7,7 @@ import { IArticle } from '@domain/communities/articles/article.interface';
 import { CommentLike } from '@domain/communities/comments/comment-like.entity';
 import { IComment } from '@domain/communities/comments/comment.interface';
 import { ArticleLike } from '@domain/communities/articles/article-like.entity';
-import { RoleEnum } from '@app/auth/authorization/types';
+import { RoleEnum } from '@app/auth/authorization/type';
 import { IUserSetting } from '@domain/user/user-setting.interface';
 
 export interface IUser {

@@ -1,11 +1,11 @@
 import { UniversityLectureProfileResponse } from '@app/university/dto/university-lecture-profile.response';
-import { UserScheduleRoleEnum } from '@app/user/command/user-schedule-role.enum';
-import { UserScheduleSetProfileResponseCommand } from '@app/user/command/user-schedule-set-profile-response.command';
+import { UserScheduleRoleEnum } from '@app/user/user-schedule-role.enum';
 import { IUniversityLecture } from '@domain/university/university-lecture.interface';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserScheduleSetProfileResponseType } from '../user.type';
 
 export class UserScheduleSetProfileResponse
-  implements UserScheduleSetProfileResponseCommand
+  implements UserScheduleSetProfileResponseType
 {
   @ApiProperty({
     description: '사용자 ID',

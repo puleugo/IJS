@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ArticleCreateRequestCommand } from '@app/community/article/commands/council-article-create-request.command';
+import { CouncilArticleCreateRequestType } from '@app/community/article/article.type';
 
 export class CouncilArticleCreateRequest
-  implements Partial<ArticleCreateRequestCommand>
+  implements Partial<CouncilArticleCreateRequestType>
 {
   @IsNotEmpty()
   @IsString()

@@ -1,8 +1,8 @@
-import { ArticleUpdateCommand } from '@app/community/article/commands/article-update.command';
 import { IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ArticleUpdateRequestType } from '@app/community/article/article.type';
 
-export class ArticleUpdateRequest implements Partial<ArticleUpdateCommand> {
+export class ArticleUpdateRequest implements Partial<ArticleUpdateRequestType> {
   @IsString()
   @IsOptional()
   @ApiProperty({ description: '글 제목', example: '글 제목', nullable: true })

@@ -1,8 +1,8 @@
-import { ArticleCreateCommand } from '@app/community/article/commands/article-create.command';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ArticleCreateRequestType } from '@app/community/article/article.type';
 
-export class ArticleCreateRequest implements Partial<ArticleCreateCommand> {
+export class ArticleCreateRequest implements Partial<ArticleCreateRequestType> {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ description: '글 제목', default: '글 제목' })

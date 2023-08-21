@@ -1,7 +1,7 @@
-import { UniversityNearBusResponseCommand } from '@app/university/command/university-near-bus-response.command';
+import { UniversityNearBusResponseType } from '@app/university/university.type';
 
 export class UniversityNearBusResponse
-  implements UniversityNearBusResponseCommand
+  implements UniversityNearBusResponseType
 {
   readonly busNumber: string; //버스 번호
   readonly busType: string; //저상버스, 일반버스 x
@@ -19,7 +19,7 @@ export class UniversityNearBusResponse
     remainMinute,
     stationName,
     stationId,
-  }: UniversityNearBusResponseCommand) {
+  }: UniversityNearBusResponseType) {
     this.busNumber = busNumber;
     this.busType = busType;
     this.routeType = routeType;
