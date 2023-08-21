@@ -1,14 +1,15 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Query,
   Req,
+  UnauthorizedException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -29,11 +30,31 @@ import { Request } from '@infrastructure/types/request.types';
 import { JwtAuthGuard } from '@app/auth/authentication/auth.gaurd';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RegisterRequest } from '@app/auth/authentication/dto/register-request';
+import { OauthLoginProviderEnum } from '@app/auth/authentication/oauth-login-provider.enum';
+import { User } from '@domain/user/user.entity';
+import {
+  JwtDecodedData,
+  JwtSubjectType,
+} from '@infrastructure/types/jwt.types';
+import { UserService } from '@app/user/user.service';
+import { HttpService } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '@nestjs-modules/mailer';
+import { UniversityService } from '@app/university/university.service';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly httpService: HttpService,
+    private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
+    private readonly universityService: UniversityService,
+    private readonly configService: ConfigService,
+    private readonly authenticationService: AuthenticationService,
+  ) {}
 
   @ApiOperation({ summary: 'Oauth 로그인' })
   @ApiBody({ type: OauthLoginRequest })
@@ -42,14 +63,47 @@ export class AuthenticationController {
   async oauthLogin(
     @Body() oauthLoginRequest: OauthLoginRequest,
   ): Promise<TokenResponse> {
-    return await this.authenticationService.oauthLogin(oauthLoginRequest);
+    let user: User;
+    switch (oauthLoginRequest.provider) {
+      case OauthLoginProviderEnum.KAKAO:
+        user = await this.authenticationService.kakaoOauthLogin(
+          oauthLoginRequest.accessToken,
+        );
+        break;
+      case OauthLoginProviderEnum.GOOGLE:
+        user = await this.authenticationService.googleOauthLogin(
+          oauthLoginRequest.accessToken,
+        );
+        break;
+      default:
+        throw new UnauthorizedException();
+    }
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.authenticationService.generateAccessToken(user.id),
+      this.authenticationService.generateRefreshToken(user.id),
+    ]);
+    return new TokenResponse(accessToken, refreshToken);
   }
 
   @ApiOperation({ summary: '토큰 갱신' })
   @Post('refresh')
   @ApiResponse({ type: TokenResponse })
   async refreshAccessToken(@Req() request: Request): Promise<TokenResponse> {
-    return await this.authenticationService.refreshAccessToken(request);
+    const refreshToken = request.cookies['refresh_token'];
+    if (!refreshToken) throw new UnauthorizedException();
+
+    const token = <JwtDecodedData>this.jwtService.decode(refreshToken);
+    if (!token || token.sub !== JwtSubjectType.REFRESH) {
+      throw new UnauthorizedException('invalid token');
+    }
+
+    const account = await this.userService.findById(token.user_id);
+    const accessToken = await this.authenticationService.generateAccessToken(
+      account.id,
+    );
+
+    return new TokenResponse(accessToken, refreshToken);
   }
 
   @ApiOperation({ summary: '회원 정보 조회' })
@@ -67,14 +121,12 @@ export class AuthenticationController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
   async verifySchoolId(
-    @Query('schoolEmail')
-    schoolEmail: string,
+    @Query('schoolEmail') schoolEmail: string,
     @Query('schoolId') schoolId: string,
     @Query('majorId', ParseIntPipe) majorId: number,
     @Req() { user }: Request,
   ): Promise<void> {
-    await this.authenticationService.verifySchoolId({
-      user,
+    await this.authenticationService.sendVerifySchoolMail(user.id, {
       schoolEmail,
       schoolId,
       majorId,
@@ -87,12 +139,19 @@ export class AuthenticationController {
   @ApiOperation({ summary: '학교 이메일 인증 및 학과 등록' })
   async verifySchoolEmailByAuthenticationCode(
     @Query('code') code: string,
+    @Req() { user }: Request,
   ): Promise<void> {
-    const isUpdated =
-      await this.authenticationService.verifySchoolEmailByAuthenticationCode(
-        code,
-      );
-    if (!isUpdated) throw new InternalServerErrorException();
+    const userData =
+      await this.authenticationService.getUserInRedisByAuthenticationCode(code);
+    if (!userData || userData.id !== user.id) {
+      throw new BadRequestException('잘못된 인증 코드입니다.');
+    }
+    await this.authenticationService.deleteRedisDataByKey(`code_${code}`);
+
+    await this.userService.updateUserById(userData.id, {
+      ...userData,
+      isVerified: true,
+    });
   }
 
   @Post('verify/identification')
@@ -109,20 +168,25 @@ export class AuthenticationController {
     @Body() registerRequest: RegisterRequest,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
-    await this.authenticationService.uploadRegisterImage(
-      registerRequest,
+    const photoUrl = await this.authenticationService.uploadRegisterImage(
       file.buffer,
-      user,
+    );
+    await this.authenticationService.requestVerificationWithSlack(
+      registerRequest,
+      user.id,
+      photoUrl,
     );
   }
 
   @Post('approve/identification/:userId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '학생 인증 이미지(학생증, 합격증명서) 승인' })
+  @ApiOperation({
+    summary: '학생 인증 이미지(학생증, 합격증명서) 승인 (어드민용 API)',
+  })
   async approveRegisterImage(
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<void> {
-    await this.authenticationService.approveRegisterImage(userId);
+    await this.authenticationService.updateUserSchoolAuthentication(userId);
   }
 }
