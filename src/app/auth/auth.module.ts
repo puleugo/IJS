@@ -1,8 +1,11 @@
-import { Module } from '@nestjs/common';
-import { AuthenticationModule } from '@app/auth/authentication/authentication.module';
-import { AuthorizationModule } from '@app/auth/authorization/authorization.module';
+import { Module, } from '@nestjs/common';
+import { AuthenticationModule, } from '@app/auth/authentication/authentication.module';
+import { AuthorizationModule, } from '@app/auth/authorization/authorization.module';
 
 @Module({
-  imports: [AuthenticationModule, AuthorizationModule],
+	imports: [
+		AuthenticationModule, AuthorizationModule,
+	],
 })
-export class AuthModule {}
+export class AuthModule {
+}

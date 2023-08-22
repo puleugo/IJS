@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
-import { UtilService } from '@infrastructure/utils/util.service';
-import { ConfigService } from '@nestjs/config';
+import { Module, } from '@nestjs/common';
+import { ConfigModule, } from '@nestjs/config';
+import { LoggerService, } from '@infrastructure/utils/logger.service';
+import { CrawlerUtilService, } from '@infrastructure/utils/crawler-util.service';
 
 @Module({
-  providers: [UtilService, ConfigService],
-  exports: [UtilService],
+	imports: [ConfigModule,],
+	providers: [LoggerService, CrawlerUtilService,],
+	exports: [LoggerService, CrawlerUtilService,],
 })
-export class UtilModule {}
+export class UtilModule {
+}

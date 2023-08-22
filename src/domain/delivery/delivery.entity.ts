@@ -1,36 +1,31 @@
-import { User } from '@domain/user/user.entity';
+import { User, } from '@domain/user/user.entity';
 import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
+	Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('deliveries')
 export class Delivery {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column()
-  orderName: string;
+    @Column()
+    orderName: string;
 
-  @Column()
-  storeUrl: string;
+    @Column()
+    storeUrl: string;
 
-  @Column()
-  orderUrl: string;
+    @Column()
+    orderUrl: string;
 
-  @Column()
-  deliveryUrl: string;
+    @Column()
+    deliveryUrl: string;
 
-  @OneToMany(() => User, (user) => user.delivery)
-  users: User[];
+    @OneToMany(() => User, ({ delivery, }) => delivery)
+    users: User[];
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date | null;
+    @DeleteDateColumn()
+    deletedAt: Date | null;
 }

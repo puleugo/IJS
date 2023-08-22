@@ -1,62 +1,56 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  ParseUUIDPipe,
-  Post,
+	Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post,
 } from '@nestjs/common';
-import { DeliveryService } from '@app/delivery/delivery.service';
-import { ApiExcludeController, ApiTags } from '@nestjs/swagger';
-import {
-  DeliveryData,
-  DeliveryPreviewResponse,
-} from '@app/delivery/dto/delivery-profile.response';
+import { DeliveryService, } from '@app/delivery/delivery.service';
+import { ApiExcludeController, ApiTags, } from '@nestjs/swagger';
+import { DeliveryData, DeliveryPreviewResponse, } from '@app/delivery/dto/delivery-profile.response';
+import { Delivery, } from '@domain/delivery/delivery.entity';
 
 @ApiTags('Delivery')
 @ApiExcludeController()
 @Controller('deliveries')
 export class DeliveryController {
-  constructor(private readonly deliveryService: DeliveryService) {}
+	constructor(private readonly deliveryService: DeliveryService) {
+	}
 
-  @Get()
-  async getDeliveries(): Promise<DeliveryPreviewResponse[]> {
-    const deliveries = await this.deliveryService.getDeliveries();
-    return deliveries.map((delivery) => new DeliveryPreviewResponse(delivery));
-  }
+    @Get()
+	async getDeliveries(): Promise<DeliveryPreviewResponse[]> {
+		const deliveries = await this.deliveryService.getDeliveries();
 
-  @Get(':deliveryId')
-  async getDeliveryProfile(
-    @Param('deliveryId', ParseIntPipe) deliveryId: number,
-  ) {
-    const delivery = await this.deliveryService.getDeliveryById(deliveryId);
-    return delivery;
-  }
+		return deliveries.map(
+			(delivery) => {
+				return new DeliveryPreviewResponse(delivery);
+			}
+		);
+	}
 
-  @Post()
-  async createDelivery(
-    @Body()
-    deliveryData: DeliveryData,
-  ) {
-    await this.deliveryService.makeDelivery(deliveryData);
-  }
+    @Get(':deliveryId')
+    async getDeliveryProfile(
+        @Param('deliveryId', ParseIntPipe) deliveryId: number
+    ): Promise<Delivery> {
+    	return  await this.deliveryService.getDeliveryById(deliveryId);
+    }
 
-  @Post(':orderId/:userId')
-  async joinDelivery(
-    @Param('orderId', ParseIntPipe) orderId: number,
-    @Param('userId', ParseUUIDPipe) userId: string,
-  ) {
-    const join = await this.deliveryService.joinDelivery(orderId, userId);
-    return join;
-  }
+    @Post()
+    async createDelivery(
+        @Body() deliveryData: DeliveryData
+    ): Promise<void> {
+    	await this.deliveryService.makeDelivery(deliveryData);
+    }
 
-  @Delete(':deliveryId')
-  async withdrawDelivery(
-    @Param('deliveryId', ParseIntPipe) deliveryId: number,
-  ) {
-    const delivery = await this.deliveryService.deleteDelivery(deliveryId);
-    return delivery;
-  }
+    @Post(':orderId/:userId')
+    async joinDelivery(
+        @Param('orderId', ParseIntPipe) orderId: number,
+        @Param('userId', ParseUUIDPipe) userId: string
+    ): Promise<Delivery> {
+    	return await this.deliveryService.joinDelivery(orderId, userId);
+
+    }
+
+    @Delete(':deliveryId')
+    async withdrawDelivery(
+        @Param('deliveryId', ParseIntPipe) deliveryId: number
+    ): Promise<void> {
+    	return  await this.deliveryService.deleteDelivery(deliveryId);
+    }
 }

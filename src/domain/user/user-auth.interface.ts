@@ -1,5 +1,5 @@
-import { User } from './user.entity';
-import { UserAuthProvider } from './user-auth-provider.entity';
+import { User, } from './user.entity';
+import { UserAuthProvider, } from './user-auth-provider.entity';
 
 export interface IUserAuth {
   username: string;

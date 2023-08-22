@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { CrawlerClient } from '@infrastructure/utils/crawler.client';
+import { Injectable, } from '@nestjs/common';
+import { CrawlerClient, } from '@infrastructure/types/crawler.client';
 
 @Injectable()
 export class UniversityMajorNoticeCrawlerClient implements CrawlerClient {
-  constructor() {}
 
-  async crawl(): Promise<any> {
-    return;
-  }
+	async crawl(): Promise<any> {
+		return;
+	}
 
-  async getStatus(): Promise<any> {
-    return;
-  }
+	async getStatus(): Promise<any> {
+		return;
+	}
 
-  async initialize(): Promise<void> {}
+	async initialize(): Promise<void> {
+		return;
+	}
 }

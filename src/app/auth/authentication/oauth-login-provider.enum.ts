@@ -1,4 +1,4 @@
 export enum OauthLoginProviderEnum {
-  KAKAO = 'KAKAO',
-  GOOGLE = 'GOOGLE',
+    KAKAO = 'KAKAO',
+    GOOGLE = 'GOOGLE',
 }

@@ -1,11 +1,11 @@
-import { User } from '@domain/user/user.entity';
-import { ScheduleSet } from '@domain/user/schedule-set.entity';
+import { User, } from '@domain/user/user.entity';
+import { ScheduleSet, } from '@domain/user/schedule-set.entity';
 
 export interface IUserScheduleSet {
-  id: number;
-  userId: string;
-  scheduleSetId: string;
-  user: User;
-  scheduleSet: ScheduleSet;
-  createdAt: Date;
+    id: number;
+    userId: string;
+    scheduleSetId: string;
+    user: User;
+    scheduleSet: ScheduleSet;
+    createdAt: Date;
 }

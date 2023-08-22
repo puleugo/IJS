@@ -1,7 +1,7 @@
-import { UserAuth } from './user-auth.entity';
+import { UserAuth, } from './user-auth.entity';
 
 export interface IUserAuthProvider {
-  id: number;
-  name: string;
-  userAuth: UserAuth[];
+    id: number;
+    name: string;
+    userAuth: UserAuth[];
 }

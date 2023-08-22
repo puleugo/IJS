@@ -1,4 +1,4 @@
 export enum UserScheduleRoleEnum {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+    ADMIN = 'ADMIN',
+    USER = 'USER',
 }

@@ -1,40 +1,35 @@
 import {
-  AfterLoad,
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
+	AfterLoad, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IsUrl } from 'class-validator';
-import { IUniversityProgram } from '@domain/university/university-program.interface';
+import { IsUrl, } from 'class-validator';
+import { IUniversityProgram, } from '@domain/university/university-program.interface';
 
 @Entity('university_programs')
 export class UniversityProgram implements IUniversityProgram {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+    @PrimaryGeneratedColumn('increment')
+    id: number;
 
-  @Column('text')
-  title: string;
+    @Column('text')
+    title: string;
 
-  @Column()
-  author: string;
+    @Column()
+    author: string;
 
-  @Column('text')
-  @IsUrl()
-  url: string;
+    @Column('text')
+    @IsUrl()
+    url: string;
 
-  @Column()
-  endAt: Date;
+    @Column()
+    endAt: Date;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @DeleteDateColumn({ nullable: true })
-  deletedAt: Date | null;
+    @DeleteDateColumn({ nullable: true, })
+    deletedAt: Date | null;
 
-  @AfterLoad()
-  updateToFullUrl() {
-    this.url = `https://edu.inje.ac.kr/program/E${this.url}`;
-  }
+    @AfterLoad()
+    updateToFullUrl(): void {
+    	this.url = `https://edu.inje.ac.kr/program/E${this.url}`;
+    }
 }

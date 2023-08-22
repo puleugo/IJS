@@ -16,10 +16,12 @@ module.exports = {
   },
   ignorePatterns: [".eslintrc.js"],
   rules: {
-    // "no-console": "error", // TODO: console -> logger
+    "no-console": "error",
     "indent": ["error", "tab", { "SwitchCase": 1, "ignoredNodes": ["PropertyDefinition"] }], // 탭으로 분리(ide에서 4로 설정할 것), 데코레이터 이후의 노드는 무시
     "semi": ["error", "always"], // 세미콜론 사용
-    "array-element-newline": ["error", "never"],
+    "array-element-newline": ["error", {
+        "ArrayExpression": { "multiline": true, "minItems": 3 }, // 배열의 요소가 3개 이상일 경우, 각각 한줄씩
+    }],
     "quotes": [2, "single", { "avoidEscape": false }], // ', `만 허용
     "eqeqeq": [2, "allow-null"], // == 금지
     "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }], // return 앞에는 빈줄 강제
@@ -35,6 +37,13 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": 0, // any 허용
     "function-paren-newline": ["error", "consistent"], // 함수의 인자가 여러줄일 경우, 첫번째 인자는 첫줄에, 나머지는 각각 한줄씩
     "object-property-newline": ["error", { "allowAllPropertiesOnSameLine": false }], // 객체의 프로퍼티가 여러줄일 경우, 첫번째 프로퍼티는 첫줄에, 나머지는 각각 한줄씩
+    "object-curly-newline": ["error", {
+      "ObjectExpression": { "multiline": true, "minProperties": 3 },
+      "ObjectPattern": { "multiline": true },
+      "ImportDeclaration": { "multiline": true, "minProperties": 3 },
+      "ExportDeclaration": { "multiline": true, "minProperties": 3 }
+    }],
+    "object-curly-spacing": ["error", "always"],
     "function-call-argument-newline": ["error", "never"], // 함수 인자에 줖바꿈 금지
     "comma-dangle": ["error", "always"], // 마지막 콤마 강제, git diff 가독성 향상
     "max-len": [2, 200, 4, { "ignoreUrls": true }] // 한줄의 최대 길이
