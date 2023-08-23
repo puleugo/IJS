@@ -52,7 +52,9 @@ export class AuthenticationService {
     	this.bot.on('callback_query', (msg) => {
     		this.answerVerification(msg);
     	});
-    	this.bot.on('polling_error', this.loggerService.verbose('telegram bot polling error'));
+    	this.bot.on('polling_error', (error) => {
+    		this.loggerService.error('텔레그램 봇 에러', error);
+    	});
     }
 
     async googleOauthLogin(accessToken: string): Promise<User> {

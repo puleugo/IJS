@@ -12,6 +12,7 @@ import { AuthPhotoClient, } from '@app/auth/authentication/utils/auth-photo.clie
 import { TypeOrmModule, } from '@nestjs/typeorm';
 import { UserAuthProvider, } from '@domain/user/user-auth-provider.entity';
 import { UniversityModule, } from '@app/university/university.module';
+import { UtilModule, } from '@infrastructure/utils/util.module';
 
 @Module({
 	imports: [
@@ -19,6 +20,7 @@ import { UniversityModule, } from '@app/university/university.module';
 		UserModule,
 		HttpModule,
 		UniversityModule,
+		UtilModule,
 		JwtModule.registerAsync({
 			imports: [ConfigModule,],
 			inject: [ConfigService,],

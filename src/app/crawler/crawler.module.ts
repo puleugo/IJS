@@ -11,8 +11,6 @@ import { ScheduleModule, } from '@nestjs/schedule';
 import { TypeOrmModule, } from '@nestjs/typeorm';
 import { Crawler, } from '@domain/crawler/crawler.entity';
 
-import { UtilModule, } from '@infrastructure/utils/util.module';
-
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([Crawler,]),
@@ -24,7 +22,6 @@ import { UtilModule, } from '@infrastructure/utils/util.module';
 		UniversityMajorNoticeCrawlerModule,
 		UniversityMealCrawlerModule,
 		UniversityProgramCrawlerModule,
-		UtilModule,
 	],
 	providers: [CrawlerService,],
 	exports: [CrawlerService,],
