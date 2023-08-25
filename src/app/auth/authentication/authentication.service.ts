@@ -66,7 +66,7 @@ export class AuthenticationService {
     		const googleUserInfo = await this.httpService.axiosRef.request({
     			method: 'GET',
     			url: 'https://people.googleapis.com/v1/people/me',
-    			headers: { Authorzation: `Bearer ${accessToken}`, },
+    			headers: { Authorization: `Bearer ${accessToken}`, },
     			params: { personFields: 'names,metadata', },
     		});
 
@@ -114,13 +114,15 @@ export class AuthenticationService {
     			},
     		},
     	});
-    	if (user) return user;
 
-    	return await this.userService.joinUserByOauth({
-    		vendorUserId: kakaoUserInfo.data.id,
-    		username: kakaoUserInfo.data.kakao_account.profile.nickname,
-    		providerType: OauthLoginProviderEnum.KAKAO,
-    	});
+    	if (!user)
+    		await this.userService.joinUserByOauth({
+    			vendorUserId: kakaoUserInfo.data.id,
+    			username: kakaoUserInfo.data.kakao_account.profile.nickname,
+    			providerType: OauthLoginProviderEnum.KAKAO,
+    		});
+
+    	return user;
     }
 
     async generateAccessToken(userId: string): Promise<string> {
