@@ -23,6 +23,7 @@ import { UserProfileResponseType, UserVerificationRequestType, } from '@app/user
 
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
+	approveMailAuthenticationURL,
 	UserAuthenticationCodeRequestType,
 	UserAuthenticationType,
 } from '@app/auth/authentication/authentication.type';
@@ -155,7 +156,7 @@ export class AuthenticationService {
     ): Promise<void> {
 
     	const randomKey = uuidv4();
-    	const url = `${process.env.APP_URL}/${API_PREFIX}/auth/mail-auth?code=${randomKey}`;
+    	const url = `${process.env.APP_URL}/${API_PREFIX}/auth/${approveMailAuthenticationURL}?code=${randomKey}`;
 
     	await this.mailerService
     		.sendMail({
