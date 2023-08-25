@@ -17,7 +17,6 @@ import { UserLecture, } from '@domain/user/user-lecture.entity';
 import { UniversityMajor, } from '@domain/university/university-major.entity';
 import { IsEmail, } from 'class-validator';
 import { IUser, } from '@domain/user/user.interface';
-import { Delivery, } from '@domain/delivery/delivery.entity';
 import { Article, } from '@domain/communities/articles/article.entity';
 import { ArticleLike, } from '@domain/communities/articles/article-like.entity';
 import { Comment, } from '@domain/communities/comments/comment.entity';
@@ -28,6 +27,7 @@ import { UserSetting, } from '@domain/user/user-setting.entity';
 
 @Entity('users')
 export class User implements IUser {
+
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -98,7 +98,7 @@ export class User implements IUser {
     @OneToMany(() => CommentLike, ({ author, }) => author)
     commentLikes: CommentLike[];
 
-    @OneToOne(() => UserSetting, { cascade: true, })
+    @OneToOne(() => UserSetting, { cascade: ['insert',], })
     @JoinColumn()
     settings: UserSetting;
 
@@ -110,7 +110,4 @@ export class User implements IUser {
 
     @DeleteDateColumn({ nullable: true, })
     deletedAt: Date | null;
-
-    @ManyToOne(() => Delivery, ({ users, }) => users, { nullable: true, })
-    delivery: Delivery | null;
 }

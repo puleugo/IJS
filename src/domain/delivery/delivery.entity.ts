@@ -1,6 +1,5 @@
-import { User, } from '@domain/user/user.entity';
 import {
-	Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn,
+	Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('deliveries')
@@ -20,8 +19,8 @@ export class Delivery {
     @Column()
     deliveryUrl: string;
 
-    @OneToMany(() => User, ({ delivery, }) => delivery)
-    users: User[];
+    // @OneToMany(() => User, ({ delivery, }) => delivery)
+    // users: User[];
 
     @CreateDateColumn()
     createdAt: Date;
