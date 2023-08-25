@@ -4,7 +4,6 @@ import { TypeOrmModule, } from '@nestjs/typeorm';
 import { UniversityEvent, } from '@domain/university/university-event.entity';
 import { UniversitySemester, } from '@domain/university/university-semester.entity';
 import { Crawler, } from '@domain/crawler/crawler.entity';
-import { UtilModule, } from '@infrastructure/utils/util.module';
 
 @Module({
 	imports: [
@@ -13,7 +12,6 @@ import { UtilModule, } from '@infrastructure/utils/util.module';
 			UniversitySemester,
 			Crawler,
 		]),
-		UtilModule,
 	],
 	providers: [UniversityEventCrawlerClient,],
 	exports: [UniversityEventCrawlerClient,],
