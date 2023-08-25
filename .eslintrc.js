@@ -46,6 +46,6 @@ module.exports = {
     "object-curly-spacing": ["error", "always"],
     "function-call-argument-newline": ["error", "never"], // 함수 인자에 줖바꿈 금지
     "comma-dangle": ["error", "always"], // 마지막 콤마 강제, git diff 가독성 향상
-    "max-len": [2, 200, 4, { "ignoreUrls": true }] // 한줄의 최대 길이
+    "max-len": [2, 200, 4, { "ignoreUrls": true }], // 한줄의 최대 길이
   }
 };

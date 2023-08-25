@@ -13,5 +13,7 @@ export type OauthLoginResponseType = {
 
 export type UserAuthenticationType = Pick<
     IUser,
-    'id' | 'schoolEmail' | 'schoolId' | 'majorId'
+    'id' | 'schoolEmail' | 'schoolId' | 'majorId'| 'name'
 >;
+
+export type UserAuthenticationCodeRequestType = Pick<IUser,'id' |  'schoolEmail' | 'schoolId' | 'majorId' | 'name'>

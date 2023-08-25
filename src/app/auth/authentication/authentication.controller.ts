@@ -50,19 +50,16 @@ export class AuthenticationController {
         @Body() oauthLoginRequest: OauthLoginRequest
 	): Promise<TokenResponse> {
 		let user: User;
-		switch (oauthLoginRequest.provider) {
-			case OauthLoginProviderEnum.KAKAO:
-				user = await this.authenticationService.kakaoOauthLogin(
-					oauthLoginRequest.accessToken
-				);
-				break;
-			case OauthLoginProviderEnum.GOOGLE:
-				user = await this.authenticationService.googleOauthLogin(
-					oauthLoginRequest.accessToken
-				);
-				break;
-			default:
-				throw new UnauthorizedException();
+		if (oauthLoginRequest.provider === OauthLoginProviderEnum.KAKAO) {
+			user = await this.authenticationService.kakaoOauthLogin(
+				oauthLoginRequest.accessToken
+			);
+		} else if (oauthLoginRequest.provider === OauthLoginProviderEnum.GOOGLE) {
+			user = await this.authenticationService.googleOauthLogin(
+				oauthLoginRequest.accessToken
+			);
+		} else {
+			throw new UnauthorizedException();
 		}
 
 		const [accessToken, refreshToken,] = await Promise.all([
@@ -110,12 +107,15 @@ export class AuthenticationController {
         @Query('schoolEmail') schoolEmail: string,
         @Query('schoolId') schoolId: string,
         @Query('majorId', ParseIntPipe) majorId: number,
+		@Query('name') name: string,
         @Req() { user, }: Request
     ): Promise<void> {
-    	await this.authenticationService.sendVerifySchoolMail(user.id, {
+    	await this.authenticationService.sendVerifySchoolMail({
+    		id: user.id,
     		schoolEmail,
     		schoolId,
     		majorId,
+    		name,
     	});
     }
 
@@ -128,9 +128,7 @@ export class AuthenticationController {
         @Req() { user, }: Request
     ): Promise<void> {
     	const userData =
-            await this.authenticationService.getUserInRedisByAuthenticationCode(
-            	code
-            );
+            await this.authenticationService.getUserInRedisByAuthenticationCode(code);
     	if (!userData || userData.id !== user.id) {
     		throw new BadRequestException('잘못된 인증 코드입니다.');
     	}

@@ -22,7 +22,10 @@ import { ConfigService, } from '@nestjs/config';
 import { UserProfileResponseType, UserVerificationRequestType, } from '@app/user/user.type';
 
 import * as TelegramBot from 'node-telegram-bot-api';
-import { UserAuthenticationType, } from '@app/auth/authentication/authentication.type';
+import {
+	UserAuthenticationCodeRequestType,
+	UserAuthenticationType,
+} from '@app/auth/authentication/authentication.type';
 import { AxiosResponse, } from 'axios';
 import { LoggerService, } from '@infrastructure/utils/logger.service';
 
@@ -79,8 +82,9 @@ export class AuthenticationService {
     		if (user) return user;
 
     		return await this.userService.joinUserByOauth({
-    			providerUsername: googleUserInfo.data.id,
-    			providerName: OauthLoginProviderEnum.GOOGLE,
+    			vendorUserId: googleUserInfo.data.id,
+    			username: '',
+    			providerType: OauthLoginProviderEnum.GOOGLE,
     		});
     	} catch (e) {
     		throw new UnauthorizedException('인증 정보가 잘못되었습니다.');
@@ -105,15 +109,16 @@ export class AuthenticationService {
     		where: {
     			auth: {
     				provider: { name: OauthLoginProviderEnum.KAKAO, },
-    				username: kakaoUserInfo.data.id,
+    				username: kakaoUserInfo.data.kakao_account.profile.nickname,
     			},
     		},
     	});
     	if (user) return user;
 
     	return await this.userService.joinUserByOauth({
-    		providerUsername: kakaoUserInfo.data.id,
-    		providerName: OauthLoginProviderEnum.KAKAO,
+    		vendorUserId: kakaoUserInfo.data.id,
+    		username: kakaoUserInfo.data.kakao_account.profile.nickname,
+    		providerType: OauthLoginProviderEnum.KAKAO,
     	});
     }
 
@@ -146,25 +151,21 @@ export class AuthenticationService {
     }
 
     async sendVerifySchoolMail(
-    	userId: string,
-    	userSchoolData: {
-            schoolEmail: string;
-            schoolId: string;
-            majorId: number;
-        }
+    	userSchoolData: UserAuthenticationCodeRequestType
     ): Promise<void> {
-    	const { schoolEmail, schoolId, majorId, } = userSchoolData;
 
     	const randomKey = uuidv4();
+    	const url = `${process.env.APP_URL}/${API_PREFIX}/auth/mail-auth?code=${randomKey}`;
+
     	await this.mailerService
     		.sendMail({
-    			to: schoolEmail, // list of receivers
+    			to: userSchoolData.schoolEmail, // list of receivers
     			subject: '인제생 인증 메일입니다.', // Subject line
-    			html: `인증을 위해 아래 링크를 클릭해주세요. ${process.env.APP_URL}/${API_PREFIX}/auth/mail-auth?code=${randomKey}`, // HTML body content
+    			html: `인증을 위해 아래 링크를 클릭해주세요. ${url}`, // HTML body content
     		})
     		.then(() => {
     			this.redis.set(
-    				`code_${randomKey}`, `{"userId": "${userId}", "schoolEmail": "${schoolEmail}", "schoolId": "${schoolId}", "majorId": "${majorId}" }`
+    				`code_${randomKey}`, JSON.stringify(userSchoolData)
     			);
 
     			this.redis.expire(`${randomKey}`, 60 * 60 * 24);
@@ -175,7 +176,17 @@ export class AuthenticationService {
     }
 
     async getProfile(userId: string): Promise<UserProfileResponseType> {
-    	return await this.userService.findById(userId, { relations: { settings: true, }, });
+    	const user=  await this.userService.findById(userId, {
+    		relations: {
+    			settings: true,
+    			major: true,
+    		},
+    	});
+
+    	return {
+    		...user,
+    		majorName: user.major.name,
+    	};
     }
 
     async uploadRegisterImage(photo: Buffer): Promise<string> {

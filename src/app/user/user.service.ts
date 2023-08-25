@@ -53,19 +53,20 @@ export class UserService {
 	}
 
 	async joinUserByOauth(data: {
-        providerUsername: string;
-        providerName: OauthLoginProviderEnum;
+        vendorUserId: string;
+		username: string;
+        providerType: OauthLoginProviderEnum;
     }): Promise<User> {
-		const userAuthProvider = await this.userAuthProviderRepository.findOne({ where: { name: data.providerName, }, });
+		const userAuthProvider = await this.userAuthProviderRepository.findOne({ where: { name: data.providerType, }, });
 		if (!userAuthProvider)
 			throw new NotFoundException('존재하지 않는 OAUTH 로그인 방식입니다.');
 
-		const user = await this.userRepository.save({});
+		const user = await this.userRepository.save({ name: data.username, });
 
 		const userAuth = this.userAuthRepository.create({
 			provider: userAuthProvider,
 			providerId: userAuthProvider.id,
-			username: data.providerUsername,
+			username: data.vendorUserId,
 			user: user,
 			userId: user.id,
 		});

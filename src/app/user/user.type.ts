@@ -13,8 +13,9 @@ export type UserPreviewResponseType = Pick<IUser, 'id'>;
 
 export type UserProfileResponseType = Pick<
     IUser,
-    'id' | 'isVerified' | 'majorId' | 'schoolId' | 'schoolEmail'
+    'id' | 'name' | 'isVerified' | 'majorId' | 'schoolId' | 'schoolEmail'
 > & {
+    majorName: string;
     settings: Pick<
         IUserSetting,
         | 'isIgnoredMealNotification'

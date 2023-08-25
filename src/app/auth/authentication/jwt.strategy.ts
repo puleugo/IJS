@@ -25,9 +25,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 			throw new UnauthorizedException();
 		}
 
-		const user = await this.userService.findById(data.user_id,);
+		const user = await this.userService.findById(data.user_id, { relations: { major: true, }, });
 		if (!user) throw new UserTokenInValidate();
 
-		return new UserProfileResponse(user);
+		return new UserProfileResponse({
+			...user,
+			majorName: user.major?.name,
+		});
 	}
 }
