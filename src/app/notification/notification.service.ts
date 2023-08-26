@@ -5,11 +5,11 @@ import { Notification, } from '@domain/user/notification/notification.entity';
 import { Repository, } from 'typeorm';
 import { InjectRepository, } from '@nestjs/typeorm';
 import { NotificationUpdateRequest, } from '@app/notification/dto/notification-update.request';
-import { NotificationProfileResponse, } from '@app/notification/dto/notification-profile.response';
 import { NotificationCategoryEnum, } from '@app/notification/notification-category.enum';
 import * as firebaseAdmin from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import { LoggerService, } from '@infrastructure/utils/logger.service';
+import { NotificationResponseType, } from '@app/notification/notification.type';
 
 dotenv.config();
 const serviceAccount: firebaseAdmin.ServiceAccount = {
@@ -60,44 +60,54 @@ export class NotificationService {
 		return await this.notificationRepository.find({ where: { notificationToken: { userId, }, }, });
 	}
 
-	async sendPush(
+	async sendMessageByUserId(
 		userId: string,
-		title: string,
-		body: string,
+		notification: NotificationResponseType,
 		category: NotificationCategoryEnum
 	): Promise<void> {
-		try {
-			const notificationToken =
-        await this.notificationTokenRepository.findOne({
+		const notificationToken = await this.notificationTokenRepository.findOne({
         	where: {
         		userId,
         		isDisable: false,
         	},
-        });
-			if (notificationToken) {
-				await this.notificationRepository.save({
+		});
+		notification.title ??= this.getNotificationTitleByCategory(category);
+
+		if (!notificationToken) return;
+		try {
+			await Promise.all([
+				this.notificationRepository.save({
 					notificationToken,
-					title,
-					body,
+					title: this.getNotificationTitleByCategory(category),
+					body: notification.body,
 					category,
-				});
-				await firebaseAdmin
-					.messaging()
-					.send({
-						notification: new NotificationProfileResponse({
-							title,
-							body,
-							category,
-						}),
-						token: notificationToken.notificationToken,
-						android: { priority: 'high', },
-					})
-					.catch((error: any) => {
-						this.loggerService.error(error);
-					});
-			}
+				}),
+				firebaseAdmin.messaging().send({
+					token: notificationToken.notificationToken,
+					notification,
+					android: { priority: 'high', },
+				}),
+			]);
 		} catch (error) {
 			this.loggerService.error(error);
 		}
+	}
+
+	//TODO: Implement this method
+	async sendMessageToCategoryAssigners(): Promise<void> {
+		return;
+	}
+
+	getNotificationTitleByCategory(category: NotificationCategoryEnum): string {
+    	switch (category) {
+        	case NotificationCategoryEnum.Meal:
+        		return '학식 알림이 도착했습니다.';
+    		case NotificationCategoryEnum.Notice:
+    			return '학부 공지 알림이 도착했습니다.';
+    		case NotificationCategoryEnum.Council:
+    			return '학생회 공지 알림이 도착했습니다.';
+    		default:
+        		return '알림이 도착했습니다.';
+    	}
 	}
 }

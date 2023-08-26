@@ -1,11 +1,30 @@
 import {
-	Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseUUIDPipe, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors,
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	ParseBoolPipe,
+	ParseUUIDPipe,
+	Post,
+	Put,
+	Query,
+	Req,
+	UploadedFile,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
 import { UserService, } from '@app/user/user.service';
 import { UserScheduleSetPreviewResponse, } from '@app/user/dto/user-schedule-set-preview.response';
 import { UserScheduleSetProfileResponse, } from '@app/user/dto/user-schedule-set-profile.response';
 import {
-	ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags,
+	ApiBearerAuth,
+	ApiBody,
+	ApiConsumes,
+	ApiCreatedResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
 } from '@nestjs/swagger';
 import { UserPreviewResponse, } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse, } from '@app/user/dto/user-schedule-profile.response';
@@ -39,7 +58,7 @@ export class UserController {
 	async sendNotification(
         @Req() { user, }: Request
 	): Promise<void> {
-		await this.notificationService.sendPush(user.id, '테스트 제목', `테스트 내용\n${new Date()}`, NotificationCategoryEnum.Notice);
+		await this.notificationService.sendMessageByUserId(user.id, { body: '테스트가 송신되었습니다.', } , NotificationCategoryEnum.Notice);
 	}
 
     @Post('notifications/allow')
