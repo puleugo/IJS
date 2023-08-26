@@ -19,7 +19,11 @@ import { Repository, } from 'typeorm';
 import { PhotoClient, } from '@infrastructure/types/photo.client';
 import { UniversityService, } from '@app/university/university.service';
 import { ConfigService, } from '@nestjs/config';
-import { UserProfileResponseType, UserVerificationRequestType, } from '@app/user/user.type';
+import {
+	UserProfileResponseType,
+	UserSchoolDataUpdateRequestType,
+	UserVerificationRequestType,
+} from '@app/user/user.type';
 
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
@@ -84,7 +88,6 @@ export class AuthenticationService {
 
     		return await this.userService.joinUserByOauth({
     			vendorUserId: googleUserInfo.data.id,
-    			username: '',
     			providerType: OauthLoginProviderEnum.GOOGLE,
     		});
     	} catch (e) {
@@ -116,9 +119,8 @@ export class AuthenticationService {
     	});
 
     	if (!user)
-    		await this.userService.joinUserByOauth({
+    		return await this.userService.joinUserByOauth({
     			vendorUserId: kakaoUserInfo.data.id,
-    			username: kakaoUserInfo.data.kakao_account.profile.nickname,
     			providerType: OauthLoginProviderEnum.KAKAO,
     		});
 
@@ -146,7 +148,7 @@ export class AuthenticationService {
     async getUserInRedisByAuthenticationCode(
     	code: string
     ): Promise<UserAuthenticationType> {
-    	return JSON.parse(await this.redis.get(`code_${code}`));
+    	return <UserAuthenticationType>JSON.parse(await this.redis.get(`code_${code}`));
     }
 
     async deleteRedisDataByKey(code: string): Promise<void> {
@@ -200,15 +202,11 @@ export class AuthenticationService {
 
     async updateUserSchoolAuthentication(
     	userId: string,
-    	majorId?: number,
-    	schoolId?: string,
-    	schoolEmail?: string
+    	updateUserSchoolDataRequest: UserSchoolDataUpdateRequestType
     ): Promise<void> {
     	await this.userService.updateUserById(userId, {
     		isVerified: true,
-    		majorId,
-    		schoolId,
-    		schoolEmail,
+    		...updateUserSchoolDataRequest,
     	});
     }
 

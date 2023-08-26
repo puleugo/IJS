@@ -48,30 +48,30 @@ export class UserService {
         @Inject('UserPhotoClient')
         private readonly userPhotoClient: PhotoClient,
         private readonly userOcrClient: UserOcrClient,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
 	) {
 	}
 
 	async joinUserByOauth(data: {
         vendorUserId: string;
-		username: string;
         providerType: OauthLoginProviderEnum;
     }): Promise<User> {
 		const userAuthProvider = await this.userAuthProviderRepository.findOne({ where: { name: data.providerType, }, });
 		if (!userAuthProvider)
 			throw new NotFoundException('존재하지 않는 OAUTH 로그인 방식입니다.');
 
-		const user = await this.userRepository.save({ name: data.username, });
-
-		const userAuth = this.userAuthRepository.create({
-			provider: userAuthProvider,
-			providerId: userAuthProvider.id,
-			username: data.vendorUserId,
-			user: user,
-			userId: user.id,
-		});
-
-		await this.userAuthRepository.save(userAuth);
+		const user = await this.userRepository.save({});
+		const [userAuth, userSetting,]= await Promise.all([
+			this.userAuthRepository.save({
+				provider: userAuthProvider,
+				providerId: userAuthProvider.id,
+				username: data.vendorUserId,
+				user: user,
+				userId: user.id,
+			}),
+			this.userSettingRepository.save({ userId: user.id, }),
+		]);
+		await this.userRepository.update({ id: user.id, }, { settings: userSetting, });
 
 		return user;
 	}

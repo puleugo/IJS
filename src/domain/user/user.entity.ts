@@ -98,7 +98,7 @@ export class User implements IUser {
     @OneToMany(() => CommentLike, ({ author, }) => author)
     commentLikes: CommentLike[];
 
-    @OneToOne(() => UserSetting, { cascade: ['insert',], })
+    @OneToOne(() => UserSetting, { cascade: true, })
     @JoinColumn()
     settings: UserSetting;
 

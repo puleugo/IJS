@@ -54,3 +54,5 @@ export type UserVerificationRequestType = Pick<
     IUser,
     'name' | 'schoolId' | 'majorId'
 >;
+
+export type UserSchoolDataUpdateRequestType = Partial<Pick<IUser, 'name' | 'schoolId' | 'schoolEmail'>>

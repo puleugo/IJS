@@ -33,10 +33,11 @@ import { UserService, } from '@app/user/user.service';
 import { approveMailAuthenticationURL, } from '@app/auth/authentication/authentication.type';
 import { JwtService, } from '@nestjs/jwt';
 import { RefreshRequest, } from '@app/auth/authentication/dto/refresh.request';
+import { UserSchoolDataUpdateRequest, } from '@app/user/dto/user-school-data-update.request';
 
 @ApiTags('Auth')
 @Controller('auth')
-export class AuthenticationController {
+export class AuthenticationController  {
 	constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
@@ -52,16 +53,15 @@ export class AuthenticationController {
         @Body() oauthLoginRequest: OauthLoginRequest
 	): Promise<TokenResponse> {
 		let user: User;
-		if (oauthLoginRequest.provider === OauthLoginProviderEnum.KAKAO) {
-			user = await this.authenticationService.kakaoOauthLogin(
-				oauthLoginRequest.accessToken
-			);
-		} else if (oauthLoginRequest.provider === OauthLoginProviderEnum.GOOGLE) {
-			user = await this.authenticationService.googleOauthLogin(
-				oauthLoginRequest.accessToken
-			);
-		} else {
-			throw new UnauthorizedException();
+		switch (oauthLoginRequest.provider) {
+			case OauthLoginProviderEnum.KAKAO:
+				user = await this.authenticationService.kakaoOauthLogin(oauthLoginRequest.accessToken);
+				break;
+			case OauthLoginProviderEnum.GOOGLE:
+				user = await this.authenticationService.googleOauthLogin(oauthLoginRequest.accessToken);
+				break;
+			default:
+				throw new UnauthorizedException('invalid provider');
 		}
 
 		const [accessToken, refreshToken,] = await Promise.all([
@@ -162,10 +162,11 @@ export class AuthenticationController {
     @Post('approve/identification/:userId')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: '학생 인증 이미지(학생증, 합격증명서) 승인 (어드민용 API)', })
+    @ApiOperation({ summary: '학생 인증 승인 (어드민용 API)', })
     async approveRegisterImage(
-        @Param('userId', ParseUUIDPipe) userId: string
+        @Param('userId', ParseUUIDPipe) userId: string,
+        @Body() userSchoolDataUpdateRequest: UserSchoolDataUpdateRequest,
     ): Promise<void> {
-    	await this.authenticationService.updateUserSchoolAuthentication(userId);
+    	await this.authenticationService.updateUserSchoolAuthentication(userId, userSchoolDataUpdateRequest);
     }
 }
