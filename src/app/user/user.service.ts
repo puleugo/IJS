@@ -76,18 +76,19 @@ export class UserService {
 		return user;
 	}
 
-	async findUserByOauthId(data: {
-        code: string;
-        provider: OauthLoginProviderEnum;
-    }): Promise<User> {
-		const authProvider = await this.userAuthProviderRepository.findOne({ where: { name: data.provider, }, });
+	async findUserByOauthId(
+		code: string,
+		provider: OauthLoginProviderEnum,
+	): Promise<User> {
+		const authProvider = await this.userAuthProviderRepository.findOne({ where: { name: provider.toString(), }, });
 		if (!authProvider) throw new NotFoundException('authProvider not found');
 
 		const userAuth = await this.userAuthRepository.findOne({
 			where: {
-				username: data.code,
-				providerId: authProvider.id,
+				username: code,
+				provider: { id: authProvider.id, },
 			},
+			relations: { user: true, },
 		});
 
 		return userAuth ? userAuth.user : null;
