@@ -1,6 +1,6 @@
 import { ApiProperty, } from '@nestjs/swagger';
 import { UserPreviewResponse, } from '@app/user/dto/user-preview.response';
-import { ArticleProfileResponseType, } from '@app/community/article/article.type';
+import { ArticleProfileResponseType, } from '@app/community/article/dto/article.type';
 
 export class ArticleProfileResponse implements ArticleProfileResponseType {
     @ApiProperty({
@@ -95,23 +95,11 @@ export class ArticleProfileResponse implements ArticleProfileResponseType {
     })
     majorId: number | null;
 
-    constructor(article: ArticleProfileResponseType) {
-    	this.id = article.id;
-    	this.title = article.title;
-    	this.content = article.content;
-    	this.images = article.images;
-    	this.boardId = article.boardId;
-    	this.likesCount = article.likesCount;
-    	this.viewsCount = article.viewsCount;
-    	this.commentsCount = article.commentsCount;
-    	this.isAnonymous = article.isAnonymous;
-    	this.author = article.isAnonymous
-    		? null
-    		: new UserPreviewResponse(article.author);
-    	this.authorId = article.isAnonymous ? '' : article.author.id;
-    	this.createdAt = article.createdAt;
-    	this.isUpdated = article.createdAt < article.updatedAt;
-    	this.isCouncil = article.isCouncil;
-    	this.majorId = article.isCouncil ? this.majorId : null;
+    constructor(data: ArticleProfileResponseType) {
+    	this.author = data.isAnonymous ? null : new UserPreviewResponse(data.author);
+    	this.authorId = data.isAnonymous ? '' : data.author.id;
+    	this.isUpdated = data.createdAt < data.updatedAt;
+    	this.majorId = data.isCouncil ? this.majorId : null;
+    	Object.assign(this, data);
     }
 }

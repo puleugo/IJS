@@ -4,17 +4,16 @@ import {
 import {
 	Between, LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository,
 } from 'typeorm';
-import { UniversityMajor, } from '@domain/university/university-major.entity';
+import { UniversityMajor, } from '@app/university/domain/university-major.entity';
 import { InjectRepository, } from '@nestjs/typeorm';
-import { UniversitySemester, } from '@domain/university/university-semester.entity';
-import { UniversityEvent, } from '@domain/university/university-event.entity';
-import { UniversityMeal, } from '@domain/university/university-meal.entity';
-import { UniversityProgram, } from '@domain/university/university-program.entity';
-import { UniversityNotice, } from '@domain/university/university-notice.entity';
-import { UniversityBusSchedule, } from '@domain/university/university-bus-schedule.entity';
-import { IUniversityMealInfo, MealCourseEnum, } from '@domain/university/university-meal.interface';
-import { getDateByTime, } from '@infrastructure/utils/get-date-by-time';
-import { getLastMondayByDate, } from '@infrastructure/utils/get-last-monday-by-date';
+import { UniversitySemester, } from '@app/university/domain/university-semester.entity';
+import { UniversityEvent, } from '@app/university/domain/university-event.entity';
+import { UniversityMeal, } from '@app/university/domain/university-meal.entity';
+import { UniversityProgram, } from '@app/university/domain/university-program.entity';
+import { UniversityNotice, } from '@app/university/domain/university-notice.entity';
+import { UniversityBusSchedule, } from '@app/university/domain/university-bus-schedule.entity';
+import { getDateByTime, } from '@common/utils/get-date-by-time';
+import { getLastMondayByDate, } from '@common/utils/get-last-monday-by-date';
 import {
 	UniversityBusProfileResponseType,
 	UniversityBusResponseType,
@@ -25,7 +24,9 @@ import {
 	UniversityNoticePreviewResponseType,
 	UniversityNoticeProfileResponseType,
 	UniversityProgramProfileResponseType,
-} from '@app/university/university.type';
+} from '@app/university/dto/university.type';
+import { MealCourseEnum, } from '@app/crawler/domain/meal-course.enum';
+import { UniversityMealInfo, } from '@app/crawler/domain/meals.type';
 
 @Injectable()
 export class UniversityService {
@@ -51,7 +52,7 @@ export class UniversityService {
 	async getUniversityMealInfoByDate(
 		UniversityMealSearchQuery: UniversityMealSearchQuery,
 		date: Date
-	): Promise<IUniversityMealInfo[]> {
+	): Promise<UniversityMealInfo[]> {
 		switch (UniversityMealSearchQuery.timeRange) {
 			case 'today':
 				return await this.getUniversityMealInfoByToday(date);
@@ -270,7 +271,7 @@ export class UniversityService {
 
 	private async getUniversityMealInfoByToday(
 		date: Date
-	): Promise<IUniversityMealInfo[]> {
+	): Promise<UniversityMealInfo[]> {
 		const meals = await this.universityMealRepository.find({ where: { publishedAt: date, }, });
 
 		if (meals.length === 0)
@@ -294,7 +295,7 @@ export class UniversityService {
 
 	private async getUniversityMealInfoByWeekly(
 		date: Date
-	): Promise<IUniversityMealInfo[]> {
+	): Promise<UniversityMealInfo[]> {
 		const lastMonday = getLastMondayByDate(date);
 		const thisFriday = new Date(
 			date.getFullYear(), date.getMonth(), lastMonday.getDate() + 4
@@ -317,7 +318,7 @@ export class UniversityService {
 			return meal.course === 'C';
 		});
 
-		const result: IUniversityMealInfo[] = [];
+		const result: UniversityMealInfo[] = [];
 		for (let i = 0; i < 5; i++) {
 			result.push({
 				courseA: courseA[i],

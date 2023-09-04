@@ -14,7 +14,7 @@ import { UniversityBusProfileResponse, } from '@app/university/dto/university-bu
 import { UniversityFinishDateProfileResponse, } from '@app/university/dto/university-finish-date-profile.response';
 import { UniversityNoticePreviewResponse, } from '@app/university/dto/university-notice-preview.response';
 import { UniversityNoticeProfileResponse, } from '@app/university/dto/university-notice-profile.response';
-import { UniversityMealSearchQuery, } from '@app/university/university.type';
+import { UniversityMealSearchQuery, } from '@app/university/dto/university.type';
 
 @ApiTags('University')
 @Controller('universities')

@@ -1,6 +1,6 @@
 import { IsBoolean, IsOptional, } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { UserUpdateSettingRequestType, } from '@app/user/user.type';
+import { UserUpdateSettingRequestType, } from '@app/user/dto/user.type';
 
 export class UserUpdateSettingRequest implements UserUpdateSettingRequestType {
     @ApiProperty({

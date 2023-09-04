@@ -1,6 +1,6 @@
 import { ApiProperty, } from '@nestjs/swagger';
-import { IUniversityMealInfo, } from '@domain/university/university-meal.interface';
-import { UniversityMealInfo, UniversityMealInfoProfileResponseType, } from '@app/university/university.type';
+import { UniversityMealInfoProfileResponseType, UniversityMealsMenuInfo, } from '@app/university/dto/university.type';
+import { UniversityMealInfo, } from '@app/crawler/domain/meals.type';
 
 export class UniversityMealInfoProfileResponse
 implements UniversityMealInfoProfileResponseType {
@@ -23,7 +23,7 @@ implements UniversityMealInfoProfileResponseType {
     	],
     	description: '월요일 식단 정보, 혹은 오늘의 식단 정보',
     })
-    readonly '0': UniversityMealInfo;
+    readonly '0': UniversityMealsMenuInfo;
     @ApiProperty({
     	example: [
     		{
@@ -44,7 +44,7 @@ implements UniversityMealInfoProfileResponseType {
     	description: '화요일 식단 정보',
     	required: false,
     })
-    readonly '1'?: UniversityMealInfo;
+    readonly '1'?: UniversityMealsMenuInfo;
 
     @ApiProperty({
     	example: [
@@ -66,7 +66,7 @@ implements UniversityMealInfoProfileResponseType {
     	description: '수요일 식단 정보',
     	required: false,
     })
-    readonly '2'?: UniversityMealInfo;
+    readonly '2'?: UniversityMealsMenuInfo;
 
     @ApiProperty({
     	example: [
@@ -88,7 +88,7 @@ implements UniversityMealInfoProfileResponseType {
     	description: '목요일 식단 정보',
     	required: false,
     })
-    readonly '3'?: UniversityMealInfo;
+    readonly '3'?: UniversityMealsMenuInfo;
 
     @ApiProperty({
     	example: [
@@ -110,7 +110,7 @@ implements UniversityMealInfoProfileResponseType {
     	description: '금요일 식단 정보',
     	required: false,
     })
-    readonly '4'?: UniversityMealInfo;
+    readonly '4'?: UniversityMealsMenuInfo;
 
     @ApiProperty({
     	example: 'weekly',
@@ -118,7 +118,7 @@ implements UniversityMealInfoProfileResponseType {
     })
     readonly time_range: 'weekly' | 'today';
 
-    constructor(meals: IUniversityMealInfo[]) {
+    constructor(meals: UniversityMealInfo[]) {
     	for (let i = 0; i < meals.length; i++) {
     		this[i] = {
     			courseA: meals[i].courseA?.menu,

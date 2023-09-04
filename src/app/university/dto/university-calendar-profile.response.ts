@@ -1,5 +1,5 @@
 import { ApiProperty, } from '@nestjs/swagger';
-import { UniversityCalendarProfileResponseType, } from '@app/university/university.type';
+import { UniversityCalendarProfileResponseType, } from '@app/university/dto/university.type';
 
 export class UniversityCalendarProfileResponse
 implements UniversityCalendarProfileResponseType {

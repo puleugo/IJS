@@ -3,26 +3,25 @@ import {
 } from '@nestjs/common';
 import { OauthLoginProviderEnum, } from '@app/auth/authentication/oauth-login-provider.enum';
 import { Repository, } from 'typeorm';
-import { User, } from '@domain/user/user.entity';
+import { User, } from '@app/user/domain/user.entity';
 import { InjectRepository, } from '@nestjs/typeorm';
-import { UserAuth, } from '@domain/user/user-auth.entity';
-import { UserAuthProvider, } from '@domain/user/user-auth-provider.entity';
-import { ScheduleSet, } from '@domain/user/schedule-set.entity';
-import { UserScheduleSet, } from '@domain/user/user-schedule-set.entity';
-import { UniversityLecture, } from '@domain/university/university-lecture.entity';
-import { UserLecture, } from '@domain/user/user-lecture.entity';
+import { UserAuth, } from '@app/user/domain/user-auth.entity';
+import { UserAuthProvider, } from '@app/user/domain/user-auth-provider.entity';
+import { ScheduleSet, } from '@app/user/domain/schedule-set.entity';
+import { UserScheduleSet, } from '@app/user/domain/user-schedule-set.entity';
+import { UniversityLecture, } from '@app/university/domain/university-lecture.entity';
+import { UserLecture, } from '@app/user/domain/user-lecture.entity';
 import * as QRCode from 'qrcode';
-import { UserScheduleRoleEnum, } from '@app/user/user-schedule-role.enum';
-import { UserFollow, } from '@domain/user/user-follow.entity';
+import { UserScheduleRoleEnum, } from '@app/user/domain/user-schedule-role.enum';
+import { UserFollow, } from '@app/user/domain/user-follow.entity';
 import { UserOcrClient, } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions, } from 'typeorm/find-options/FindOneOptions';
-import { PhotoClient, } from '@infrastructure/types/photo.client';
+import { PhotoClient, } from '@common/type/photo.client';
 import { JwtService, } from '@nestjs/jwt';
-import { USER_QR_CODE_EXPIRE, } from '../../contants';
-import { UserSetting, } from '@domain/user/user-setting.entity';
-import { UserNotFoundException, } from '@domain/error/user.error';
-import { IUser, } from '@domain/user/user.interface';
-import { ScheduleSetProfileResponseType, UserUpdateSettingRequestType, } from '@app/user/user.type';
+import { USER_QR_CODE_EXPIRE, } from '@common/type/contants';
+import { UserSetting, } from '@app/user/domain/user-setting.entity';
+import { UserNotFoundException, } from '@app/user/exception/user.error';
+import { ScheduleSetProfileResponseType, UserUpdateSettingRequestType, } from '@app/user/dto/user.type';
 
 @Injectable()
 export class UserService {
@@ -49,8 +48,7 @@ export class UserService {
         private readonly userPhotoClient: PhotoClient,
         private readonly userOcrClient: UserOcrClient,
         private readonly jwtService: JwtService,
-	) {
-	}
+	) {}
 
 	async joinUserByOauth(data: {
         vendorUserId: string;
@@ -257,7 +255,7 @@ export class UserService {
 		return;
 	}
 
-	async updateUserById(id: string, data: Partial<IUser>): Promise<void> {
+	async updateUserById(id: string, data: Partial<User>): Promise<void> {
 		const { affected, } = await this.userRepository.update({ id, }, data);
 		if (affected <= 0) throw new UserNotFoundException();
 

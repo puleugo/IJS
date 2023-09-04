@@ -8,13 +8,12 @@ import {
 	ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags,
 } from '@nestjs/swagger';
 import { BoardCreateRequest, } from '@app/community/board/dto/board-create.request';
-import { Request, } from '@infrastructure/types/request.types';
+import { Request, } from '@common/type/request.type';
 
 @Controller('boards')
 @ApiTags('[커뮤니티] 게시판')
 export class BoardController {
-	constructor(private readonly boardsService: BoardService) {
-	}
+	constructor(private readonly boardsService: BoardService) {}
 
     @Get()
     @ApiOperation({ summary: '게시판 목록 조회', })

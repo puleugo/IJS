@@ -1,6 +1,6 @@
-import { NotificationCategoryEnum, } from '@app/notification/notification-category.enum';
+import { NotificationCategoryEnum, } from '@app/notification/domain/notification-category.enum';
 import { ApiProperty, } from '@nestjs/swagger';
-import { NotificationProfileResponseType, } from '@app/notification/notification.type';
+import { NotificationProfileResponseType, } from '@app/notification/domain/notification.type';
 
 const NotificationCategoryName = new Map<number, string>([
 	[NotificationCategoryEnum.Unknown, '확인되지 않음',],

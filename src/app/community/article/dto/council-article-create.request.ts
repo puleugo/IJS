@@ -2,7 +2,7 @@ import {
 	IsNotEmpty, IsOptional, IsString,
 } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { CouncilArticleCreateRequestType, } from '@app/community/article/article.type';
+import { CouncilArticleCreateRequestType, } from '@app/community/article/dto/article.type';
 
 export class CouncilArticleCreateRequest
 implements Partial<CouncilArticleCreateRequestType> {

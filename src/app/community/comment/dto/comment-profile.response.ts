@@ -1,7 +1,7 @@
 import { UserPreviewResponse, } from '@app/user/dto/user-preview.response';
 import { ApiProperty, } from '@nestjs/swagger';
 import { ReplyCommentProfileResponse, } from '@app/community/comment/dto/reply-comment-profile.response';
-import { CommentProfileResponseType, } from '@app/community/comment/comment.type';
+import { CommentProfileResponseType, } from '@app/community/comment/dto/comment.type';
 
 export class CommentProfileResponse implements CommentProfileResponseType {
 	@ApiProperty({

@@ -10,5 +10,4 @@ import { CommentModule, } from '@app/community/comment/comment.module';
 		CommentModule,
 	],
 })
-export class CommunityModule {
-}
+export class CommunityModule {}

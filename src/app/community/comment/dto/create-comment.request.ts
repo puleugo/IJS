@@ -1,6 +1,6 @@
 import { ApiProperty, } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, } from 'class-validator';
-import { CommentCreateRequestType, } from '@app/community/comment/comment.type';
+import { CommentCreateRequestType, } from '@app/community/comment/dto/comment.type';
 
 export class CreateCommentRequest implements Partial<CommentCreateRequestType> {
     @IsNotEmpty()

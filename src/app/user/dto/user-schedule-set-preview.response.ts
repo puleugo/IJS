@@ -1,6 +1,6 @@
-import { IUserScheduleSet, } from '@domain/user/user-schedule-set.interface';
 import { ApiProperty, } from '@nestjs/swagger';
-import { UserScheduleSetPreviewResponseType, } from '@app/user/user.type';
+import { UserScheduleSetPreviewResponseType, } from '@app/user/dto/user.type';
+import { UserScheduleSet, } from '@app/user/domain/user-schedule-set.entity';
 
 export class UserScheduleSetPreviewResponse
 implements UserScheduleSetPreviewResponseType {
@@ -22,7 +22,7 @@ implements UserScheduleSetPreviewResponseType {
     })
     readonly createdAt: Date;
 
-    constructor({ scheduleSet, }: IUserScheduleSet) {
+    constructor({ scheduleSet, }: UserScheduleSet) {
     	this.id = scheduleSet.id;
     	this.userCount = scheduleSet.users.length;
     	this.createdAt = scheduleSet.createdAt;

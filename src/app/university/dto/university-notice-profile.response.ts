@@ -1,5 +1,5 @@
 import { ApiProperty, } from '@nestjs/swagger';
-import { UniversityNoticeProfileResponseType, } from '@app/university/university.type';
+import { UniversityNoticeProfileResponseType, } from '@app/university/dto/university.type';
 
 export class UniversityNoticeProfileResponse
 implements UniversityNoticeProfileResponseType {

@@ -2,14 +2,13 @@ import {
 	Controller, Ip, Post,
 } from '@nestjs/common';
 import { ApiTags, } from '@nestjs/swagger';
-import { LogResponseTypes, } from '@infrastructure/types/log-respone.types';
+import { LogResponseTypes, } from '@common/type/log-respone.type';
 import { InjectRedis, Redis, } from '@nestjs-modules/ioredis';
 
 @ApiTags('Health Check')
 @Controller('health-check')
 export class HealthCheckController {
-	constructor(@InjectRedis() private readonly redis: Redis) {
-	}
+	constructor(@InjectRedis() private readonly redis: Redis) {}
 
     @Post()
 	healthCheck(@Ip() ip: string): LogResponseTypes {

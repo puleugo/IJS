@@ -3,17 +3,21 @@ import {
 	IsNull, Not, Repository,
 } from 'typeorm';
 import { InjectRepository, } from '@nestjs/typeorm';
-import { Comment, } from '@domain/communities/comments/comment.entity';
+import { Comment, } from '@app/community/comment/domain/comment.entity';
 import { BoardService, } from '@app/community/board/board.service';
 
-import { CommentLike, } from '@domain/communities/comments/comment-like.entity';
-import { ArticleService, } from '@app/community/article/article.service';
+import { CommentLike, } from '@app/community/comment/domain/comment-like.entity';
+import { ArticleService, } from '@app/community/article/service/article.service';
 import { FindOneOptions, } from 'typeorm/find-options/FindOneOptions';
-import { BoardNotFoundException, } from '@domain/error/board.error';
-import { ArticleNotFoundException, } from '@domain/error/article.error';
+import { BoardNotFoundException, } from '@app/community/board/exception/board.error';
+import { ArticleNotFoundException, } from '@app/community/article/exception/article.error';
 import {
-	AlreadyLikedCommentException, CantLikeOwnCommentException, CommentNotFoundException, CommentPermissionDeniedException, FailedToLikeCommentException,
-} from '@domain/error/comment.error';
+	AlreadyLikedCommentException,
+	CantLikeOwnCommentException,
+	CommentNotFoundException,
+	CommentPermissionDeniedException,
+	FailedToLikeCommentException,
+} from '@app/community/comment/exception/comment.error';
 import {
 	CommentCreateRequestType,
 	CommentDeleteRequestType,
@@ -21,7 +25,7 @@ import {
 	CommentListQuery,
 	CommentProfileResponseType,
 	ReplyCommentProfileResponseType,
-} from '@app/community/comment/comment.type';
+} from '@app/community/comment/dto/comment.type';
 
 @Injectable()
 export class CommentService {
@@ -32,8 +36,7 @@ export class CommentService {
         private commentLikeRepository: Repository<CommentLike>,
         private readonly boardService: BoardService,
         private readonly articlesService: ArticleService
-	) {
-	}
+	) {}
 
 	async getComments(
 		commentListQuery: CommentListQuery

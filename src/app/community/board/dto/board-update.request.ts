@@ -2,7 +2,7 @@ import {
 	IsBoolean, IsNotEmpty, IsString,
 } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { BoardUpdateRequestType, } from '@app/community/board/board.type';
+import { BoardUpdateRequestType, } from '@app/community/board/dto/board.type';
 
 export class BoardUpdateRequest implements Partial<BoardUpdateRequestType> {
     @IsString()

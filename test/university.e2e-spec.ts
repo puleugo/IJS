@@ -8,7 +8,7 @@ import { EventEmitterModule, } from '@nestjs/event-emitter';
 import { AppModule, } from '@app/app.module';
 import * as request from 'supertest';
 import { Connection, } from 'typeorm';
-import { getLastMondayByDate, } from '@infrastructure/utils/get-last-monday-by-date';
+import { getLastMondayByDate, } from '../src/common/utils/get-last-monday-by-date';
 
 describe('학교 정보 API e2e', () => {
 	let app: INestApplication;

@@ -22,13 +22,13 @@ import {
 } from '@nestjs/swagger';
 import { UserProfileResponse, } from '@app/user/dto/user-profile.response';
 
-import { Request, } from '@infrastructure/types/request.types';
+import { Request, } from '@common/type/request.type';
 import { JwtAuthGuard, } from '@app/auth/authentication/auth.gaurd';
 import { FileInterceptor, } from '@nestjs/platform-express';
 import { RegisterRequest, } from '@app/auth/authentication/dto/register.request';
 import { OauthLoginProviderEnum, } from '@app/auth/authentication/oauth-login-provider.enum';
-import { User, } from '@domain/user/user.entity';
-import { JwtDecodedData, JwtSubjectType, } from '@infrastructure/types/jwt.types';
+import { User, } from '@app/user/domain/user.entity';
+import { JwtDecodedData, JwtSubjectType, } from '@common/type/jwt.type';
 import { UserService, } from '@app/user/user.service';
 import { approveMailAuthenticationURL, } from '@app/auth/authentication/authentication.type';
 import { JwtService, } from '@nestjs/jwt';
@@ -42,8 +42,7 @@ export class AuthenticationController  {
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
         private readonly authenticationService: AuthenticationService
-	) {
-	}
+	) {}
 
     @ApiOperation({ summary: 'Oauth 로그인', })
     @ApiBody({ type: OauthLoginRequest, })
@@ -119,6 +118,10 @@ export class AuthenticationController  {
     		majorId,
     		name,
     	});
+    }
+    @Get('test')
+    async test(): Promise<string> {
+    	return '<h1 style="text-align: center">인재생 인증이 완료되었습니다.</h1><p style="text-align: center">이제 인제생 앱에서 학생증을 사용하세요!</p>';
     }
 
     @Get(approveMailAuthenticationURL)

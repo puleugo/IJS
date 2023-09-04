@@ -2,7 +2,7 @@ import {
 	IsNotEmpty, IsOptional, IsString,
 } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { ArticleCreateRequestType, } from '@app/community/article/article.type';
+import { ArticleCreateRequestType, } from '@app/community/article/dto/article.type';
 
 export class ArticleCreateRequest implements Partial<ArticleCreateRequestType> {
     @IsNotEmpty()

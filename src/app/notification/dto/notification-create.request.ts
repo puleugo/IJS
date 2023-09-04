@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { NotificationCreateRequestType, } from '@app/notification/notification.type';
+import { NotificationCreateRequestType, } from '@app/notification/domain/notification.type';
 
 export class NotificationCreateRequest
 implements NotificationCreateRequestType {

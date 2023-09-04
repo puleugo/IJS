@@ -1,4 +1,4 @@
-import { PhotoClient, } from '@infrastructure/types/photo.client';
+import { PhotoClient, } from '@common/type/photo.client';
 import { Injectable, } from '@nestjs/common';
 import { ConfigService, } from '@nestjs/config';
 import { S3, } from 'aws-sdk';

@@ -29,9 +29,9 @@ import {
 import { UserPreviewResponse, } from '@app/user/dto/user-preview.response';
 import { UserScheduleProfileResponse, } from '@app/user/dto/user-schedule-profile.response';
 import { JwtAuthGuard, } from '@app/auth/authentication/auth.gaurd';
-import { Request, } from '@infrastructure/types/request.types';
+import { Request, } from '@common/type/request.type';
 import { ScheduleSetProfileResponse, } from '@app/user/dto/schedule-set-profile.response';
-import { LogResponseTypes, } from '@infrastructure/types/log-respone.types';
+import { LogResponseTypes, } from '@common/type/log-respone.type';
 import { FileInterceptor, } from '@nestjs/platform-express';
 import { ImageUploadRequest, } from '@app/auth/authentication/dto/image-upload.request';
 import { UserUpdateSettingRequest, } from '@app/user/dto/user-update-setting.request';
@@ -39,7 +39,7 @@ import { NotificationService, } from '@app/notification/notification.service';
 import { NotificationCreateRequest, } from '@app/notification/dto/notification-create.request';
 import { NotificationUpdateRequest, } from '@app/notification/dto/notification-update.request';
 import { NotificationProfileResponse, } from '@app/notification/dto/notification-profile.response';
-import { NotificationCategoryEnum, } from '@app/notification/notification-category.enum';
+import { NotificationCategoryEnum, } from '@app/notification/domain/notification-category.enum';
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard)
@@ -49,8 +49,7 @@ export class UserController {
 	constructor(
         private readonly userService: UserService,
         private readonly notificationService: NotificationService
-	) {
-	}
+	) {}
 
     @Post('notifications/test')
     @ApiOperation({ summary: '본 유저로 푸시 알림을 테스트합니다.', })

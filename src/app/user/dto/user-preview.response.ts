@@ -1,5 +1,5 @@
 import { ApiProperty, } from '@nestjs/swagger';
-import { UserPreviewResponseType, } from '../user.type';
+import { UserPreviewResponseType, } from './user.type';
 
 export class UserPreviewResponse implements UserPreviewResponseType {
     @ApiProperty({

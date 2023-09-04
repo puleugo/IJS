@@ -26,12 +26,9 @@
       "@app/*": [
         "src/app/*"
       ],
-      "@infrastructure/*": [
-        "src/infrastructure/*"
+      "@common/*": [
+        "src/common/*"
       ],
-      "@domain/*": [
-        "src/domain/*"
-      ]
     },
     "allowJs": true
   }

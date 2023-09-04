@@ -1,26 +1,53 @@
 import {
-	Body, Controller, Delete, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFiles, UseGuards, UseInterceptors,
+	Body,
+	Controller,
+	Delete,
+	Get,
+	InternalServerErrorException,
+	Param,
+	ParseIntPipe,
+	Patch,
+	Post,
+	Query,
+	Req,
+	UploadedFiles,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
-import { ArticleService, } from '@app/community/article/article.service';
-import { ArticlePreviewResponse, } from '@app/community/article/dto/article-preview.response';
+import { ArticleService, } from '@app/community/article/service/article.service';
+import {
+	ArticlePreviewResponse,
+	PagedArticlePreviewResponse,
+} from '@app/community/article/dto/article-preview.response';
 import { ArticleProfileResponse, } from '@app/community/article/dto/article-profile.response';
 import { ArticleCreateRequest, } from '@app/community/article/dto/article-create.request';
 import { JwtAuthGuard, } from '@app/auth/authentication/auth.gaurd';
-import { Request, } from '@infrastructure/types/request.types';
+import { Request, } from '@common/type/request.type';
 import { ArticleUpdateRequest, } from '@app/community/article/dto/article-update.request';
 import {
-	ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags,
+	ApiBadRequestResponse,
+	ApiBearerAuth,
+	ApiBody,
+	ApiConsumes,
+	ApiCreatedResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
 } from '@nestjs/swagger';
-import { Pagination, } from '@infrastructure/types/pagination.types';
 import { FilesInterceptor, } from '@nestjs/platform-express';
 import { BoardService, } from '@app/community/board/board.service';
 import { CouncilArticleCreateRequest, } from '@app/community/article/dto/council-article-create.request';
-import { BoardNotFoundException, } from '@domain/error/board.error';
+import { BoardNotFoundException, } from '@app/community/board/exception/board.error';
 import {
-	ArticleNotFoundException, ArticlePermissionDeniedException, CanNotLikeOwnArticleException,
-} from '@domain/error/article.error';
+	ArticleNotFoundException,
+	ArticlePermissionDeniedException,
+	CanNotLikeOwnArticleException,
+} from '@app/community/article/exception/article.error';
 import { ArticleReportRequest, } from '@app/community/article/dto/article-report.request';
 import { UserService, } from '@app/user/user.service';
+import { IPagination, } from '@common/utils/pagination.types';
 
 @Controller('boards/:boardId/articles')
 @UseGuards(JwtAuthGuard)
@@ -31,8 +58,7 @@ export class ArticleController {
         private readonly boardService: BoardService,
         private readonly articleService: ArticleService,
         private readonly userService: UserService
-	) {
-	}
+	) {}
 
     @Get()
     @ApiOperation({ summary: '게시글 목록 조회', })
@@ -43,14 +69,14 @@ export class ArticleController {
     })
     @ApiOkResponse({
     	description: '게시글 목록 조회 성공',
-    	type: [ArticlePreviewResponse,],
+    	type: PagedArticlePreviewResponse,
     })
     @ApiNotFoundResponse({ description: '게시판을 찾을 수 없습니다.', })
 	async getArticles(
         @Param('boardId', ParseIntPipe) boardId: number,
         @Query('page', ParseIntPipe) page: number,
         @Query('limit', ParseIntPipe) limit: number
-	): Promise<Pagination<ArticlePreviewResponse>> {
+	): Promise<IPagination<ArticlePreviewResponse>> {
 		const board = await this.boardService.findById(boardId);
 		if (!board) throw new BoardNotFoundException();
 
@@ -114,7 +140,7 @@ export class ArticleController {
     	].join('<br>'),
     })
 
-    async getArticle(
+    async getArticleProfile(
         @Param('boardId', ParseIntPipe) boardId: number,
         @Param('articleId', ParseIntPipe) articleId: number
     ): Promise<ArticleProfileResponse> {

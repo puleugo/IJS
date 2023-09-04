@@ -1,4 +1,4 @@
-import { PhotoClient, } from '@infrastructure/types/photo.client';
+import { PhotoClient, } from '@common/type/photo.client';
 import * as sharp from 'sharp';
 import { Injectable, } from '@nestjs/common';
 

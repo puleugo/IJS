@@ -1,5 +1,5 @@
 import { ApiProperty, } from '@nestjs/swagger';
-import { BoardProfileResponseType, } from '@app/community/board/board.type';
+import { BoardProfileResponseType, } from '@app/community/board/dto/board.type';
 
 export class BoardProfileResponse implements BoardProfileResponseType {
     @ApiProperty({

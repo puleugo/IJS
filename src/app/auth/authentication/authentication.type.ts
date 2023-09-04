@@ -1,5 +1,5 @@
 import { OauthLoginProviderEnum, } from '@app/auth/authentication/oauth-login-provider.enum';
-import { IUser, } from '@domain/user/user.interface';
+import { User, } from '@app/user/domain/user.entity';
 
 export const approveMailAuthenticationURL = 'approve/mail';
 
@@ -14,8 +14,8 @@ export type OauthLoginResponseType = {
 };
 
 export type UserAuthenticationType = Pick<
-    IUser,
+    User,
     'id' | 'schoolEmail' | 'schoolId' | 'majorId'| 'name'
 >;
 
-export type UserAuthenticationCodeRequestType = Pick<IUser,'id' |  'schoolEmail' | 'schoolId' | 'majorId' | 'name'>
+export type UserAuthenticationCodeRequestType = Pick<User,'id' |  'schoolEmail' | 'schoolId' | 'majorId' | 'name'>

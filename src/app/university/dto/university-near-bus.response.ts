@@ -1,4 +1,4 @@
-import { UniversityNearBusResponseType, } from '@app/university/university.type';
+import { UniversityNearBusResponseType, } from '@app/university/dto/university.type';
 
 export class UniversityNearBusResponse
 implements UniversityNearBusResponseType {

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { UserVerificationRequestType, } from '@app/user/user.type';
+import { UserVerificationRequestType, } from '@app/user/dto/user.type';
 
 export class RegisterRequest implements UserVerificationRequestType {
     @IsOptional()

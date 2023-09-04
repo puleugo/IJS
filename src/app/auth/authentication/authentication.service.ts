@@ -1,29 +1,29 @@
 import {
 	Inject, Injectable, UnauthorizedException,
 } from '@nestjs/common';
-import { User, } from '@domain/user/user.entity';
+import { User, } from '@app/user/domain/user.entity';
 import { UserService, } from '@app/user/user.service';
 import { OauthLoginProviderEnum, } from '@app/auth/authentication/oauth-login-provider.enum';
 import { HttpService, } from '@nestjs/axios';
 import { JwtService, } from '@nestjs/jwt';
 import {
 	ACCESS_TOKEN_EXPIRE, API_PREFIX, REFRESH_TOKEN_EXPIRE,
-} from '../../../contants';
-import { JwtSubjectType, } from '@infrastructure/types/jwt.types';
+} from '@common/type/contants';
+import { JwtSubjectType, } from '@common/type/jwt.type';
 import { MailerService, } from '@nestjs-modules/mailer';
 import { v4 as uuidv4, } from 'uuid';
 import { InjectRedis, Redis, } from '@nestjs-modules/ioredis';
 import { InjectRepository, } from '@nestjs/typeorm';
-import { UserAuthProvider, } from '@domain/user/user-auth-provider.entity';
+import { UserAuthProvider, } from '@app/user/domain/user-auth-provider.entity';
 import { Repository, } from 'typeorm';
-import { PhotoClient, } from '@infrastructure/types/photo.client';
+import { PhotoClient, } from '@common/type/photo.client';
 import { UniversityService, } from '@app/university/university.service';
 import { ConfigService, } from '@nestjs/config';
 import {
 	UserProfileResponseType,
 	UserSchoolDataUpdateRequestType,
 	UserVerificationRequestType,
-} from '@app/user/user.type';
+} from '@app/user/dto/user.type';
 
 import * as TelegramBot from 'node-telegram-bot-api';
 import {
@@ -32,7 +32,7 @@ import {
 	UserAuthenticationType,
 } from '@app/auth/authentication/authentication.type';
 import { AxiosResponse, } from 'axios';
-import { LoggerService, } from '@infrastructure/utils/logger.service';
+import { LoggerService, } from '@common/utils/logger.service';
 
 @Injectable()
 export class AuthenticationService {
@@ -52,13 +52,13 @@ export class AuthenticationService {
         @Inject('AuthPhotoClient')
         private readonly authPhotoClient: PhotoClient,
         @InjectRepository(UserAuthProvider)
-        private readonly userAuthProviderRepository: Repository<UserAuthProvider>
+        private readonly userAuthProviderRepository: Repository<UserAuthProvider>,
     ) {
     	const telegramBotKey = this.configService.get('TELEGRAM_BOT_KEY', '');
     	this.chatId = this.configService.get('TELEGRAM_CHAT_ID', '6279443618');
     	this.bot = new TelegramBot(telegramBotKey, { polling: true, });
     	this.bot.on('callback_query', (msg) => {
-    		this.answerVerification(msg);
+    		this.answerVerification(msg).then().catch();
     	});
     	this.bot.on('polling_error', (error) => {
     		this.loggerService.error('텔레그램 봇 에러', error);
@@ -109,14 +109,7 @@ export class AuthenticationService {
     	if (!kakaoUserInfo)
     		throw new UnauthorizedException('카카오 로그인에 실패했습니다.');
 
-    	const user = await this.userService.findById(kakaoUserInfo.data.id, {
-    		where: {
-    			auth: {
-    				provider: { name: OauthLoginProviderEnum.KAKAO, },
-    				username: kakaoUserInfo.data.kakao_account.profile.nickname,
-    			},
-    		},
-    	});
+    	const user = await this.userService.findUserByOauthId(kakaoUserInfo.data.id, OauthLoginProviderEnum.KAKAO);
 
     	if (!user)
     		return await this.userService.joinUserByOauth({
@@ -166,7 +159,7 @@ export class AuthenticationService {
     		.sendMail({
     			to: userSchoolData.schoolEmail, // list of receivers
     			subject: '인제생 인증 메일입니다.', // Subject line
-    			html: `인증을 위해 아래 링크를 클릭해주세요. ${url}`, // HTML body content
+    			html: `<p>안녕하세요, 인제생입니다.</p><p>인증을 위해 아래 링크를 클릭해주세요.</p><a href="${url}">${url}</a>`, // HTML body content
     		})
     		.then(() => {
     			this.redis.set(

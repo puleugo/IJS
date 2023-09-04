@@ -1,6 +1,6 @@
 import { IsOptional, IsString, } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { ArticleUpdateRequestType, } from '@app/community/article/article.type';
+import { ArticleUpdateRequestType, } from '@app/community/article/dto/article.type';
 
 export class ArticleUpdateRequest implements Partial<ArticleUpdateRequestType> {
     @IsString()

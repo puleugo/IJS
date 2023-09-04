@@ -1,6 +1,6 @@
 import { UniversityCalendarProfileResponse, } from '@app/university/dto/university-calendar-profile.response';
 import { ApiProperty, } from '@nestjs/swagger';
-import { MonthlyEventsResponse, UniversityCalendarResponseType, } from '@app/university/university.type';
+import { MonthlyEventsResponse, UniversityCalendarResponseType, } from '@app/university/dto/university.type';
 
 export class UniversityCalendarResponse
 implements UniversityCalendarResponseType {

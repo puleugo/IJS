@@ -1,4 +1,4 @@
-import { UserSchoolDataUpdateRequestType, } from '@app/user/user.type';
+import { UserSchoolDataUpdateRequestType, } from '@app/user/dto/user.type';
 import { ApiProperty, } from '@nestjs/swagger';
 import {
 	IsEmail, IsOptional, IsString,

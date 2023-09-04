@@ -1,6 +1,6 @@
-import { IUserSetting, } from '@domain/user/user-setting.interface';
+import { IUserSetting, } from '@app/user/domain/user-setting.interface';
 import { ApiProperty, } from '@nestjs/swagger';
-import { UserProfileResponseType, } from '@app/user/user.type';
+import { UserProfileResponseType, } from '@app/user/dto/user.type';
 
 export class UserProfileResponse implements UserProfileResponseType {
 	@ApiProperty({

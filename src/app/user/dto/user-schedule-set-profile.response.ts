@@ -1,8 +1,8 @@
 import { UniversityLectureProfileResponse, } from '@app/university/dto/university-lecture-profile.response';
-import { UserScheduleRoleEnum, } from '@app/user/user-schedule-role.enum';
-import { IUniversityLecture, } from '@domain/university/university-lecture.interface';
+import { UserScheduleRoleEnum, } from '@app/user/domain/user-schedule-role.enum';
 import { ApiProperty, } from '@nestjs/swagger';
-import { UserScheduleSetProfileResponseType, } from '../user.type';
+import { UserScheduleSetProfileResponseType, } from './user.type';
+import { UniversityLecture, } from '@app/university/domain/university-lecture.entity';
 
 export class UserScheduleSetProfileResponse
 implements UserScheduleSetProfileResponseType {
@@ -37,7 +37,7 @@ implements UserScheduleSetProfileResponseType {
     }: {
         userId: string;
         role: UserScheduleRoleEnum;
-        lectures: IUniversityLecture[];
+        lectures: UniversityLecture[];
     }) {
     	this.userId = userId;
     	this.role = role;

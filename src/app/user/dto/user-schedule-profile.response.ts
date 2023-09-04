@@ -1,6 +1,6 @@
 import { UniversityLectureProfileResponse, } from '@app/university/dto/university-lecture-profile.response';
-import { IUniversityLecture, } from '@domain/university/university-lecture.interface';
-import { UserScheduleProfileResponseType, } from '../user.type';
+import { UserScheduleProfileResponseType, } from './user.type';
+import { UniversityLecture, } from '@app/university/domain/university-lecture.entity';
 
 export class UserScheduleProfileResponse
 implements UserScheduleProfileResponseType {
@@ -12,7 +12,7 @@ implements UserScheduleProfileResponseType {
     	4: [],
     };
 
-    constructor(lectures: IUniversityLecture[]) {
+    constructor(lectures: UniversityLecture[]) {
     	for (const lecture of lectures) {
     		const lectureProfile = new UniversityLectureProfileResponse(
     			lecture

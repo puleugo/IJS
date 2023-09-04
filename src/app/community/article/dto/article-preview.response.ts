@@ -1,7 +1,8 @@
 import { UserPreviewResponse, } from '@app/user/dto/user-preview.response';
 import { ApiProperty, } from '@nestjs/swagger';
-import { ArticlePreviewRequestType, } from '@app/community/article/article.type';
-import { UserPreviewResponseType, } from '@app/user/user.type';
+import { ArticlePreviewRequestType, } from '@app/community/article/dto/article.type';
+import { UserPreviewResponseType, } from '@app/user/dto/user.type';
+import { Pagination, } from '@common/utils/pagination.types';
 
 export class ArticlePreviewResponse implements ArticlePreviewRequestType {
     @ApiProperty({
@@ -80,32 +81,12 @@ export class ArticlePreviewResponse implements ArticlePreviewRequestType {
     @ApiProperty()
     readonly majorId?: number;
 
-    constructor({
-    	id,
-    	title,
-    	content,
-    	images,
-    	boardId,
-    	likesCount,
-    	commentsCount,
-    	author,
-    	createdAt,
-    	isAnonymous,
-    	isCouncil,
-    	majorId,
-    }: ArticlePreviewRequestType) {
-    	this.id = id;
-    	this.title = title;
-    	this.content = content;
-    	this.images = images;
-    	this.boardId = boardId;
-    	this.likesCount = likesCount;
-    	this.commentsCount = commentsCount;
-    	this.author = isAnonymous ? null : new UserPreviewResponse(author);
-    	this.authorId = isAnonymous ? '' : author.id;
-    	this.createdAt = createdAt;
-    	this.isAnonymous = isAnonymous;
-    	this.isCouncil = isCouncil;
-    	this.majorId = isCouncil ? null : majorId;
+    constructor(data: Partial<ArticlePreviewRequestType>) {
+    	this.author = data.isAnonymous ? null : new UserPreviewResponse(data.author);
+    	this.authorId = data.isAnonymous ? '' : data.author.id;
+    	this.majorId = data.isCouncil ? null : data.majorId;
+    	Object.assign(this, data);
     }
 }
+
+export class PagedArticlePreviewResponse extends Pagination(ArticlePreviewResponse) {}

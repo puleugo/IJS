@@ -2,7 +2,7 @@ import {
 	IsBoolean, IsNotEmpty, IsString,
 } from 'class-validator';
 import { ApiProperty, } from '@nestjs/swagger';
-import { BoardCreateRequestType, } from '@app/community/board/board.type';
+import { BoardCreateRequestType, } from '@app/community/board/dto/board.type';
 
 export class BoardCreateRequest implements BoardCreateRequestType {
     @IsString()

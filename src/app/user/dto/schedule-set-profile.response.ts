@@ -1,5 +1,5 @@
 import { ApiProperty, } from '@nestjs/swagger';
-import { ScheduleSetProfileResponseType, } from '@app/user/user.type';
+import { ScheduleSetProfileResponseType, } from '@app/user/dto/user.type';
 
 export class ScheduleSetProfileResponse
 implements ScheduleSetProfileResponseType {

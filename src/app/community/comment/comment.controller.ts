@@ -4,7 +4,7 @@ import {
 import { CommentProfileResponse, } from '@app/community/comment/dto/comment-profile.response';
 import { CommentService, } from '@app/community/comment/comment.service';
 import { JwtAuthGuard, } from '@app/auth/authentication/auth.gaurd';
-import { Request, } from '@infrastructure/types/request.types';
+import { Request, } from '@common/type/request.type';
 import { CreateCommentRequest, } from '@app/community/comment/dto/create-comment.request';
 import {
 	ApiBadRequestResponse,
@@ -18,7 +18,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { BoardService, } from '@app/community/board/board.service';
-import { ArticleService, } from '@app/community/article/article.service';
+import { ArticleService, } from '@app/community/article/service/article.service';
 
 @Controller('boards/:boardId/articles/:articleId/comments')
 @ApiTags('[커뮤니티] 댓글')
@@ -29,8 +29,7 @@ export class CommentController {
         private readonly boardService: BoardService,
         private readonly articlesService: ArticleService,
         private readonly commentService: CommentService
-	) {
-	}
+	) {}
 
     @Get()
     @ApiOperation({ summary: '댓글 목록 조회', })

@@ -1,23 +1,22 @@
 import { Injectable, } from '@nestjs/common';
 import { BoardCreateRequest, } from '@app/community/board/dto/board-create.request';
 import { FindOneOptions, } from 'typeorm/find-options/FindOneOptions';
-import { Board, } from '@domain/communities/boards/board.entity';
 import { Repository, UpdateResult, } from 'typeorm';
 import { InjectRepository, } from '@nestjs/typeorm';
-import { BoardNotFoundException, } from '@domain/error/board.error';
+import { BoardNotFoundException, } from '@app/community/board/exception/board.error';
 import {
 	BoardDeleteRequestType,
 	BoardProfileResponseType,
 	BoardUpdateRequestType,
-} from '@app/community/board/board.type';
+} from '@app/community/board/dto/board.type';
+import { Board, } from '@app/community/board/domain/board.entity';
 
 @Injectable()
 export class BoardService {
 	constructor(
         @InjectRepository(Board)
         private readonly boardRepository: Repository<Board>
-	) {
-	}
+	) {}
 
 	async getBoards(): Promise<BoardProfileResponseType[]> {
 		return await this.boardRepository.find();

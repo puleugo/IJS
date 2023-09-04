@@ -1,6 +1,6 @@
 import { UniversityBusProfileResponse, } from '@app/university/dto/university-bus-profile.response';
 import { ApiProperty, } from '@nestjs/swagger';
-import { UniversityBusProfileResponseType, UniversityBusResponseType, } from '@app/university/university.type';
+import { UniversityBusProfileResponseType, UniversityBusResponseType, } from '@app/university/dto/university.type';
 
 export class UniversityBusResponse implements UniversityBusResponseType {
     @ApiProperty({

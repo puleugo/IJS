@@ -1,10 +1,10 @@
-import { User, } from '@domain/user/user.entity';
-import { Board, } from '@domain/communities/boards/board.entity';
-import { Article, } from '@domain/communities/articles/article.entity';
-import { Comment, } from '@domain/communities/comments/comment.entity';
-import { UniversityNotice, } from '@domain/university/university-notice.entity';
-import { UniversityMeal, } from '@domain/university/university-meal.entity';
+import { User, } from '@app/user/domain/user.entity';
+import { Article, } from '@app/community/article/domain/article.entity';
+import { Comment, } from '@app/community/comment/domain/comment.entity';
+import { UniversityNotice, } from '@app/university/domain/university-notice.entity';
+import { UniversityMeal, } from '@app/university/domain/university-meal.entity';
 import { CustomDecorator, SetMetadata, } from '@nestjs/common';
+import { Board, } from '@app/community/board/domain/board.entity';
 
 export enum RoleEnum {
     USER = 'user',
