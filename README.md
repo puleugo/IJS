@@ -29,17 +29,17 @@
 ## Installation
 
 ```bash
-$ yarn install
+$ npm install
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ yarn run start
+$ nest start
 
 # watch mode
-$ yarn run start:dev
+$ nest start --watch
 
 # production mode
 $ yarn run start:prod
@@ -49,13 +49,13 @@ $ yarn run start:prod
 
 ```bash
 # unit tests
-$ yarn run test
+$ npm run test
 
 # e2e tests
-$ yarn run test:e2e
+$ npm run test:e2e
 
 # test coverage
-$ yarn run test:cov
+$ npm run test:cov
 ```
 
 ## Support

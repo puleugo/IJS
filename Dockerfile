@@ -10,22 +10,22 @@ RUN set -x \
         udev \
         ttf-freefont \
         chromium \
-    && yarn add puppeteer@20.2.1
+    && npm i puppeteer@20.2.1
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN yarn install --frozen-lockfile
+RUN npm ci
 
 COPY . .
-RUN yarn build
+RUN npm run build
 
 FROM node:16-alpine AS production
 
 WORKDIR /app
 
 COPY --from=build /app/package*.json ./
-RUN yarn install --frozen-lockfile --production
+RUN npm ci --only=production
 
 COPY --from=build /app/dist ./dist
 

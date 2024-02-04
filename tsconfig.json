@@ -30,6 +30,5 @@
         "src/common/*"
       ],
     },
-    "allowJs": true
   }
 }
