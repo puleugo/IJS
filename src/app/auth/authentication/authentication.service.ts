@@ -12,7 +12,6 @@ import {
 import { JwtSubjectType, } from '@common/type/jwt.type';
 import { MailerService, } from '@nestjs-modules/mailer';
 import { v4 as uuidv4, } from 'uuid';
-import { InjectRedis, Redis, } from '@nestjs-modules/ioredis';
 import { InjectRepository, } from '@nestjs/typeorm';
 import { UserAuthProvider, } from '@app/user/domain/user-auth-provider.entity';
 import { Repository, } from 'typeorm';
@@ -47,8 +46,6 @@ export class AuthenticationService {
         private readonly universityService: UniversityService,
         private readonly configService: ConfigService,
 		private readonly loggerService: LoggerService,
-        @InjectRedis()
-        private readonly redis: Redis,
         @Inject('AuthPhotoClient')
         private readonly authPhotoClient: PhotoClient,
         @InjectRepository(UserAuthProvider)
@@ -141,11 +138,13 @@ export class AuthenticationService {
     async getUserInRedisByAuthenticationCode(
     	code: string
     ): Promise<UserAuthenticationType> {
-    	return <UserAuthenticationType>JSON.parse(await this.redis.get(`code_${code}`));
+    	// return <UserAuthenticationType>JSON.parse(await this.redis.get(`code_${code}`));
+    	return;
     }
 
     async deleteRedisDataByKey(code: string): Promise<void> {
-    	await this.redis.del(`code_${code}`);
+    	// await this.redis.del(`code_${code}`);
+    	return;
     }
 
     async sendVerifySchoolMail(
@@ -162,14 +161,14 @@ export class AuthenticationService {
     			html: `<p>안녕하세요, 인제생입니다.</p><p>인증을 위해 아래 링크를 클릭해주세요.</p><a href="${url}">${url}</a>`, // HTML body content
     		})
     		.then(() => {
-    			this.redis.set(
-    				`code_${randomKey}`, JSON.stringify(userSchoolData)
-    			);
+    			// this.redis.set(
+    			// 	`code_${randomKey}`, JSON.stringify(userSchoolData)
+    			// );
 
-    			this.redis.expire(`${randomKey}`, 60 * 60 * 24);
+    			// this.redis.expire(`${randomKey}`, 60 * 60 * 24);
     		})
     		.catch((e) => {
-    			this.loggerService.error('이메일 송신에 실패했습니다.',e);
+    			// this.loggerService.error('이메일 송신에 실패했습니다.',e);
     		});
     }
 
