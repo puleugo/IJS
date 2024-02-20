@@ -16,7 +16,6 @@ import { LoggerService, } from '@common/utils/logger.service';
 	const app: INestApplication =
     await NestFactory.create<NestFastifyApplication>(
     	MainModule, { logger: new LoggerService, }
-    	// new FastifyAdapter(),
     );
 
 	// Create swagger document

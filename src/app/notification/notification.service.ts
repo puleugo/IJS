@@ -18,7 +18,7 @@ const serviceAccount: firebaseAdmin.ServiceAccount = {
 	clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 };
 
-firebaseAdmin.initializeApp({ credential: firebaseAdmin.credential.cert(serviceAccount), });
+// firebaseAdmin.initializeApp({ credential: firebaseAdmin.credential.cert(serviceAccount), });
 
 @Injectable()
 export class NotificationService {

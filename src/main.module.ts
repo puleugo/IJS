@@ -1,11 +1,11 @@
-import { Module } from "@nestjs/common";
-import { CommonModule } from "@common/common.module";
-import { AppModule } from "@app/app.module";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigModule } from "@nestjs/config";
-import { ClientsModule, Transport } from "@nestjs/microservices";
-import * as process from "process";
-import { dataSourceConfig } from "@common/database/data-source";
+import { Module, } from '@nestjs/common';
+import { CommonModule, } from '@common/common.module';
+import { AppModule, } from '@app/app.module';
+import { TypeOrmModule, } from '@nestjs/typeorm';
+import { ConfigModule, } from '@nestjs/config';
+import { ClientsModule, Transport, } from '@nestjs/microservices';
+import * as process from 'process';
+import { dataSourceConfig, } from '@common/database/data-source';
 
 @Module({
 	imports: [
