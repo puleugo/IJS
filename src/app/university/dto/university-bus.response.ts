@@ -1,28 +1,29 @@
-import {
-  UniversityBusProfileCommand,
-  UniversityBusResponseCommand,
-} from '@app/university/command/university-bus-response.command';
-import { UniversityBusProfileResponse } from '@app/university/dto/university-bus-profile.response';
-import { ApiProperty } from '@nestjs/swagger';
+import { UniversityBusProfileResponse, } from '@app/university/dto/university-bus-profile.response';
+import { ApiProperty, } from '@nestjs/swagger';
+import { UniversityBusProfileResponseType, UniversityBusResponseType, } from '@app/university/dto/university.type';
 
-export class UniversityBusResponse implements UniversityBusResponseCommand {
-  @ApiProperty({
-    type: [UniversityBusProfileResponse],
-    description: '학교에 도착하는 버스',
-  })
-  toSchool: UniversityBusProfileCommand[];
-  @ApiProperty({
-    type: [UniversityBusProfileResponse],
-    description: '학교에서 출발하는 버스',
-  })
-  fromSchool: UniversityBusProfileCommand[];
+export class UniversityBusResponse implements UniversityBusResponseType {
+    @ApiProperty({
+    	type: [UniversityBusProfileResponse,],
+    	description: '학교에 도착하는 버스',
+    })
+    readonly toSchool: UniversityBusProfileResponseType[];
+    @ApiProperty({
+    	type: [UniversityBusProfileResponse,],
+    	description: '학교에서 출발하는 버스',
+    })
+    readonly fromSchool: UniversityBusProfileResponseType[];
 
-  constructor({ toSchool, fromSchool }: UniversityBusResponseCommand) {
-    this.toSchool = toSchool.map(
-      (bus) => new UniversityBusProfileResponse(bus),
-    );
-    this.fromSchool = fromSchool.map(
-      (bus) => new UniversityBusProfileResponse(bus),
-    );
-  }
+    constructor({ toSchool, fromSchool, }: UniversityBusResponseType) {
+    	this.toSchool = toSchool.map(
+    		(bus) => {
+    			return new UniversityBusProfileResponse(bus);
+    		}
+    	);
+    	this.fromSchool = fromSchool.map(
+    		(bus) => {
+    			return new UniversityBusProfileResponse(bus);
+    		}
+    	);
+    }
 }

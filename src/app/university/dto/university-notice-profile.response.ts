@@ -1,52 +1,71 @@
-import { UniversityNoticeProfileResponseCommand } from '@app/university/command/university-notice-profile-response.command';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, } from '@nestjs/swagger';
+import { UniversityNoticeProfileResponseType, } from '@app/university/dto/university.type';
 
 export class UniversityNoticeProfileResponse
-  implements UniversityNoticeProfileResponseCommand
-{
-  @ApiProperty({ example: 1, description: '학과 공지사항 식별자' })
-  id: number;
-  @ApiProperty({
-    example: '학과 공지사항 제목',
-    description: '학과 공지사항 제목',
-  })
-  title: string;
+implements UniversityNoticeProfileResponseType {
+    @ApiProperty({
+    	description: '공지 게시글 ID',
+    	example: 1,
+    })
+    readonly id: number;
 
-  @ApiProperty({
-    example:
-      'https://cs.inje.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?uid=4414&mod=document&pageid=1',
-    description: '학과 공지사항 링크',
-  })
-  url: string;
+    @ApiProperty({
+    	description: '공지 게시글 제목',
+    	example: '2023년도 학사 일정',
+    })
+    readonly title: string;
 
-  @ApiProperty({
-    example: '학과사무실',
-    description: '학과 공지사항 작성자',
-  })
-  author: string;
-  @ApiProperty({
-    example: '2023-03-20T16:36:00.000Z',
-    description: '학과 공지사항 작성일',
-  })
-  wroteAt: Date;
+    @ApiProperty({
+    	description: '공지 게시글 내용',
+    	example: '2023년도 학사 일정입니다.',
+    })
+    readonly content: string;
 
-  @ApiProperty({
-    example: '컴퓨터공학과',
-    description: '학과 공지사항 학과',
-  })
-  major: string;
+    @ApiProperty({
+    	description: '공지 게시글 URL',
+    	example: 'https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=',
+    })
+    readonly url: string;
 
-  constructor({
-    id,
-    title,
-    url,
-    author,
-    wroteAt,
-  }: UniversityNoticeProfileResponseCommand) {
-    this.id = id;
-    this.title = title;
-    this.url = url;
-    this.author = author;
-    this.wroteAt = wroteAt;
-  }
+    @ApiProperty({
+    	description: '공지 게시글 작성자',
+    	example: '김대표',
+    })
+    readonly files: string[];
+
+    @ApiProperty({
+    	description: '공지 게시글 조회수',
+    	example: 100,
+    })
+    readonly viewsCount: number;
+
+    @ApiProperty({
+    	description: '공지 게시글 작성 일',
+    	example: 1,
+    })
+    readonly majorId: number;
+
+    @ApiProperty({
+    	description: '학과명',
+    	example: '컴퓨터공학과',
+    })
+    readonly majorName: string;
+
+    @ApiProperty({
+    	description: '공지 작성 일',
+    	example: new Date(),
+    })
+    readonly wroteAt: Date;
+
+    constructor(data: UniversityNoticeProfileResponseType) {
+    	this.id = data.id;
+    	this.title = data.title;
+    	this.content = data.content;
+    	this.majorId = data.majorId;
+    	this.majorName = data.majorName;
+    	this.url = data.url;
+    	this.files = data.files;
+    	this.viewsCount = data.viewsCount;
+    	this.wroteAt = data.wroteAt;
+    }
 }

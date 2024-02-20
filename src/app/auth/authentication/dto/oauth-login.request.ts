@@ -1,17 +1,17 @@
-import { OauthLoginProviderEnum } from '@app/auth/authentication/command/oauth-login-provider.enum';
-import { OauthLoginRequestCommand } from '@app/auth/authentication/command/oauth-login-request.command';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { OauthLoginProviderEnum, } from '@app/auth/authentication/oauth-login-provider.enum';
+import { ApiProperty, } from '@nestjs/swagger';
+import { IsEnum, IsString, } from 'class-validator';
+import { OauthLoginRequestType, } from '@app/auth/authentication/authentication.type';
 
-export class OauthLoginRequest implements OauthLoginRequestCommand {
-  @IsString()
-  @ApiProperty({ default: 'aaa.bbb.ccc' })
-  accessToken: string;
+export class OauthLoginRequest implements OauthLoginRequestType {
+    @IsString()
+    @ApiProperty({ default: 'aaa.bbb.ccc', })
+    readonly accessToken: string;
 
-  @IsEnum(OauthLoginProviderEnum)
-  @ApiProperty({
-    enum: OauthLoginProviderEnum,
-    default: OauthLoginProviderEnum.GOOGLE,
-  })
-  provider: OauthLoginProviderEnum;
+    @IsEnum(OauthLoginProviderEnum)
+    @ApiProperty({
+    	enum: OauthLoginProviderEnum,
+    	default: OauthLoginProviderEnum.GOOGLE,
+    })
+    readonly provider: OauthLoginProviderEnum;
 }

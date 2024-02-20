@@ -1,79 +1,84 @@
-import { Injectable } from '@nestjs/common';
-import { BoardCreateRequest } from '@app/community/board/dtos/board-create.request';
-import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { Board } from '@domain/communities/boards/board.entity';
-import { Repository, UpdateResult } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { BoardProfileCommand } from '@app/community/board/commands/board-profile.command';
-import { BoardUpdateCommand } from '@app/community/board/commands/board-update.command';
-import { BoardDeleteCommand } from '@app/community/board/commands/board-delete.command';
-import { BoardNotFoundException } from '@domain/error/board.error';
+import { Injectable, } from '@nestjs/common';
+import { BoardCreateRequest, } from '@app/community/board/dto/board-create.request';
+import { FindOneOptions, } from 'typeorm/find-options/FindOneOptions';
+import { Repository, UpdateResult, } from 'typeorm';
+import { InjectRepository, } from '@nestjs/typeorm';
+import { BoardNotFoundException, } from '@app/community/board/exception/board.error';
+import {
+	BoardDeleteRequestType,
+	BoardProfileResponseType,
+	BoardUpdateRequestType,
+} from '@app/community/board/dto/board.type';
+import { Board, } from '@app/community/board/domain/board.entity';
 
 @Injectable()
 export class BoardService {
-  constructor(
-    @InjectRepository(Board)
-    private readonly boardRepository: Repository<Board>,
-  ) {}
+	constructor(
+        @InjectRepository(Board)
+        private readonly boardRepository: Repository<Board>
+	) {}
 
-  async getBoards(): Promise<BoardProfileCommand[]> {
-    const boards = await this.boardRepository.find();
-    return boards;
-  }
+	async getBoards(): Promise<BoardProfileResponseType[]> {
+		return await this.boardRepository.find();
+	}
 
-  async createBoard(
-    boardCreateRequest: BoardCreateRequest,
-  ): Promise<BoardProfileCommand> {
-    const createdBoard = this.boardRepository.create(boardCreateRequest);
+	async createBoard(
+		boardCreateRequest: BoardCreateRequest
+	): Promise<BoardProfileResponseType> {
+		const createdBoard = this.boardRepository.create(boardCreateRequest);
 
-    const board = await this.boardRepository.save(createdBoard);
-    return board;
-  }
+		return await this.boardRepository.save(createdBoard);
+	}
 
-  async updateBoard(
-    boardUpdateRequest: BoardUpdateCommand,
-  ): Promise<BoardProfileCommand> {
-    const { id, ...BoardUpdateData } = boardUpdateRequest;
-    const board = await this.boardRepository.findOne({
-      where: { id },
-    });
-    if (!board) throw new BoardNotFoundException();
-    const updatedBoard = await this.boardRepository.save({
-      ...board,
-      ...BoardUpdateData,
-    });
-    return updatedBoard;
-  }
+	async updateBoard(
+		boardUpdateRequest: BoardUpdateRequestType
+	): Promise<BoardProfileResponseType> {
+		const { id, ...BoardUpdateData } = boardUpdateRequest;
+		const board = await this.boardRepository.findOne({ where: { id, }, });
+		if (!board) throw new BoardNotFoundException();
 
-  async deleteBoard(boardDeleteCommand: BoardDeleteCommand): Promise<boolean> {
-    const { id } = boardDeleteCommand;
-    const isBoardExist = await this.boardRepository.exist({ where: { id } });
-    if (!isBoardExist) throw new BoardNotFoundException();
+		return await this.boardRepository.save({
+			...board,
+			...BoardUpdateData,
+		});
+	}
 
-    const { affected } = await this.boardRepository.softDelete({ id });
-    return affected > 0;
-  }
+	async deleteBoard(
+		deleteRequestType: BoardDeleteRequestType
+	): Promise<boolean> {
+		const { id, } = deleteRequestType;
+		const isBoardExist = await this.boardRepository.exist({ where: { id, }, });
+		if (!isBoardExist) throw new BoardNotFoundException();
 
-  async findById(id: number, options?: FindOneOptions<Board>): Promise<Board> {
-    return await this.boardRepository.findOne({
-      ...options,
-      ...{ where: { id, ...options?.where } },
-    });
-  }
+		const { affected, } = await this.boardRepository.softDelete({ id, });
 
-  async decrementArticleCount(boardId: number): Promise<UpdateResult> {
-    return await this.boardRepository.decrement(
-      { id: boardId },
-      'articlesCount',
-      1,
-    );
-  }
+		return affected > 0;
+	}
 
-  async incrementArticleCount(boardId: number): Promise<UpdateResult> {
-    return await this.boardRepository.increment(
-      { id: boardId },
-      'articlesCount',
-      1,
-    );
-  }
+	async findById(
+		id: number,
+		options?: FindOneOptions<Board>
+	): Promise<Board> {
+		return await this.boardRepository.findOne({
+			...options,
+			...{
+				where: {
+					id,
+					...options?.where,
+				},
+			},
+		});
+	}
+
+	async decrementArticleCount(boardId: number): Promise<UpdateResult> {
+		return await this.boardRepository.decrement(
+			{ id: boardId, }, 'articlesCount', 1
+		);
+	}
+
+	async incrementArticleCount(boardId: number): Promise<UpdateResult> {
+		return await this.boardRepository.increment(
+			{ id: boardId, }, 'articlesCount', 1
+		);
+	}
 }
