@@ -36,7 +36,7 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": 0, // 명시적 모듈 바운더리 타입 허용
     "@typescript-eslint/no-explicit-any": 0, // any 허용
     "function-paren-newline": ["error", "consistent"], // 함수의 인자가 여러줄일 경우, 첫번째 인자는 첫줄에, 나머지는 각각 한줄씩
-    "object-property-newline": ["error", { "allowAllPropertiesOnSameLine": false }], // 객체의 프로퍼티가 여러줄일 경우, 첫번째 프로퍼티는 첫줄에, 나머지는 각각 한줄씩
+    "object-property-newline": ["error", { "allowAllPropertiesOnSameLine": true }], // 객체의 프로퍼티가 여러개일 때 한줄 허용
     "object-curly-newline": ["error", {
       "ObjectExpression": { "multiline": true, "minProperties": 3 },
       "ObjectPattern": { "multiline": true },
