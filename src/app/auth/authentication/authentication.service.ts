@@ -6,9 +6,7 @@ import { UserService, } from '@app/user/user.service';
 import { OauthLoginProviderEnum, } from '@app/auth/authentication/oauth-login-provider.enum';
 import { HttpService, } from '@nestjs/axios';
 import { JwtService, } from '@nestjs/jwt';
-import {
-	ACCESS_TOKEN_EXPIRE, API_PREFIX, REFRESH_TOKEN_EXPIRE,
-} from '@common/type/contants';
+import { Constants, } from '@common/type/contants';
 import { JwtSubjectType, } from '@common/type/jwt.type';
 import { MailerService, } from '@nestjs-modules/mailer';
 import { v4 as uuidv4, } from 'uuid';
@@ -45,7 +43,7 @@ export class AuthenticationService {
         private readonly mailerService: MailerService,
         private readonly universityService: UniversityService,
         private readonly configService: ConfigService,
-		private readonly loggerService: LoggerService,
+				private readonly loggerService: LoggerService,
         @Inject('AuthPhotoClient')
         private readonly authPhotoClient: PhotoClient,
         @InjectRepository(UserAuthProvider)
@@ -120,7 +118,7 @@ export class AuthenticationService {
     async generateAccessToken(userId: string): Promise<string> {
     	return await this.jwtService.signAsync(
     		{ user_id: userId, }, {
-    			expiresIn: ACCESS_TOKEN_EXPIRE,
+    			expiresIn: Constants.ACCESS_TOKEN_EXPIRE,
     			subject: JwtSubjectType.ACCESS,
     		}
     	);
@@ -129,7 +127,7 @@ export class AuthenticationService {
     async generateRefreshToken(userId: string): Promise<string> {
     	return await this.jwtService.signAsync(
     		{ user_id: userId, }, {
-    			expiresIn: REFRESH_TOKEN_EXPIRE,
+    			expiresIn: Constants.REFRESH_TOKEN_EXPIRE,
     			subject: JwtSubjectType.REFRESH,
     		}
     	);
@@ -152,7 +150,7 @@ export class AuthenticationService {
     ): Promise<void> {
 
     	const randomKey = uuidv4();
-    	const url = `${process.env.APP_URL}/${API_PREFIX}/auth/${approveMailAuthenticationURL}?code=${randomKey}`;
+    	const url = `${process.env.APP_URL}/${Constants.API_PREFIX}/auth/${approveMailAuthenticationURL}?code=${randomKey}`;
 
     	await this.mailerService
     		.sendMail({

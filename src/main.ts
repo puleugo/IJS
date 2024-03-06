@@ -7,9 +7,7 @@ import { SwaggerModule, } from '@nestjs/swagger';
 import { MainModule, } from './main.module';
 
 import generateSwaggerDocument from '@common/swagger/swagger.generator';
-import { API_PREFIX, } from '@common/type/contants';
-import { NestFastifyApplication, } from '@nestjs/platform-fastify';
-import { LoggerService, } from '@common/utils/logger.service';
+import { Constants, } from '@common/type/contants';
 
 (async (): Promise<void> => {
 	// Initialize app with root module
@@ -18,10 +16,9 @@ import { LoggerService, } from '@common/utils/logger.service';
     	MainModule, { logger: new LoggerService, }
     );
 
-	// Create swagger document
-	SwaggerModule.setup(
-		`${API_PREFIX}/docs`, app, generateSwaggerDocument(app), { swaggerOptions: { persistAuthorization: true, }, }
-	);
+	// app 설정
+	// 스웨거 문서화
+	SwaggerModule.setup(`${Constants.API_PREFIX}/docs`, app, generateSwaggerDocument(app), { swaggerOptions: { persistAuthorization: true, }, });
 
 	// Apply rules for validation
 	app.useGlobalInterceptors(
@@ -40,8 +37,8 @@ import { LoggerService, } from '@common/utils/logger.service';
 		credentials: true,
 	});
 
-	// Apply global api prefix
-	app.setGlobalPrefix(API_PREFIX);
+	// URL에 API 경로 접두사 추가
+	app.setGlobalPrefix(Constants.API_PREFIX);
 
 	// Listen to requests
 	await app.listen(process.env.APP_PORT || 3000, '0.0.0.0');

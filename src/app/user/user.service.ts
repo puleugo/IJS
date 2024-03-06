@@ -18,7 +18,7 @@ import { UserOcrClient, } from '@app/user/utils/user-ocr.client';
 import { FindOneOptions, } from 'typeorm/find-options/FindOneOptions';
 import { PhotoClient, } from '@common/type/photo.client';
 import { JwtService, } from '@nestjs/jwt';
-import { USER_QR_CODE_EXPIRE, } from '@common/type/contants';
+import { Constants, } from '@common/type/contants';
 import { UserSetting, } from '@app/user/domain/user-setting.entity';
 import { UserNotFoundException, } from '@app/user/exception/user.error';
 import { ScheduleSetProfileResponseType, UserUpdateSettingRequestType, } from '@app/user/dto/user.type';
@@ -315,7 +315,7 @@ export class UserService {
 
 	private async generateNativeQRCode(studentId: string): Promise<string> {
 		const token = await this.jwtService.signAsync(
-			{ studentId, }, { expiresIn: USER_QR_CODE_EXPIRE, }
+			{ studentId, }, { expiresIn: Constants.USER_QR_CODE_EXPIRE, }
 		);
 
 		return QRCode.toDataURL(token);
